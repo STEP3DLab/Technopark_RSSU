@@ -14,41 +14,46 @@
 #logos .logos-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 #logos .logo-card {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 #logos .logo-card img {
   max-width: 120px;
-  width: 100%;
+  max-height: 72px;
+  width: auto;
   height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(15, 23, 42, 0.08));
   transition: transform 0.3s ease;
 }
 
 #logos .logo-card figcaption {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.01em;
+}
+
+#logos .logo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
 }
 
 #logos .logo-card:hover img {
   transform: scale(1.05);
-}
-
-@media (min-width: 640px) {
-  #logos .logos-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  #logos .logos-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
