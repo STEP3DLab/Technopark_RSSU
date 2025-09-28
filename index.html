@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Step3D.Lab — Лаборатория промдизайна и инжиниринга</title>
+  <meta name="description" content="CAD/CAE, реверс‑инжиниринг, 3D‑сканирование и аддитивное производство. Курсы ДПО и проектные работы." />
+
+  <!-- Tailwind (через CDN: без сборки) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    /* Кастомная конфигурация Tailwind для контейнера и теней */
+    tailwind.config = {
+      theme: {
+        extend: {
+          maxWidth: { '7xl': '80rem' },
+          boxShadow: { 'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)' }
+        }
+      }
+    }
+  </script>
+
+  <!-- Небольшие пользовательские стили (компонентные классы) -->
+  <link rel="stylesheet" href="assets/css/custom.css" />
+
+  <!-- Иконки Lucide (ванильная версия) -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+
+  <!-- Основной JS проекта -->
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body class="min-h-screen bg-white text-slate-900 selection:bg-indigo-100">
+  <!-- Ссылка для скринридеров: переход к контенту -->
+  <a href="#content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-indigo-600 text-white px-3 py-2 rounded-lg">К содержанию</a>
+
+  <!-- Фоновая декорация (неинтерактивная) -->
+  <div aria-hidden class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-32 -left-10 h-80 w-80 rounded-full bg-indigo-200/40 blur-3xl"></div>
+    <div class="absolute top-20 -right-10 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl"></div>
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-72 w-[90%] max-w-5xl rounded-[3rem] bg-gradient-to-r from-indigo-50 via-sky-50 to-teal-50 blur-2xl"></div>
+  </div>
+
+  <!-- Хедер: липкий, с мобильным меню -->
+  <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-2 font-semibold tracking-tight">
+        <div class="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 via-blue-500 to-teal-400 grid place-items-center shadow-sm">
+          <i data-lucide="blocks" class="h-5 w-5 text-white"></i>
+        </div>
+        <span class="text-lg">Step3D.Lab</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#features" class="hover:text-indigo-600">Возможности</a>
+        <a href="#equipment" class="hover:text-indigo-600">Оборудование</a>
+        <a href="#tools" class="hover:text-indigo-600">Инструменты</a>
+        <a href="#projects" class="hover:text-indigo-600">Проекты</a>
+        <a href="#edu" class="hover:text-indigo-600">Курсы</a>
+        <a href="#gallery" class="hover:text-indigo-600">Галерея</a>
+        <a href="#faq" class="hover:text-indigo-600">FAQ</a>
+        <a href="#contact" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-white hover:bg-slate-800">
+          Оставить заявку
+          <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+      </nav>
+      <div class="md:hidden">
+        <button id="menuBtn" aria-label="Открыть меню" class="p-2 rounded-xl border border-slate-200">
+          <i data-lucide="panel-right-open" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden absolute inset-x-0 top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 grid gap-2 text-sm">
+        <a href="#features" class="py-2">Возможности</a>
+        <a href="#equipment" class="py-2">Оборудование</a>
+        <a href="#tools" class="py-2">Инструменты</a>
+        <a href="#projects" class="py-2">Проекты</a>
+        <a href="#edu" class="py-2">Курсы</a>
+        <a href="#gallery" class="py-2">Галерея</a>
+        <a href="#contact" class="py-2 font-medium text-white bg-slate-900 rounded-xl text-center">Оставить заявку</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="relative">
+    <!-- Hero-блок: крупный заголовок + ключевые карточки -->
+    <section class="relative overflow-hidden">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <h1 class="reveal text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+          Лаборатория промдизайна
+          <span class="block bg-gradient-to-r from-indigo-600 via-sky-600 to-teal-500 bg-clip-text text-transparent">и инжиниринга</span>
+        </h1>
+        <p class="mt-4 max-w-3xl text-lg text-slate-600">
+          CAD/CAE, реверсивный инжиниринг, 3D‑сканирование и аддитивное производство. Учим и делаем продукты на базе технопарка РГСУ совместно с ООО «СТЕП 3Д».
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="#contact" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-white hover:bg-slate-800">
+            Оставить заявку
+            <i data-lucide="arrow-right" class="h-4 w-4"></i>
+          </a>
+          <a href="#features" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 hover:border-slate-900">
+            О лаборатории
+          </a>
+        </div>
+
+        <!-- Три краткие карточки преимуществ -->
+        <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center">
+                <i data-lucide="sparkles" class="h-5 w-5"></i>
+              </div>
+              <h3 class="font-semibold">Полный цикл</h3>
+            </div>
+            <p class="mt-3 text-slate-600">От скана и CAD до печати, постобработки и презентации. Параллельно обучаем и сопровождаем проекты.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center">
+                <i data-lucide="shield" class="h-5 w-5"></i>
+              </div>
+              <h3 class="font-semibold">Проектная работа</h3>
+            </div>
+            <p class="mt-3 text-slate-600">R&D‑проекты, сопровождение производственных задач, консалт для команд.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center">
+                <i data-lucide="graduation-cap" class="h-5 w-5"></i>
+              </div>
+              <h3 class="font-semibold">Курсы ДПО</h3>
+            </div>
+            <p class="mt-3 text-slate-600">Учебные планы 48–72 часа с индивидуальными проектами и подготовкой к чемпионатам.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Возможности лаборатории -->
+    <section id="features" class="py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Возможности лаборатории</h2>
+        <p class="mt-2 text-slate-600 max-w-2xl">Полный цикл — от скана и CAD до печати и презентации. Параллельно обучаем и сопровождаем проекты.</p>
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="scan" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">3D‑сканирование</h3>
+            <p class="mt-2 text-slate-600 text-sm">Съём, обработка облаков/мешей, выверка и контроль.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="cpu" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">CAD/CAE‑моделирование</h3>
+            <p class="mt-2 text-slate-600 text-sm">Parametric CAD, симуляции, подготовка техдоков.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="shield" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">Реверсивный инжиниринг</h3>
+            <p class="mt-2 text-slate-600 text-sm">Переход «Mesh→Solid», совместимость STEP/IGES.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="printer" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">Аддитивное производство</h3>
+            <p class="mt-2 text-slate-600 text-sm">FDM и DLP/SLA, пилотные партии, постпроцессинг.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="box" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">Прототипирование</h3>
+            <p class="mt-2 text-slate-600 text-sm">Сборка макетов, посадки и подгонка, презентация.</p>
+          </div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="graduation-cap" class="h-5 w-5"></i></div>
+            <h3 class="mt-4 font-semibold">Образование</h3>
+            <p class="mt-2 text-slate-600 text-sm">Курсы ДПО 48–72 ч, проектные школы, наставничество.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Оборудование (без ПО) -->
+    <section id="equipment" class="py-16 bg-slate-50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Оборудование</h2>
+        <p class="mt-2 text-slate-600 max-w-2xl">Профессиональные 3D‑сканеры, принтеры FDM/DLP и станки: лазер/ЧПУ.</p>
+
+        <!-- Фильтры оборудования -->
+        <div class="mt-6 flex flex-wrap gap-2" id="equip-filters">
+          <button data-filter="all" class="equip-filter rounded-xl border px-3 py-1.5 text-sm border-slate-900 text-slate-900">Все</button>
+          <button data-filter="scanners" class="equip-filter rounded-xl border px-3 py-1.5 text-sm border-slate-300 text-slate-600 hover:border-slate-900">3D‑сканеры</button>
+          <button data-filter="printers" class="equip-filter rounded-xl border px-3 py-1.5 text-sm border-slate-300 text-slate-600 hover:border-slate-900">3D‑принтеры</button>
+          <button data-filter="cnc" class="equip-filter rounded-xl border px-3 py-1.5 text-sm border-slate-300 text-slate-600 hover:border-slate-900">CNC и лазер</button>
+        </div>
+
+        <!-- Карточки оборудования -->
+        <div id="equip-grid" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div data-type="scanners" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="scan" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">RangeVision NEO</div><div class="text-sm text-slate-500">RangeVision</div></div>
+            </div>
+          </div>
+          <div data-type="scanners" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="scan" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">RangeVision Spectrum</div><div class="text-sm text-slate-500">RangeVision</div></div>
+            </div>
+          </div>
+          <div data-type="scanners" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="scan" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Artec Eva</div><div class="text-sm text-slate-500">Artec · ручной</div></div>
+            </div>
+          </div>
+          <div data-type="printers" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="printer" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Ultimaker 3</div><div class="text-sm text-slate-500">Ultimaker · FDM</div></div>
+            </div>
+          </div>
+          <div data-type="printers" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="printer" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Designer X</div><div class="text-sm text-slate-500">Picaso 3D · FDM</div></div>
+            </div>
+          </div>
+          <div data-type="printers" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="printer" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Formlabs (семейство)</div><div class="text-sm text-slate-500">Formlabs · DLP/SLA</div></div>
+            </div>
+          </div>
+          <div data-type="cnc" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="cpu" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Roland MDX‑40/50/540</div><div class="text-sm text-slate-500">CNC</div></div>
+            </div>
+          </div>
+          <div data-type="cnc" class="equip-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="cpu" class="h-5 w-5"></i></div>
+              <div><div class="font-semibold">Trotec Speedy 300</div><div class="text-sm text-slate-500">Лазер</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Рекомендованные инструменты (кликабельные карточки) -->
+    <section id="tools" class="py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">GenAI + Open Source</h2>
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <a href="https://www.perplexity.ai/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">Perplexity AI</div>
+            <div class="mt-1 text-slate-600 text-sm">AI‑поиск и аналитика для исследований и брифов.</div>
+          </a>
+          <a href="https://qwenlm.ai/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">Qwen AI</div>
+            <div class="mt-1 text-slate-600 text-sm">Мультимодальные модели Alibaba для генерации контента и кода.</div>
+          </a>
+          <a href="https://www.blender.org/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">Blender</div>
+            <div class="mt-1 text-slate-600 text-sm">Открытый пакет для 3D‑моделирования, анимации и рендера.</div>
+          </a>
+          <a href="https://www.freecad.org/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">FreeCAD</div>
+            <div class="mt-1 text-slate-600 text-sm">Параметрический CAD‑пакет с открытым исходным кодом.</div>
+          </a>
+          <a href="https://openscad.org/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">OpenSCAD</div>
+            <div class="mt-1 text-slate-600 text-sm">Скриптовый CAD для точных параметрических моделей.</div>
+          </a>
+          <a href="https://huggingface.co/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">Hugging Face</div>
+            <div class="mt-1 text-slate-600 text-sm">Маркетплейс моделей ИИ и инструменты для экспериментов.</div>
+          </a>
+          <a href="https://www.tflex.com/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">T‑FLEX CAD</div>
+            <div class="mt-1 text-slate-600 text-sm">Профессиональный параметрический CAD российского производства.</div>
+          </a>
+          <a href="https://notebooklm.google/" target="_blank" rel="noopener" class="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="text-lg font-semibold group-hover:text-indigo-700">NotebookLM</div>
+            <div class="mt-1 text-slate-600 text-sm">Google‑сервис заметок и исследований на основе ваших источников.</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Проекты и образование -->
+    <section id="projects" class="py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Проекты и направления НИР</h2>
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center"><i data-lucide="sparkles" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">MedTech</div><p class="mt-1 text-sm text-slate-600">Исследования, пилоты и внедрения в партнёрстве с индустрией.</p></div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center"><i data-lucide="sparkles" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">Robotics</div><p class="mt-1 text-sm text-slate-600">Исследования, пилоты и внедрения в партнёрстве с индустрией.</p></div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center"><i data-lucide="sparkles" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">Reverse engineering</div><p class="mt-1 text-sm text-slate-600">Исследования, пилоты и внедрения в партнёрстве с индустрией.</p></div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-indigo-600 text-white grid place-items-center"><i data-lucide="sparkles" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">Design & Render</div><p class="mt-1 text-sm text-slate-600">Исследования, пилоты и внедрения в партнёрстве с индустрией.</p></div>
+        </div>
+      </div>
+
+      <div id="edu" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-16">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Курсы ДПО и проектные школы</h2>
+        <p class="mt-2 max-w-3xl text-сlate-600">Учебные планы 48–72 часа с индивидуальными проектами, подготовка к чемпионатам «Профессионалы», WorldSkills, HI‑TECH.</p>
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="graduation-cap" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">CAD/CAE‑моделирование</div><p class="mt-1 text-sm text-slate-600">Проект‑ориентированный трек</p><ul class="mt-3 space-y-1 text-sm text-slate-600"><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>48–72 акад. часа</li><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>Индивидуальные проекты</li></ul></div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="graduation-cap" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">Реверсивный инжиниринг</div><p class="mt-1 text-sm text-slate-600">Scan→CAD, контроль качества</p><ul class="mt-3 space-y-1 text-sm text-slate-600"><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>48–72 акад. часа</li><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>Индивидуальные проекты</li></ul></div>
+          <div class="reveal rounded-3xl border border-slate-200 bg-white п-6 shadow-sm"><div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center"><i data-lucide="graduation-cap" class="h-5 w-5"></i></div><div class="mt-3 font-semibold">Аддитивное производство</div><p class="mt-1 text-sm text-slate-600">Материалы, режимы, постпроцесс</p><ul class="mt-3 space-y-1 text-sm text-slate-600"><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>48–72 акад. часа</li><li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="h-4 w-4 text-green-600"></i>Индивидуальные проекты</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Галерея с лайтбоксом -->
+    <section id="gallery" class="py-16 bg-slate-50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Галерея</h2>
+            <p class="mt-2 text-slate-600 max-w-2xl">Фотографии проектов, процесса и оборудования Step3D.Lab.</p>
+          </div>
+        </div>
+
+        <!-- Сетка изображений: замените пути на свои файлы в /images/lab/-->
+        <div id="gallery-grid" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/1.jpg" alt="3D‑печать · FDM" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">3D‑печать · FDM</span></button>
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/2.jpg" alt="3D‑сканирование · Eva" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">3D‑сканирование · Eva</span></button>
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/3.jpg" alt="Reverse · Mesh→CAD" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">Reverse · Mesh→CAD</span></button>
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/4.jpg" alt="DLP/SLA · Постпроцесс" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">DLP/SLA · Постпроцесс</span></button>
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/5.jpg" alt="Проектная работа · R&D" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">Проектная работа · R&D</span></button>
+          <button class="gal-btn group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><img src="images/lab/6.jpg" alt="Курсы · 48–72 ч" loading="lazy" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:h-64 lg:h-72"><span class="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/85 px-2 py-1 text-xs text-slate-800 backdrop-blur">Курсы · 48–72 ч</span></button>
+        </div>
+      </div>
+
+      <!-- Лайтбокс (управление: стрелки/свайпы/клавиатура) -->
+      <div id="lightbox" class="hidden fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
+        <div class="relative w-full max-w-6xl">
+          <button id="lb-close" aria-label="Закрыть" class="absolute -top-10 right-0 rounded-full bg-white/90 p-2 shadow"><i data-lucide="x" class="h-5 w-5"></i></button>
+          <button id="lb-prev" aria-label="Предыдущее" class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hidden sm:flex"><i data-lucide="chevron-left" class="h-6 w-6"></i></button>
+          <button id="lb-next" aria-label="Следующее" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hidden sm:flex"><i data-lucide="chevron-right" class="h-6 w-6"></i></button>
+          <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div class="bg-black"><img id="lb-img" alt="" class="mx-auto max-h-[70vh] w-auto object-contain" /></div>
+            <div id="lb-cap" class="border-t border-slate-200 p-3 text-sm text-slate-700"></div>
+            <div class="border-t border-slate-200 p-2 overflow-x-auto"><div id="lb-strip" class="flex gap-2"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-16">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold tracking-tight text-center">Вопросы и ответы</h2>
+        <div class="mt-8 space-y-4">
+          <details class="group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="flex cursor-pointer list-none items-center justify-between font-medium">С кем вы работаете?<i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-open:rotate-90"></i></summary><p class="mt-3 text-slate-600">С образовательными организациями, инженерными командами и частными заказчиками.</p></details>
+          <details class="group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="flex cursor-pointer list-none items-center justify-between font-medium">Можно ли сделать пилотный проект?<i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-open:rotate-90"></i></summary><p class="mt-3 text-slate-600">Да. Заполните заявку — предложим формат: учебный модуль, проект, НИОКР или услуга.</p></details>
+          <details class="group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-sm"><summary class="flex cursor-pointer list-none items-center justify-between font-medium">Какие форматы обучения?<i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-open:rotate-90"></i></summary><p class="mt-3 text-slate-600">Курсы ДПО 48–72 часа, проектные школы и наставничество над R&D‑задачами.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Контакты + форма -->
+    <section id="contact" class="py-16 bg-slate-50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-8 items-start">
+          <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 class="font-semibold text-lg">Контакты</h3>
+            <p class="mt-2 text-slate-600">Задайте вопрос или оставьте заявку — поможем выбрать формат: учебный модуль, проект, НИОКР или услуга.</p>
+            <div class="mt-4 space-y-3 text-sm">
+              <div class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4"></i> Москва, ул. Беговая, 12</div>
+              <div class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4"></i> +7 (000) 000‑00‑00</div>
+              <div class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4"></i> info@step3d.lab</div>
+            </div>
+          </div>
+
+          <form class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm" onsubmit="event.preventDefault(); alert('Спасибо! Заявка отправлена (демо).')">
+            <h3 class="font-semibold text-lg">Оставить заявку</h3>
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input required placeholder="Имя" class="rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <input required placeholder="Телефон" class="rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <input type="email" required placeholder="Email" class="rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2" />
+              <textarea rows="4" placeholder="Комментарий" class="rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
+              <label class="sm:col-span-2 flex items-start gap-2 text-sm text-slate-600"><input type="checkbox" required class="mt-1"> Согласен(а) на обработку персональных данных</label>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-white hover:bg-slate-800">Отправить <i data-lucide="send" class="h-4 w-4"></i></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Футер -->
+  <footer class="mt-8 border-top border-t border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 text-sm text-slate-600">
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <div class="flex items-center gap-2 font-semibold"><div class="h-7 w-7 rounded-xl bg-slate-900 grid place-items-center"><i data-lucide="blocks" class="h-4 w-4 text-white"></i></div> Step3D.Lab</div>
+          <p class="mt-2 text-slate-500">Лаборатория промдизайна и инжиниринга. Технопарк РГСУ.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <div class="font-medium text-slate-900">Продукты</div>
+            <ul class="mt-2 space-y-1">
+              <li><a href="#features" class="hover:text-slate-900">Возможности</a></li>
+              <li><a href="#equipment" class="hover:text-slate-900">Оборудование</a></li>
+              <li><a href="#projects" class="hover:text-slate-900">Проекты</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-medium text-slate-900">Ресурсы</div>
+            <ul class="mt-2 space-y-1">
+              <li><a href="#edu" class="hover:text-slate-900">Курсы</a></li>
+              <li><a href="#tools" class="hover:text-slate-900">Инструменты</a></li>
+              <li><a href="#contact" class="hover:text-slate-900">Связаться</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="md:text-right">
+          <p>© <span id="year"></span> Step3D.Lab. Конфиденциальность · Условия · Файлы cookie</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
