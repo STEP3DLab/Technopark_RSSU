@@ -1,0 +1,18 @@
+{
+  "name": "technopark_rssu",
+  "version": "1.0.0",
+  "description": "Проект разделён на минимальные и понятные модули: ``` step3dlab-static/ ├─ index.html            # Разметка страниц и секции ├─ assets/ │  ├─ css/ │  │  └─ custom.css      # Небольшие пользовательские стили │  └─ js/ │     └─ main.js         # Поведение: меню, фильтры, галерея └─ images/    └─ lab/               # Фотографии для галереи (шесть примеров)       ├─ 1.jpg … 6.jpg ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "icons:png": "node scripts/svg2png.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "sharp": "^0.34.4",
+    "svgo": "^4.0.0"
+  }
+}
