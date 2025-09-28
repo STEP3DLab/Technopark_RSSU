@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img">
+  <title>NL placeholder</title>
+  <rect width="160" height="80" rx="18" fill="#e0f2fe" />
+  <text x="80" y="50" text-anchor="middle" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="700" fill="#0369a1">NL</text>
+</svg>
