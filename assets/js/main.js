@@ -3,18 +3,12 @@
 
 // Ждём полной загрузки DOM (скрипт подключён с defer, но на всякий случай)
 document.addEventListener('DOMContentLoaded', () => {
-  initIcons();
   setYear();
   initMobileMenu();
   initRevealOnScroll();
   initEquipmentFilter();
   initGalleryLightbox();
 });
-
-// Инициализация набора иконок Lucide
-function initIcons() {
-  if (window.lucide && lucide.createIcons) lucide.createIcons();
-}
 
 // Подстановка текущего года в футере
 function setYear() {

@@ -1,0 +1,48 @@
+:root {
+  --icon-stroke-color: currentColor;
+  --icon-hover-stroke-color: currentColor;
+  --icon-hover-scale: 1.05;
+  --icon-transition-duration: 200ms;
+}
+
+[data-theme="dark"] {
+  --icon-stroke-color: currentColor;
+  --icon-hover-stroke-color: currentColor;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: inherit;
+  transition: transform var(--icon-transition-duration) ease, color var(--icon-transition-duration) ease;
+}
+
+.icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  stroke: var(--icon-stroke-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: inherit;
+}
+
+.icon:hover,
+.icon:focus-visible {
+  transform: scale(var(--icon-hover-scale));
+  color: var(--icon-hover-stroke-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
+  }
+
+  .icon:hover,
+  .icon:focus-visible {
+    transform: none;
+  }
+}
