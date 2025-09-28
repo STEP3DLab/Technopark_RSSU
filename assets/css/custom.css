@@ -9,3 +9,46 @@
 /* Анимация появления блоков при прокрутке */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s, transform .6s; }
 .reveal.in { opacity: 1; transform: none; }
+
+/* Сетка логотипов раздела GenAI + Open Source */
+#logos .logos-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#logos .logo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+#logos .logo-card img {
+  max-width: 120px;
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+#logos .logo-card figcaption {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+#logos .logo-card:hover img {
+  transform: scale(1.05);
+}
+
+@media (min-width: 640px) {
+  #logos .logos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  #logos .logos-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
