@@ -20,6 +20,16 @@ step3dlab-static/
 ## Как заменить фото
 Положите свои изображения в `images/lab/` и при желании обновите подписи (`alt`) в секции `#gallery` внутри `index.html`.
 
+## Генерация PNG из SVG
+Для обновления PNG-версий иконок и логотипов из исходных SVG выполните:
+
+```bash
+npm install
+npm run icons:png
+```
+
+Скрипт `icons:png` проходит по `assets/icons/tabler/` и `assets/logos/svg/`, создавая PNG-размеры 64×64, 128×128 и 256×256 пикселей в соответствующих подпапках `assets/icons/png/` и `assets/logos/png/`.
+
 ## Деплой на GitHub Pages
 1. Создайте репозиторий и загрузите папку проекта.
 2. В настройках включите **Pages** → *Deploy from branch* → ветка `main`, папка `/root`.
