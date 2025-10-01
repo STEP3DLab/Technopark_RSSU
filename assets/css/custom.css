@@ -21,8 +21,44 @@
 }
 
 /* Анимация появления блоков при прокрутке */
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s, transform .6s; }
-.reveal.in { opacity: 1; transform: none; }
+.reveal {
+  --reveal-transform: translateY(28px);
+  --reveal-delay: 0s;
+  --reveal-blur: 8px;
+  opacity: 0;
+  transform: var(--reveal-transform);
+  filter: blur(var(--reveal-blur));
+  transition-property: opacity, transform, filter;
+  transition-duration: 0.7s;
+  transition-delay: var(--reveal-delay);
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.reveal[data-reveal="up"] { --reveal-transform: translateY(36px); }
+.reveal[data-reveal="down"] { --reveal-transform: translateY(-36px); }
+.reveal[data-reveal="left"] { --reveal-transform: translateX(-36px); }
+.reveal[data-reveal="right"] { --reveal-transform: translateX(36px); }
+.reveal[data-reveal="scale"] {
+  --reveal-transform: scale(0.94);
+  transform-origin: center;
+  --reveal-blur: 0px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
 
 /* Сетка логотипов раздела GenAI + Open Source */
 #logos .logos-grid {
