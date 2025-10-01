@@ -39,6 +39,9 @@
 
   <!-- Фоновая декорация (неинтерактивная) -->
   <div aria-hidden class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <canvas id="bg-canvas" class="absolute inset-0 h-full w-full"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-900/10 to-transparent"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.22),_transparent_55%)]"></div>
     <div class="absolute -top-32 -left-10 h-80 w-80 rounded-full bg-indigo-200/40 blur-3xl"></div>
     <div class="absolute top-20 -right-10 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl"></div>
     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-72 w-[90%] max-w-5xl rounded-[3rem] bg-gradient-to-r from-indigo-50 via-sky-50 to-teal-50 blur-2xl"></div>
