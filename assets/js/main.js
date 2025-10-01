@@ -199,10 +199,53 @@ function initBackgroundAnimation() {
 
 // Плавное появление блоков при скролле (IntersectionObserver)
 function initRevealOnScroll() {
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  const items = Array.from(document.querySelectorAll('.reveal'));
+  if (!items.length) return;
+
+  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  if (prefersReducedMotion && prefersReducedMotion.matches) {
+    items.forEach(el => el.classList.add('in'));
+    return;
+  }
+
+  // Поддержка кастомной задержки через data-атрибуты и группового стэггеринга
+  document.querySelectorAll('[data-reveal-parent]').forEach(parent => {
+    const step = parseFloat(parent.dataset.revealStep || '0.1');
+    let index = 0;
+    parent.querySelectorAll('.reveal').forEach(child => {
+      if (child.dataset.revealDelay) return;
+      child.style.setProperty('--reveal-delay', `${(index * step).toFixed(3)}s`);
+      index += 1;
+    });
+  });
+
+  items.forEach(el => {
+    const delay = el.dataset.revealDelay?.trim();
+    if (!delay) return;
+    const value = /[a-z%]+$/i.test(delay) ? delay : `${delay}s`;
+    el.style.setProperty('--reveal-delay', value);
+  });
+
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
+
+  items.forEach(el => io.observe(el));
+
+  prefersReducedMotion?.addEventListener?.('change', event => {
+    if (event.matches) {
+      io.disconnect();
+      items.forEach(el => el.classList.add('in'));
+    } else {
+      items.forEach(el => {
+        if (!el.classList.contains('in')) io.observe(el);
+      });
+    }
+  });
 }
 
 // Фильтрация карточек оборудования
