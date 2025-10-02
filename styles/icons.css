@@ -1,4 +1,10 @@
 :root {
+  --icon-size-sm: clamp(1rem, 0.9rem + 0.25vw, 1.3rem);
+  --icon-size-md: clamp(1.2rem, 1rem + 0.45vw, 1.65rem);
+  --icon-size-lg: clamp(1.5rem, 1.2rem + 0.6vw, 2rem);
+  --icon-size-xl: clamp(1.8rem, 1.45rem + 0.8vw, 2.4rem);
+  --icon-ring-color: rgba(37, 99, 235, 0.16);
+  --icon-ring-shadow: 0 6px 18px rgba(37, 99, 235, 0.15);
   --icon-accent: #1d4ed8;
   --icon-muted: #64748b;
   --icon-invert: #ffffff;
@@ -6,21 +12,56 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --icon-ring-color: rgba(96, 165, 250, 0.28);
+    --icon-ring-shadow: 0 12px 28px rgba(15, 23, 42, 0.45);
     --icon-accent: #93c5fd;
     --icon-muted: #94a3b8;
     --icon-invert: #0f172a;
   }
 }
 
+@keyframes iconPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.9;
+  }
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes iconSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .icon {
+  --icon-size: var(--icon-size-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: var(--icon-size);
+  height: var(--icon-size);
   color: inherit;
-  transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease, opacity 0.2s ease;
 }
 
 .icon::before {
@@ -38,14 +79,28 @@
   -webkit-mask-size: contain;
 }
 
+.icon[data-ring]::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--icon-size) * -0.32);
+  border-radius: 50%;
+  border: 1.5px solid var(--icon-ring-color);
+  opacity: 0.6;
+  box-shadow: var(--icon-ring-shadow);
+  pointer-events: none;
+  animation: iconPulse 3.6s ease-in-out infinite;
+}
+
 .icon[data-size="sm"] {
-  width: 1rem;
-  height: 1rem;
+  --icon-size: var(--icon-size-sm);
 }
 
 .icon[data-size="lg"] {
-  width: 1.5rem;
-  height: 1.5rem;
+  --icon-size: var(--icon-size-lg);
+}
+
+.icon[data-size="xl"] {
+  --icon-size: var(--icon-size-xl);
 }
 
 .icon[data-variant="accent"] {
@@ -60,20 +115,54 @@
   color: var(--icon-invert);
 }
 
+.icon[data-anim="float"] {
+  animation: iconFloat 6s ease-in-out infinite;
+}
+
+.icon[data-anim="spin"] {
+  animation: iconSpin 9s linear infinite;
+}
+
+.icon-badge .icon {
+  --icon-size: var(--icon-size-lg);
+}
+
+.icon-badge.small .icon {
+  --icon-size: clamp(1.3rem, 1.05rem + 0.3vw, 1.7rem);
+}
+
+.icon-badge .icon:not([data-ring])::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--icon-size) * -0.28);
+  border-radius: 50%;
+  border: 1px solid var(--icon-ring-color);
+  opacity: 0.4;
+  pointer-events: none;
+  animation: iconPulse 4.4s ease-in-out infinite;
+}
+
+.bullet-list .icon,
+.contact-list .icon,
+.faq-list summary .icon,
+.form-grid .icon,
+.footer-grid .icon {
+  --icon-size: var(--icon-size-sm);
+  color: var(--icon-accent);
+}
+
 @media (hover: hover) {
   a:hover .icon,
   button:hover .icon,
   summary:hover .icon {
-    transform: translate3d(2px, 0, 0);
-  }
-
-  .icon[data-anim="pulse"]:hover {
-    transform: scale(1.05);
+    transform: translate3d(2px, -2px, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .icon {
+  .icon,
+  .icon::after {
+    animation: none !important;
     transition: none;
   }
 

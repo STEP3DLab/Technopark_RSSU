@@ -1,8 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img">
-  <title>T-FLEX CAD логотип</title>
-  <rect width="160" height="120" rx="24" fill="#041225" />
-  <path fill="#0f62fe" d="M36 36h40v16H64v48H48V52H36V36z" />
-  <path fill="#ffffff" d="M82 48h44v12H82z" />
-  <path fill="#0f62fe" d="M82 66h18c8.3 0 15 6.7 15 15s-6.7 15-15 15H82z" />
-  <rect x="102" y="72" width="20" height="18" rx="9" fill="#ffffff" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">T-FLEX CAD — анимированный логотип</title>
+  <desc id="desc">Техногенная монограмма T с плавной пластикой и CAD-сеткой.</desc>
+  <defs>
+    <linearGradient id="tflex-body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+    <linearGradient id="tflex-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#bae6fd" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="36" ry="36" fill="#0f172a" />
+  <g opacity="0.25" stroke="#1e40af" stroke-width="2">
+    <path d="M0 48h160" />
+    <path d="M0 80h160" />
+    <path d="M0 112h160" />
+    <path d="M48 0v160" />
+    <path d="M80 0v160" />
+    <path d="M112 0v160" />
+  </g>
+  <path d="M48 44h64c8 0 14-6 14-14v-6H34v6c0 8 6 14 14 14h16v66c0 18 10 30 28 30 12 0 22-6 28-16l-16-10c-4 6-10 8-12 8-6 0-10-4-10-12z" fill="url(#tflex-body)" />
+  <path d="M64 52h48v12H64z" fill="#0ea5e9" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4s" repeatCount="indefinite" />
+  </path>
+  <path d="M64 116c10 14 30 22 44 10" fill="none" stroke="url(#tflex-glow)" stroke-width="6" stroke-linecap="round" opacity="0.8">
+    <animate attributeName="stroke-dasharray" values="0 60;60 0;0 60" dur="5s" repeatCount="indefinite" />
+  </path>
 </svg>
