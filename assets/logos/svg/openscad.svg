@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img">
-  <title>OS placeholder</title>
-  <rect width="160" height="80" rx="18" fill="#fef9c3" />
-  <text x="80" y="50" text-anchor="middle" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="700" fill="#ca8a04">OS</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img">
+  <title>OpenSCAD логотип</title>
+  <rect width="160" height="120" rx="24" fill="#202020" />
+  <polygon points="80 20 122 44 122 96 80 116 38 92 38 40" fill="#ffce1f" />
+  <path fill="#202020" d="M80 46l-22 12v24l22 12 22-12V58L80 46zm0 10l12 6v12l-12 6-12-6V62l12-6z" />
 </svg>

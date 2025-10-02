@@ -1,5 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img">
-  <title>FC placeholder</title>
-  <rect width="160" height="80" rx="18" fill="#eff6ff" />
-  <text x="80" y="50" text-anchor="middle" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="700" fill="#1d4ed8">FC</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img">
+  <title>FreeCAD логотип</title>
+  <rect width="160" height="120" rx="24" fill="#11243a" />
+  <path fill="#f44336" d="M54 28h27c5 0 9 4 9 9v18h-23v-8h-13v46H39V41c0-7.2 5.8-13 13-13z" />
+  <path fill="#1e88e5" d="M86 56h17l18 18v22h-17V84h-18V56z" />
+  <path fill="#90caf9" d="M103 74h18l-18-18v18z" />
+  <circle cx="66" cy="42" r="6" fill="#fff" />
 </svg>

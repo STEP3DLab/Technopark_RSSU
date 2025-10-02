@@ -452,17 +452,6 @@ section {
   gap: 16px;
 }
 
-.card.link {
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 18px;
-}
-
-.card.link img {
-  width: 48px;
-  height: 48px;
-}
-
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -492,28 +481,63 @@ section {
   background: var(--color-accent-soft);
 }
 
-.logo-band {
+
+.tool-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  padding: 24px;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.tool-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-xs);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.logo-band figure {
+.tool-card:hover,
+.tool-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-accent);
+}
+
+.tool-card__logo {
+  width: 72px;
+  height: 72px;
   display: grid;
-  gap: 10px;
-  justify-items: center;
-  font-size: 0.9rem;
-  color: var(--color-muted);
+  place-items: center;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-.logo-band img {
-  width: 64px;
-  height: 64px;
+.tool-card__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tool-card__body {
+  display: grid;
+  gap: 8px;
+}
+
+.tool-card__body h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.tool-card__body p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
 }
 
 .bullet-list {
