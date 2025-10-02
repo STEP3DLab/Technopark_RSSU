@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>3D принтер печатает ребра — анимированная иконка</title>
+  <defs>
+    <style>
+      :root {
+        --stroke: currentColor;
+        --frame: #7a7a7a;
+        --accent: currentColor;
+        --speed: 5s;
+      }
+
+      .frame {
+        stroke: var(--frame);
+        stroke-width: 4;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .bed {
+        fill: none;
+        stroke: var(--frame);
+        stroke-width: 4;
+      }
+
+      .rib {
+        stroke: var(--accent);
+        stroke-width: 4;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: draw var(--speed) ease-in-out infinite;
+      }
+
+      .sternum {
+        stroke: var(--accent);
+        stroke-width: 4;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .nozzle {
+        fill: var(--accent);
+      }
+
+      .belt {
+        stroke: var(--frame);
+        stroke-width: 3;
+      }
+
+      @keyframes draw {
+        0% {
+          stroke-dashoffset: 1000;
+          opacity: 0.2;
+        }
+
+        20% {
+          opacity: 1;
+        }
+
+        55% {
+          stroke-dashoffset: 0;
+        }
+
+        70% {
+          opacity: 1;
+        }
+
+        85% {
+          opacity: 0.8;
+        }
+
+        100% {
+          stroke-dashoffset: 0;
+          opacity: 0.6;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .rib {
+          animation: none;
+          stroke-dashoffset: 0;
+          opacity: 1;
+        }
+
+        #buildMask rect {
+          y: 80px;
+          height: 90px;
+        }
+
+        #buildMask rect > animate,
+        #zig-animation animateMotion {
+          display: none;
+        }
+
+        #zig-animation rect {
+          transform: translate(86px, 80px);
+        }
+      }
+    </style>
+    <path id="zig" d="M 86 80 L 170 80 L 170 92 L 86 92 L 86 104 L 170 104 L 170 116 L 86 116 L 86 128 L 170 128 L 170 140 L 86 140 L 86 152 L 170 152 L 170 164 L 86 164" />
+    <mask id="buildMask">
+      <rect x="80" y="170" width="96" height="0" fill="white">
+        <animate attributeName="y" values="170;80" dur="var(--speed)" repeatCount="indefinite" />
+        <animate attributeName="height" values="0;90" dur="var(--speed)" repeatCount="indefinite" />
+      </rect>
+    </mask>
+  </defs>
+
+  <g class="frame">
+    <rect x="12" y="12" width="232" height="232" rx="16" />
+    <line x1="36" y1="56" x2="220" y2="56" />
+    <line class="belt" x1="36" y1="64" x2="220" y2="64" />
+    <rect class="bed" x="56" y="184" width="144" height="20" rx="4" />
+  </g>
+
+  <rect x="80" y="72" width="96" height="104" rx="6" class="frame" />
+
+  <g id="zig-animation">
+    <rect class="nozzle" x="-6" y="-6" width="12" height="12" rx="2">
+      <animateMotion dur="var(--speed)" repeatCount="indefinite">
+        <mpath href="#zig" />
+      </animateMotion>
+    </rect>
+    <line x1="86" y1="56" x2="86" y2="72" class="frame" />
+    <line x1="170" y1="56" x2="170" y2="72" class="frame" />
+  </g>
+
+  <g id="ribs" mask="url(#buildMask)">
+    <g fill="currentColor" opacity="0.06">
+      <path d="M128 86 l0 70" />
+    </g>
+  </g>
+
+  <line x1="128" y1="86" x2="128" y2="166" class="sternum" />
+
+  <path class="rib" d="M124 92 C 112 92, 96 96, 90 108" />
+  <path class="rib" d="M132 92 C 144 92, 160 96, 166 108" />
+  <path class="rib" d="M124 104 C 110 104, 92 110, 86 122" />
+  <path class="rib" d="M132 104 C 146 104, 164 110, 170 122" />
+  <path class="rib" d="M124 116 C 108 116, 90 124, 86 136" />
+  <path class="rib" d="M132 116 C 148 116, 166 124, 170 136" />
+  <path class="rib" d="M124 128 C 108 128, 90 138, 86 150" />
+  <path class="rib" d="M132 128 C 148 128, 166 138, 170 150" />
+  <path class="rib" d="M124 140 C 110 140, 92 152, 88 160" />
+  <path class="rib" d="M132 140 C 146 140, 164 152, 168 160" />
+</svg>
