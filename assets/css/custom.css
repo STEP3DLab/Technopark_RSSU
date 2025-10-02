@@ -756,6 +756,16 @@ section {
   gap: 10px;
 }
 
+.contact-list a {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.contact-list a:hover,
+.contact-list a:focus-visible {
+  color: var(--color-accent-dark);
+}
+
 .contact-form {
   gap: 20px;
 }
@@ -873,6 +883,16 @@ section {
   .footer-meta {
     text-align: right;
   }
+}
+
+.footer-meta a {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.footer-meta a:hover,
+.footer-meta a:focus-visible {
+  color: var(--color-accent-dark);
 }
 
 .footer-meta .muted {
