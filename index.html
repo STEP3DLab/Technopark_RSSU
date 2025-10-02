@@ -160,7 +160,16 @@
           <button type="button" class="filter-button" data-filter="cnc">CNC и лазер</button>
         </div>
         <div id="equip-grid" class="card-grid">
-          <article class="card compact" data-equip-item data-type="scanners">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="scanners"
+            data-equip-id="rangevision-neo"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-3d-skanirovanie.svg')"></span></span>
               <div>
@@ -169,7 +178,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="scanners">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="scanners"
+            data-equip-id="rangevision-spectrum"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-3d-skanirovanie.svg')"></span></span>
               <div>
@@ -178,7 +196,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="scanners">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="scanners"
+            data-equip-id="artec-eva"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-3d-skanirovanie.svg')"></span></span>
               <div>
@@ -187,7 +214,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="printers">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="printers"
+            data-equip-id="ultimaker-3"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-additivnoe-proizvodstvo.svg')"></span></span>
               <div>
@@ -196,7 +232,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="printers">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="printers"
+            data-equip-id="designer-x"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-additivnoe-proizvodstvo.svg')"></span></span>
               <div>
@@ -205,7 +250,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="printers">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="printers"
+            data-equip-id="formlabs"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-additivnoe-proizvodstvo.svg')"></span></span>
               <div>
@@ -214,7 +268,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="cnc">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="cnc"
+            data-equip-id="roland-mdx"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-cad-cae-modelirovanie.svg')"></span></span>
               <div>
@@ -223,7 +286,16 @@
               </div>
             </header>
           </article>
-          <article class="card compact" data-equip-item data-type="cnc">
+          <article
+            class="card compact"
+            data-equip-item
+            data-type="cnc"
+            data-equip-id="trotec-speedy-300"
+            role="button"
+            tabindex="0"
+            aria-haspopup="dialog"
+            aria-controls="equipment-modal"
+          >
             <header>
               <span class="icon-badge small"><span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-cad-cae-modelirovanie.svg')"></span></span>
               <div>
@@ -232,6 +304,42 @@
               </div>
             </header>
           </article>
+        </div>
+        <div class="equipment-modal" id="equipment-modal" data-equip-modal hidden>
+          <div class="equipment-modal__overlay" data-modal-overlay></div>
+          <div
+            class="equipment-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="equipment-modal-title"
+            aria-describedby="equipment-modal-description"
+            tabindex="-1"
+            data-modal-dialog
+          >
+            <div class="equipment-modal__glow" aria-hidden="true"></div>
+            <header class="equipment-modal__header">
+              <div class="equipment-modal__meta">
+                <span class="equipment-modal__badge" data-modal-badge></span>
+                <p class="equipment-modal__subtitle" data-modal-subtitle></p>
+              </div>
+              <button type="button" class="equipment-modal__close" aria-label="Закрыть" data-modal-close>
+                <span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-zakryt-galereyu.svg')"></span>
+              </button>
+            </header>
+            <div class="equipment-modal__body">
+              <h3 id="equipment-modal-title" data-modal-title></h3>
+              <p class="equipment-modal__description" id="equipment-modal-description" data-modal-description></p>
+              <div class="equipment-modal__content">
+                <table class="equipment-modal__table">
+                  <tbody data-modal-specs></tbody>
+                </table>
+                <div class="equipment-modal__highlights">
+                  <h4>Ключевые преимущества</h4>
+                  <ul class="equipment-modal__chips" data-modal-highlights></ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
