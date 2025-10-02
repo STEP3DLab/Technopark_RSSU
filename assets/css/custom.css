@@ -131,6 +131,12 @@ section {
   letter-spacing: -0.01em;
 }
 
+.brand-logo {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
 .brand-icon {
   display: grid;
   place-items: center;
