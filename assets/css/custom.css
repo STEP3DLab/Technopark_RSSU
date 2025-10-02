@@ -133,7 +133,7 @@ section {
 
 .brand-logo {
   display: block;
-  height: 44px;
+  height: clamp(40px, 4vw, 56px);
   width: auto;
 }
 
@@ -356,32 +356,75 @@ section {
 }
 
 .icon-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  --badge-size: clamp(3rem, 2.6rem + 1vw, 3.8rem);
+  width: var(--badge-size);
+  height: var(--badge-size);
+  border-radius: calc(var(--badge-size) * 0.35);
   display: grid;
   place-items: center;
-  background: var(--color-surface-muted);
+  position: relative;
   color: var(--color-accent);
+  background: linear-gradient(140deg, var(--color-surface-muted) 0%, var(--color-surface) 60%, rgba(37, 99, 235, 0.08) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.icon-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.14), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(14, 165, 233, 0.14), transparent 60%);
+  opacity: 0.65;
+  pointer-events: none;
 }
 
 .icon-badge[data-animated] {
-  padding: 4px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  padding: 6px;
+}
+
+.icon-badge[data-animated]::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.28), rgba(14, 165, 233, 0.18), rgba(59, 130, 246, 0.28));
+  animation: badgeSweep 12s linear infinite;
+  opacity: 0.45;
 }
 
 .icon-badge[data-animated] img {
   width: 100%;
   height: 100%;
   display: block;
-  border-radius: 10px;
+  border-radius: calc(var(--badge-size) * 0.32);
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .icon-badge.small {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  --badge-size: clamp(2.6rem, 2.1rem + 0.6vw, 3.2rem);
+  border-radius: calc(var(--badge-size) * 0.4);
+}
+
+.icon-badge.small::after {
+  opacity: 0.5;
+}
+
+@keyframes badgeSweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-badge[data-animated]::before {
+    animation: none;
+  }
 }
 
 .section {
@@ -988,6 +1031,15 @@ section {
 
 .faq-list summary::-webkit-details-marker {
   display: none;
+}
+
+.faq-list summary .icon {
+  margin-left: auto;
+  color: var(--color-accent);
+}
+
+.faq-list details[open] summary .icon {
+  transform: rotate(90deg);
 }
 
 .faq-list details p {

@@ -1,10 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img">
-  <title>NotebookLM логотип</title>
-  <rect width="160" height="120" rx="24" fill="#0d1b2a" />
-  <path fill="#4285f4" d="M44 30h36c8.8 0 16 7.2 16 16v48H60c-8.8 0-16-7.2-16-16V30z" />
-  <path fill="#34a853" d="M120 30H96c-8.8 0-16 7.2-16 16v48h40c8.8 0 16-7.2 16-16V46c0-8.8-7.2-16-16-16z" />
-  <path fill="#fbbc04" d="M80 30h16v50c0 5.5-4.5 10-10 10h-6V30z" />
-  <path fill="#ea4335" d="M80 30H64v50c0 5.5 4.5 10 10 10h6V30z" />
-  <circle cx="64" cy="48" r="6" fill="#fff" opacity="0.85" />
-  <circle cx="96" cy="48" r="6" fill="#fff" opacity="0.85" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">NotebookLM — анимированный логотип</title>
+  <desc id="desc">Открытая цифровая книга с мерцающими страницами.</desc>
+  <defs>
+    <linearGradient id="notebook-cover" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+    <linearGradient id="notebook-page" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="32" ry="32" fill="#0f172a" />
+  <path d="M34 50h92c8 0 14 6 14 14v48c0 8-6 14-14 14H34c-8 0-14-6-14-14V64c0-8 6-14 14-14z" fill="#111c34" />
+  <path d="M52 56h32c14 0 26 6 38 18v42c-12-8-24-12-38-12H52z" fill="url(#notebook-cover)" opacity="0.85" />
+  <path d="M108 56H76c-14 0-26 6-38 18v42c12-8 24-12 38-12h32z" fill="url(#notebook-page)" />
+  <g stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+    <path d="M68 70h24">
+      <animate attributeName="stroke-dasharray" values="0 32;32 0;0 32" dur="4s" repeatCount="indefinite" />
+    </path>
+    <path d="M68 82h18">
+      <animate attributeName="stroke-dasharray" values="0 24;24 0;0 24" dur="3.4s" repeatCount="indefinite" />
+    </path>
+    <path d="M68 94h28">
+      <animate attributeName="stroke-dasharray" values="0 40;40 0;0 40" dur="5s" repeatCount="indefinite" />
+    </path>
+  </g>
+  <g stroke="#a855f7" stroke-width="2" stroke-linecap="round" opacity="0.6">
+    <path d="M92 70h16">
+      <animate attributeName="stroke-dasharray" values="0 20;20 0;0 20" dur="4.5s" repeatCount="indefinite" />
+    </path>
+    <path d="M92 82h12">
+      <animate attributeName="stroke-dasharray" values="0 16;16 0;0 16" dur="3s" repeatCount="indefinite" />
+    </path>
+    <path d="M92 94h20">
+      <animate attributeName="stroke-dasharray" values="0 28;28 0;0 28" dur="4.8s" repeatCount="indefinite" />
+    </path>
+  </g>
+  <circle cx="80" cy="124" r="8" fill="#38bdf8" opacity="0.8">
+    <animate attributeName="r" values="8;10;8" dur="3.8s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="80" cy="124" r="3" fill="#0f172a">
+    <animate attributeName="r" values="3;5;3" dur="3.8s" repeatCount="indefinite" />
+  </circle>
 </svg>
