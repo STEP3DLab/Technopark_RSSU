@@ -1,5 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img">
-  <title>PA placeholder</title>
-  <rect width="160" height="80" rx="18" fill="#eef2ff" />
-  <text x="80" y="50" text-anchor="middle" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="700" fill="#3730a3">PA</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img">
+  <title>Perplexity AI логотип</title>
+  <defs>
+    <linearGradient id="perplexity-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00c4ff" />
+      <stop offset="50%" stop-color="#6959ff" />
+      <stop offset="100%" stop-color="#ff4ecd" />
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="52" fill="#0b1120" />
+  <path fill="none" stroke="url(#perplexity-gradient)" stroke-width="10" stroke-linecap="round" d="M86 28c-12.8-8.7-30.2-8-42.1 2.1C31 43 29.6 63.4 41 77.6c12.4 15.6 36 17.2 51.2 3.4" />
+  <path fill="none" stroke="url(#perplexity-gradient)" stroke-width="10" stroke-linecap="round" d="M34 92c8.5 6.2 19.5 8.7 30 6.8 10.4-1.8 19.6-7.9 25.2-16.8" opacity="0.75" />
+  <circle cx="82" cy="38" r="8" fill="#fff" />
 </svg>

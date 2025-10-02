@@ -1,5 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img">
-  <title>TF placeholder</title>
-  <rect width="160" height="80" rx="18" fill="#f1f5f9" />
-  <text x="80" y="50" text-anchor="middle" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="700" fill="#0f172a">TF</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" role="img">
+  <title>T-FLEX CAD логотип</title>
+  <rect width="160" height="120" rx="24" fill="#041225" />
+  <path fill="#0f62fe" d="M36 36h40v16H64v48H48V52H36V36z" />
+  <path fill="#ffffff" d="M82 48h44v12H82z" />
+  <path fill="#0f62fe" d="M82 66h18c8.3 0 15 6.7 15 15s-6.7 15-15 15H82z" />
+  <rect x="102" y="72" width="20" height="18" rx="9" fill="#ffffff" />
 </svg>
