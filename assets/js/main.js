@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initEquipmentFilter();
   initEquipmentModal();
   initGalleryLightbox();
+  initScrollSpy();
+  initQuickCta();
 });
 
 function setYear() {
@@ -71,6 +73,85 @@ function initEquipmentFilter() {
   });
 
   applyFilter(current);
+}
+
+function initScrollSpy() {
+  const links = Array.from(document.querySelectorAll('[data-scrollspy-link]'));
+  const sections = Array.from(document.querySelectorAll('[data-scrollspy]'));
+
+  if (!links.length || !sections.length || !('IntersectionObserver' in window)) {
+    return;
+  }
+
+  const linkGroups = links.reduce((map, link) => {
+    const hash = link.getAttribute('href') || '';
+    if (!hash.startsWith('#')) return map;
+    const id = hash.slice(1);
+    if (!id) return map;
+    if (!map.has(id)) {
+      map.set(id, []);
+    }
+    map.get(id).push(link);
+    return map;
+  }, new Map());
+
+  const trackedSections = sections.filter(section => section.id && linkGroups.has(section.id));
+  if (!trackedSections.length) {
+    return;
+  }
+
+  let activeId = null;
+
+  const setActive = (id) => {
+    if (!id || id === activeId) return;
+    links.forEach(link => link.classList.remove('is-active'));
+    const group = linkGroups.get(id);
+    if (group) {
+      group.forEach(link => link.classList.add('is-active'));
+      activeId = id;
+    }
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActive(entry.target.id);
+        }
+      });
+    },
+    {
+      rootMargin: '-50% 0px -45%',
+      threshold: 0.1
+    }
+  );
+
+  trackedSections.forEach(section => observer.observe(section));
+
+  const initialHash = window.location.hash.replace('#', '');
+  if (initialHash && linkGroups.has(initialHash)) {
+    setActive(initialHash);
+  }
+}
+
+function initQuickCta() {
+  const quickCta = document.querySelector('[data-quick-cta]');
+  const hero = document.querySelector('.hero');
+
+  if (!quickCta || !hero || !('IntersectionObserver' in window)) {
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        quickCta.classList.toggle('is-visible', !entry.isIntersecting);
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  observer.observe(hero);
 }
 
 function initEquipmentModal() {

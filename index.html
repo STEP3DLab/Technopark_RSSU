@@ -19,28 +19,32 @@
         <img class="brand-logo" src="assets/logos/svg/step3d-lab.svg" alt="Step3D.Lab" />
       </a>
       <nav class="desktop-nav" aria-label="Основные ссылки">
-        <a href="#features">Возможности</a>
-        <a href="#equipment">Оборудование</a>
-        <a href="#tools">Инструменты</a>
-        <a href="#projects">Проекты</a>
-        <a href="#edu">Курсы</a>
-        <a href="#gallery">Галерея</a>
-        <a href="#faq">FAQ</a>
-        <a class="nav-cta" href="#contact">Заявка</a>
+        <a href="#features" data-scrollspy-link>Возможности</a>
+        <a href="#equipment" data-scrollspy-link>Оборудование</a>
+        <a href="#approach" data-scrollspy-link>Процесс</a>
+        <a href="#tools" data-scrollspy-link>Инструменты</a>
+        <a href="#projects" data-scrollspy-link>Проекты</a>
+        <a href="#edu" data-scrollspy-link>Курсы</a>
+        <a href="#testimonials" data-scrollspy-link>Отзывы</a>
+        <a href="#gallery" data-scrollspy-link>Галерея</a>
+        <a href="#faq" data-scrollspy-link>FAQ</a>
+        <a class="nav-cta" href="#contact" data-scrollspy-link>Заявка</a>
       </nav>
       <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="mobile-nav" aria-expanded="false" data-menu-toggle>
         <span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-otkryt-menyu.svg')"></span>
       </button>
     </div>
     <nav class="mobile-nav" id="mobile-nav" aria-label="Мобильное меню" data-mobile-nav>
-      <a href="#features">Возможности</a>
-      <a href="#equipment">Оборудование</a>
-      <a href="#tools">Инструменты</a>
-      <a href="#projects">Проекты</a>
-      <a href="#edu">Курсы</a>
-      <a href="#gallery">Галерея</a>
-      <a href="#faq">FAQ</a>
-      <a class="nav-cta" href="#contact">Оставить заявку</a>
+      <a href="#features" data-scrollspy-link>Возможности</a>
+      <a href="#equipment" data-scrollspy-link>Оборудование</a>
+      <a href="#approach" data-scrollspy-link>Процесс</a>
+      <a href="#tools" data-scrollspy-link>Инструменты</a>
+      <a href="#projects" data-scrollspy-link>Проекты</a>
+      <a href="#edu" data-scrollspy-link>Курсы</a>
+      <a href="#testimonials" data-scrollspy-link>Отзывы</a>
+      <a href="#gallery" data-scrollspy-link>Галерея</a>
+      <a href="#faq" data-scrollspy-link>FAQ</a>
+      <a class="nav-cta" href="#contact" data-scrollspy-link>Оставить заявку</a>
     </nav>
   </header>
 
@@ -94,7 +98,28 @@
       </div>
     </section>
 
-    <section id="features" class="section">
+    <section id="highlights" class="section section--tight accent">
+      <div class="container metrics-grid">
+        <article class="metric-card">
+          <span class="metric-value">12&nbsp;+</span>
+          <p class="metric-label">лет развиваем лаборатории промышленного дизайна</p>
+        </article>
+        <article class="metric-card">
+          <span class="metric-value">450&nbsp;+</span>
+          <p class="metric-label">прототипов и пилотных партий выпущено в Step3D.Lab</p>
+        </article>
+        <article class="metric-card">
+          <span class="metric-value">25</span>
+          <p class="metric-label">единиц оборудования: 3D‑сканеры, FDM/SLA, CNC</p>
+        </article>
+        <article class="metric-card">
+          <span class="metric-value">8</span>
+          <p class="metric-label">образовательных треков под задачи бизнеса и вузов</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="features" class="section" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>Возможности лаборатории</h2>
@@ -147,7 +172,7 @@
       </div>
     </section>
 
-    <section id="equipment" class="section accent">
+    <section id="equipment" class="section accent" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>Оборудование</h2>
@@ -344,7 +369,34 @@
       </div>
     </section>
 
-    <section id="tools" class="section">
+    <section id="approach" class="section" data-scrollspy>
+      <div class="container">
+        <div class="section-header">
+          <h2>Как мы работаем</h2>
+          <p>Прозрачный процесс с понятными контрольными точками — от первой консультации до внедрения готового решения.</p>
+        </div>
+        <div class="approach-grid">
+          <article class="approach-step" data-step="1">
+            <h3>Диагностика задачи</h3>
+            <p>Готовим короткий бриф, проводим встречу и собираем исходные данные: чертежи, 3D‑модели, требования к материалам.</p>
+          </article>
+          <article class="approach-step" data-step="2">
+            <h3>Концепт и план проекта</h3>
+            <p>Подбираем оборудование, составляем роудмап и планируем ресурсы команды. Согласовываем смету и календарь.</p>
+          </article>
+          <article class="approach-step" data-step="3">
+            <h3>Производство и тесты</h3>
+            <p>Проводим 3D‑сканирование, моделирование и печать. Тестируем прототипы, собираем фидбек и дорабатываем.</p>
+          </article>
+          <article class="approach-step" data-step="4">
+            <h3>Передача и сопровождение</h3>
+            <p>Готовим документацию, обучаем команду заказчика и помогаем с внедрением: от демонстрации до серийного запуска.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tools" class="section" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>GenAI и open source инструменты</h2>
@@ -427,7 +479,7 @@
       </div>
     </section>
 
-    <section id="projects" class="section">
+    <section id="projects" class="section" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>Проекты и НИР</h2>
@@ -466,7 +518,7 @@
       </div>
     </section>
 
-    <section id="edu" class="section accent">
+    <section id="edu" class="section accent" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>Курсы ДПО и проектные школы</h2>
@@ -510,7 +562,7 @@
       </div>
     </section>
 
-    <section id="gallery" class="section">
+    <section id="gallery" class="section" data-scrollspy>
       <div class="container">
         <div class="section-header">
           <h2>Галерея</h2>
@@ -563,7 +615,48 @@
       </div>
     </section>
 
-    <section id="faq" class="section accent">
+    <section id="testimonials" class="section accent" data-scrollspy>
+      <div class="container">
+        <div class="section-header">
+          <h2>Отзывы партнёров</h2>
+          <p>Компании и образовательные команды о совместных проектах и наставничестве Step3D.Lab.</p>
+        </div>
+        <div class="testimonial-grid">
+          <figure class="testimonial-card">
+            <blockquote>
+              Step3D.Lab помогла нам ускорить цикл разработки: от идеи до готового прототипа прошли меньше чем за четыре недели
+              — с полным сопровождением инженеров и дизайнеров.
+            </blockquote>
+            <figcaption>
+              <span>Николай Андреев</span>
+              <span class="meta">руководитель продукта, MedTech стартап</span>
+            </figcaption>
+          </figure>
+          <figure class="testimonial-card">
+            <blockquote>
+              Благодаря совместной программе с лабораторией наши студенты получили навыки работы с 3D‑сканерами и аддитивным
+              производством, а мы — обновили учебные модули под запросы индустрии.
+            </blockquote>
+            <figcaption>
+              <span>Екатерина Соколова</span>
+              <span class="meta">заместитель директора технопарка</span>
+            </figcaption>
+          </figure>
+          <figure class="testimonial-card">
+            <blockquote>
+              Лаборатория не только закрыла задачи по реверс‑инжинирингу деталей, но и подготовила команду к серийному запуску:
+              передали документацию, чек-листы и провели обучение для наших специалистов.
+            </blockquote>
+            <figcaption>
+              <span>Алексей Трошин</span>
+              <span class="meta">руководитель производственного направления</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section accent" data-scrollspy>
       <div class="container narrow">
         <div class="section-header center">
           <h2>Вопросы и ответы</h2>
@@ -594,7 +687,24 @@
       </div>
     </section>
 
-    <section id="contact" class="section">
+    <section class="section section--tight" id="cta" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-card">
+          <div>
+            <p class="eyebrow">Совместные проекты</p>
+            <h2 id="cta-title">Давайте обсудим задачу на коротком созвоне</h2>
+            <p>Расскажите о продукте или учебном курсе — подготовим предложение с планом и подбором оборудования в течение двух
+              рабочих дней.</p>
+          </div>
+          <a class="btn primary" href="#contact">
+            Назначить консультацию
+            <span class="icon" aria-hidden="true" style="--icon-src: url('../assets/icons/custom/icon-pereiti-k-kontaktam.svg')"></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section" data-scrollspy>
       <div class="container contact-grid">
         <div class="card">
           <h2>Контакты</h2>
@@ -680,5 +790,10 @@
       </div>
     </div>
   </footer>
+
+  <a class="quick-cta" href="#contact" aria-label="Оставить заявку" data-quick-cta>
+    <span class="icon" aria-hidden="true" data-size="lg" data-variant="invert" style="--icon-src: url('../assets/icons/custom/icon-otpravit-zayavku.svg')"></span>
+    <span class="quick-cta__label">Оставить заявку</span>
+  </a>
 </body>
 </html>
