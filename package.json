@@ -1,18 +1,18 @@
 {
-  "name": "technopark_rssu",
+  "name": "rgsu-skb-page",
   "version": "1.0.0",
-  "description": "Проект разделён на минимальные и понятные модули: ``` step3dlab-static/ ├─ index.html            # Разметка страниц и секции ├─ assets/ │  ├─ css/ │  │  └─ custom.css      # Небольшие пользовательские стили │  └─ js/ │     └─ main.js         # Поведение: меню, фильтры, галерея └─ images/    └─ lab/               # Фотографии для галереи (шесть примеров)       ├─ 1.jpg … 6.jpg ```",
-  "main": "index.js",
+  "private": true,
+  "description": "Production-ready landing page for the RGSU Technopark Student Design Bureau",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "icons:png": "node scripts/svg2png.mjs"
+    "build": "node build-standalone.js",
+    "test:static": "node tests/static-audit.js",
+    "test:smoke": "node tests/smoke.js",
+    "test": "npm run test:static && npm run test:smoke"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
-    "sharp": "^0.34.4",
-    "svgo": "^4.0.0"
+    "playwright": "^1.61.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
