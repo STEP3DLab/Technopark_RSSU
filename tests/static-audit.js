@@ -51,7 +51,7 @@ assert(fs.existsSync(path.join(root, 'backend', 'Code.gs')) && fs.existsSync(pat
 assert(html.includes('до 4 МБ') && js.includes('4 * 1024 * 1024'), 'Ограничение вложения не согласовано');
 assert((html.match(/src="assets\/step3d\/[^"]+\.webp"/g) || []).length === 6, 'Витрина лаборатории должна содержать 6 оптимизированных фотографий');
 assert((html.match(/src="assets\/step3d\/[^"]+\.webp"[^>]+loading="lazy"[^>]+decoding="async"/g) || []).length === 6, 'Фотографии лаборатории должны загружаться отложенно');
-assert(html.includes('https://t.me/STEP_3D_Lab/530') && html.includes('https://t.me/STEP_3D_Lab/539'), 'Нет ссылок на исходные публикации лаборатории');
+assert(!/t\.me|telegram|телеграм/i.test(html), 'В интерфейсе осталась ссылка или упоминание Telegram');
 assert(!forbiddenInterfaceTerms.test(auditableInterfaceStrings), `В интерфейсе осталось английское обозначение: ${auditableInterfaceStrings.match(forbiddenInterfaceTerms)?.[0] || ''}`);
 assert(!forbiddenScriptCopy.test(js), `В сообщениях сценария осталось английское обозначение: ${js.match(forbiddenScriptCopy)?.[0] || ''}`);
 assert((html.match(/class="project-card[^\"]*reveal"/g) || []).length === 2, 'В разработке должны оставаться две приоритетные карточки проектов');
