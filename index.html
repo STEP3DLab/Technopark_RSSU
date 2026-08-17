@@ -3,504 +3,251 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="СКБ Технопарка РГСУ помогает студентам разработать практическую часть курсовой или ВКР: модель, прототип, программу или инженерную систему.">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#053250">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="ru_RU">
-  <meta property="og:site_name" content="РГСУ">
-  <meta property="og:title" content="Практическая часть курсовой и ВКР — СКБ Технопарка РГСУ">
-  <meta property="og:description" content="Наставники, лаборатории и оборудование для разработки модели, прототипа, программы или инженерной системы.">
-  <meta name="twitter:card" content="summary">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Студенческое конструкторское бюро Технопарка РГСУ","description":"Практическая часть курсовой и ВКР: модели, прототипы, программы и инженерные системы.","inLanguage":"ru-RU","isPartOf":{"@type":"CollegeOrUniversity","name":"Российский государственный социальный университет","url":"https://rgsu.net/"},"about":{"@type":"Organization","name":"СКБ Технопарка РГСУ","email":"technopark@rgsu.net","telephone":"+7-916-841-45-16","address":{"@type":"PostalAddress","addressLocality":"Москва","streetAddress":"ул. Вильгельма Пика, д. 4, стр. 8","addressCountry":"RU"}}}</script>
-  <title>Практическая часть курсовой и ВКР — СКБ Технопарка РГСУ</title>
-  <link rel="icon" href="assets/rgsu-logo.png" type="image/png">
-  <link rel="apple-touch-icon" href="assets/rgsu-logo.png">
-  <link rel="preload" href="assets/fonts/Manrope-Regular.subset.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/fonts/Manrope-ExtraBold.subset.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Будущий сайт Технопарка и Студенческого конструкторского бюро РГСУ для студентов университета.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#073b5c">
+  <title>Технопарк РГСУ — страница в разработке</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0b2b3c;
+      --muted: #58707d;
+      --blue: #073b5c;
+      --cyan: #18b7d6;
+      --lime: #d9e95f;
+      --paper: #f5f9fb;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+      font-family: Inter, Manrope, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 15%, rgba(24, 183, 214, .18), transparent 34%),
+        radial-gradient(circle at 86% 82%, rgba(217, 233, 95, .26), transparent 32%),
+        var(--paper);
+    }
+
+    .page {
+      position: relative;
+      width: min(940px, 100%);
+      min-height: min(620px, calc(100vh - 48px));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 56px;
+      padding: clamp(28px, 5vw, 64px);
+      border: 1px solid rgba(7, 59, 92, .12);
+      border-radius: 32px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 30px 90px rgba(7, 59, 92, .12);
+      backdrop-filter: blur(18px);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .page::before,
+    .page::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: 999px;
+      filter: blur(2px);
+    }
+
+    .page::before {
+      width: 260px;
+      height: 260px;
+      top: -130px;
+      right: -90px;
+      background: linear-gradient(145deg, rgba(24, 183, 214, .36), rgba(24, 183, 214, .03));
+    }
+
+    .page::after {
+      width: 200px;
+      height: 200px;
+      left: -100px;
+      bottom: -110px;
+      background: linear-gradient(145deg, rgba(217, 233, 95, .5), rgba(217, 233, 95, .04));
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: fit-content;
+      font-weight: 800;
+      letter-spacing: .02em;
+      color: var(--blue);
+    }
+
+    .brand__mark {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      color: var(--white);
+      background: var(--blue);
+      box-shadow: 0 10px 26px rgba(7, 59, 92, .18);
+    }
+
+    .brand__text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.12;
+    }
+
+    .brand__text small {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 22px;
+      padding: 8px 13px;
+      border: 1px solid rgba(7, 59, 92, .12);
+      border-radius: 999px;
+      color: var(--blue);
+      background: rgba(255, 255, 255, .8);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 6px rgba(24, 183, 214, .12);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+
+    .lead {
+      max-width: 670px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.58;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: fit-content;
+      margin-top: 34px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .status__line {
+      position: relative;
+      width: 94px;
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(7, 59, 92, .1);
+    }
+
+    .status__line::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 45%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--lime));
+      animation: move 2.2s ease-in-out infinite alternate;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(7, 59, 92, .1);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @keyframes move {
+      from { transform: translateX(0); }
+      to { transform: translateX(122%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .status__line::after { animation: none; }
+    }
+
+    @media (max-width: 620px) {
+      body { padding: 12px; }
+      .page {
+        min-height: calc(100vh - 24px);
+        border-radius: 24px;
+        gap: 42px;
+      }
+      h1 { font-size: clamp(40px, 13vw, 62px); }
+      footer { flex-direction: column; gap: 7px; }
+    }
+  </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Перейти к содержанию</a>
-  <div class="page-progress" aria-hidden="true"><span></span></div>
-  <div class="network-status" role="status" aria-live="polite" hidden>Нет соединения с интернетом. Данные останутся в форме, пока страница открыта.</div>
+  <main class="page">
+    <header class="brand" aria-label="Технопарк РГСУ">
+      <span class="brand__mark" aria-hidden="true">Р</span>
+      <span class="brand__text">
+        Технопарк РГСУ
+        <small>Студенческое конструкторское бюро</small>
+      </span>
+    </header>
 
-  <header class="site-header" id="top">
-    <div class="topbar">
-      <div class="container topbar__inner">
-        <nav class="audience-nav" aria-label="Навигация по аудиториям">
-          <a href="#student-project">Студентам</a>
-          <a href="#partners">Организациям</a>
-          <a href="#nts">Сотрудникам</a>
-        </nav>
-        <div class="topbar__tools">
-          <a href="mailto:technopark@rgsu.net">technopark@rgsu.net</a>
-          <a href="tel:+79168414516">+7 (916) 841-45-16</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="container header-main">
-      <a class="brand" href="#top" aria-label="РГСУ — на главную">
-        <span class="brand__logo-crop"><img class="brand__logo" src="assets/rgsu-logo.png" width="612" height="792" alt=""></span>
-        <span class="brand__text">
-          <strong>Студенческое конструкторское бюро</strong>
-          <small>Технопарк РГСУ</small>
-        </span>
-      </a>
-
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
-        <span></span><span></span><span></span><span class="sr-only">Открыть меню</span>
-      </button>
-
-      <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
-        <a href="#about">Главная</a>
-        <a class="nav-student" href="#student-project">Практическая часть</a>
-        <a href="#labs">Лаборатории</a>
-        <a href="#projects">Проекты</a>
-        <a href="#nts">НТС</a>
-        <button class="button button--small" type="button" data-open-form="student">Обсудить практическую часть</button>
-      </nav>
-    </div>
-  </header>
-
-  <main id="main" tabindex="-1">
-    <section class="hero" id="about">
-      <div class="container">
-        <nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="https://rgsu.net/">РГСУ</a></li><li><span>Наука и инновации</span></li><li aria-current="page">СКБ</li></ol></nav>
-        <div class="hero__grid">
-          <div class="hero__content reveal">
-            <span class="eyebrow">Для студентов РГСУ</span>
-            <h1>Поможем разработать практическую часть курсовой работы или ВКР</h1>
-            <p class="hero__lead">Уже есть тема или только идея? Поможем определить результат, подобрать наставника и лабораторию, создать модель, прототип, программу или инженерную систему.</p>
-            <div class="hero__actions">
-              <button class="button" type="button" data-open-form="student">Обсудить практическую часть <span aria-hidden="true">↗</span></button>
-              <a class="button button--ghost" href="#student-cases">Примеры результатов</a>
-              <button class="hero__partner-link" type="button" data-open-form="partner">Я представляю организацию →</button>
-            </div>
-            <div class="integrity-banner"><strong>Вы — автор проекта.</strong><span>СКБ не пишет учебную работу за студента: наставник помогает спроектировать и выполнить практическую часть, а текст вы готовите самостоятельно.</span></div>
-          </div>
-
-          <div class="hero-console reveal" data-tilt>
-            <div class="hero-console__bar"><span><i></i> Три лаборатории · одна команда</span><strong>СКБ РГСУ · 2026</strong></div>
-            <div class="system-map" role="img" aria-label="СКБ соединяет тему студента с тремя лабораториями и практическим результатом">
-              <svg viewBox="0 0 560 450" aria-hidden="true" focusable="false">
-                <defs>
-                  <radialGradient id="hub-glow"><stop offset="0" stop-color="#29c7e8" stop-opacity=".5"/><stop offset="1" stop-color="#29c7e8" stop-opacity="0"/></radialGradient>
-                  <linearGradient id="route-gradient" x1="0" x2="1"><stop stop-color="#29c7e8"/><stop offset="1" stop-color="#c9e56c"/></linearGradient>
-                  <pattern id="console-grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#fff" stroke-opacity=".055"/></pattern>
-                </defs>
-                <rect width="560" height="450" fill="url(#console-grid)"/>
-                <circle class="map-orbit map-orbit--outer" cx="280" cy="225" r="166"/>
-                <circle class="map-orbit" cx="280" cy="225" r="112"/>
-                <circle class="map-radar" cx="280" cy="225" r="82"/>
-                <path class="map-route" d="M280 225 150 120M280 225 419 125M280 225 421 327M280 225 145 330"/>
-                <g class="map-node map-node--input" transform="translate(91 86)"><rect width="118" height="64" rx="16"/><text x="59" y="27">ВАША ТЕМА</text><text class="map-node__sub" x="59" y="45">идея / задание</text></g>
-                <g class="map-node" transform="translate(374 91)"><rect width="118" height="64" rx="16"/><text x="59" y="27">МОДЕЛИ</text><text class="map-node__sub" x="59" y="45">проектирование</text></g>
-                <g class="map-node" transform="translate(377 295)"><rect width="118" height="64" rx="16"/><text x="59" y="27">ИИ</text><text class="map-node__sub" x="59" y="45">цифровая среда</text></g>
-                <g class="map-node" transform="translate(86 298)"><rect width="126" height="64" rx="16"/><text x="63" y="27">РОБОТЫ</text><text class="map-node__sub" x="63" y="45">управление</text></g>
-                <g class="map-hub" transform="translate(280 225)"><circle r="72" fill="url(#hub-glow)"/><circle r="48"/><text y="-3">СКБ</text><text class="map-hub__sub" y="18">ТЕХНОПАРК</text></g>
-                <circle class="map-pulse map-pulse--1" cx="280" cy="225" r="5"/>
-                <circle class="map-pulse map-pulse--2" cx="280" cy="225" r="5"/>
-              </svg>
-              <div class="system-map__mobile" aria-hidden="true"><span>Ваша тема</span><i>→</i><span>Наставник и лаборатория</span><i>→</i><span>Практический результат</span></div>
-              <span class="system-map__label system-map__label--one">01 · анализ задачи</span>
-              <span class="system-map__label system-map__label--two">02 · подбор команды</span>
-              <span class="system-map__label system-map__label--three">03 · разработка</span>
-              <span class="system-map__label system-map__label--four">04 · результат</span>
-            </div>
-            <div class="hero-console__metrics" aria-label="Ключевые параметры работы СКБ">
-              <div><strong data-count="3">3</strong><span>лаборатории</span></div>
-              <div><strong data-count="4">4</strong><span>этапа работы</span></div>
-              <div><strong>1</strong><span>практический результат</span></div>
-            </div>
-            <p class="hero-console__note"><i></i> Тему можно уточнить вместе с наставником</p>
-          </div>
-        </div>
+    <section class="content">
+      <span class="eyebrow">Новый сайт готовится</span>
+      <h1>Страница находится в разработке</h1>
+      <p class="lead">Здесь появится сайт для студентов РГСУ о возможностях Технопарка и Студенческого конструкторского бюро: лабораториях, проектах, оборудовании и участии в разработках.</p>
+      <div class="status" aria-label="Сайт разрабатывается">
+        <span class="status__line" aria-hidden="true"></span>
+        Идёт подготовка материалов
       </div>
     </section>
 
-    <section class="section student-fit" id="student-project">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div><p class="section-kicker">Когда обращаться</p><h2>СКБ поможет, если…</h2></div>
-          <p>Можно прийти даже без готового технического задания. Достаточно темы, предварительной идеи или требований научного руководителя.</p>
-        </div>
-        <div class="fit-grid">
-          <article class="fit-card reveal"><span>01</span><h3>Есть тема, но нет практической части</h3><p>Вместе определим, что можно спроектировать, изготовить, запрограммировать или испытать.</p></article>
-          <article class="fit-card reveal"><span>02</span><h3>Нужен конкретный результат</h3><p>Поможем создать модель, макет, программу, действующий образец или провести исследование.</p></article>
-          <article class="fit-card reveal"><span>03</span><h3>Нужны ресурсы и наставник</h3><p>Подберём лабораторию, оборудование и специалиста под задачу и доступные сроки.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--soft student-cases" id="student-cases">
-      <div class="container">
-        <div class="section-heading reveal"><div><p class="section-kicker">Примеры учебных результатов</p><h2>Что может стать практической частью</h2></div><p>Результат согласуем с научным руководителем с учётом сроков, материалов и доступного оборудования.</p></div>
-        <div class="case-grid">
-          <article class="case-card reveal"><span class="case-card__lab">Инженерное проектирование</span><h3>Учебный медицинский тренажёр</h3><dl><div><dt>Тема</dt><dd>Разработка модульного симулятора</dd></div><div><dt>Результат</dt><dd>Трёхмерная модель, прототип и испытания</dd></div><div><dt>Для текста работы</dt><dd>Схемы, фотографии, параметры конструкции и результаты проверки</dd></div></dl></article>
-          <article class="case-card reveal"><span class="case-card__lab">ИИ и виртуальная среда</span><h3>Цифровой учебный модуль</h3><dl><div><dt>Тема</dt><dd>Разработка интерактивного тренажёра</dd></div><div><dt>Результат</dt><dd>Рабочий программный прототип</dd></div><div><dt>Для текста работы</dt><dd>Сценарий, устройство программы, интерфейс и результаты проверки удобства</dd></div></dl></article>
-          <article class="case-card reveal"><span class="case-card__lab">Робототехника</span><h3>Автоматизированный макет</h3><dl><div><dt>Тема</dt><dd>Создание системы управления устройством</dd></div><div><dt>Результат</dt><dd>Электронный узел и алгоритм</dd></div><div><dt>Для текста работы</dt><dd>Схема подключения, код, протокол испытаний и демонстрация работы</dd></div></dl></article>
-        </div>
-
-        <div class="process-panel reveal">
-          <div class="process-panel__head"><p class="section-kicker">Как проходит работа</p><h2>Четыре понятных шага</h2></div>
-          <div class="process-route" aria-hidden="true"><span></span></div>
-          <ol class="process-list" data-process><li><span>01</span><div><strong>Отправляете тему</strong><p>Можно предварительную — приложите всё, что уже есть.</p><small>Входные данные</small></div></li><li><span>02</span><div><strong>Вместе определяем результат</strong><p>Оцениваем реализуемость, объём и доступные сроки.</p><small>Проектная задача</small></div></li><li><span>03</span><div><strong>Вы разрабатываете с наставником</strong><p>Используете консультации, оборудование и инфраструктуру.</p><small>Прототипирование</small></div></li><li><span>04</span><div><strong>Фиксируете результат</strong><p>Модель, испытания, фото, схемы и данные для самостоятельного описания.</p><small>Практическая глава</small></div></li></ol>
-          <button class="button" type="button" data-open-form="student">Обсудить практическую часть <span aria-hidden="true">↗</span></button>
-        </div>
-      </div>
-    </section>
-
-    <section class="section labs" id="labs">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div>
-            <p class="section-kicker">Возможности</p>
-            <h2>Три лаборатории.<br>Одна проектная среда.</h2>
-          </div>
-          <p>Команды формируются под задачу и могут объединять специалистов из разных направлений.</p>
-        </div>
-
-        <div class="lab-system reveal" aria-label="Схема движения задачи через лаборатории СКБ">
-          <div class="lab-system__input"><span>Вход</span><strong>Тема или задача</strong><small>идея · требования · исходные данные</small></div>
-          <div class="lab-system__core"><span class="lab-system__pulse"></span><strong>СКБ</strong><small>проектная сборка</small></div>
-          <div class="lab-system__branches">
-            <div><i>01</i><span><strong>Инженерное проектирование</strong><small>форма · конструкция · производство</small></span></div>
-            <div><i>02</i><span><strong>ИИ и цифровая среда</strong><small>данные · программы · виртуальная среда</small></span></div>
-            <div><i>03</i><span><strong>Робототехника</strong><small>электроника · управление · испытания</small></span></div>
-          </div>
-          <div class="lab-system__output"><span>Выход</span><strong>Практический результат</strong><small>модель · прототип · программа · система</small></div>
-        </div>
-
-        <div class="lab-grid">
-          <article class="lab-card lab-card--coral reveal">
-            <div class="lab-card__top"><span>Лаборатория 01</span><span class="lab-card__arrow">↗</span></div>
-            <div class="lab-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 120 100" aria-hidden="true" focusable="false"><path d="M20 74 48 22l18 29 13-18 23 41H20Z"/><circle cx="88" cy="21" r="10"/></svg>
-            </div>
-            <h3>Промышленный дизайн и инженерное проектирование</h3>
-            <p>Трёхмерное моделирование и сканирование, восстановление моделей по образцу, создание прототипов, трёхмерная печать и подготовка мастер-моделей.</p>
-            <button class="link-button" type="button" data-lab="industry">Подробнее <span>→</span></button>
-          </article>
-
-          <article class="lab-card lab-card--sky reveal">
-            <div class="lab-card__top"><span>Лаборатория 02</span><span class="lab-card__arrow">↗</span></div>
-            <div class="lab-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 120 100" aria-hidden="true" focusable="false"><rect x="23" y="18" width="74" height="55" rx="10"/><path d="M38 83h44M60 73v10M38 46h12l7-12 10 25 7-13h10"/></svg>
-            </div>
-            <h3>Компьютерные науки и искусственный интеллект</h3>
-            <p>Решения на основе ИИ, анализ данных, сайты и мобильные приложения, тренажёры виртуальной и дополненной реальности, компьютерное зрение.</p>
-            <button class="link-button" type="button" data-lab="ai">Подробнее <span>→</span></button>
-          </article>
-
-          <article class="lab-card lab-card--lime reveal">
-            <div class="lab-card__top"><span>Лаборатория 03</span><span class="lab-card__arrow">↗</span></div>
-            <div class="lab-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 120 100" aria-hidden="true" focusable="false"><path d="M33 35h54v42H33zM44 22h32v13M60 12v10M23 45h10M87 45h10M47 55h2M71 55h2M48 68c7 5 17 5 24 0"/></svg>
-            </div>
-            <h3>Робототехника и беспилотные системы</h3>
-            <p>Мехатроника, электроника, программирование контроллеров, мобильные роботы, БПЛА и испытания инженерных систем.</p>
-            <button class="link-button" type="button" data-lab="robotics">Подробнее <span>→</span></button>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--soft projects" id="projects">
-      <div class="container">
-        <div class="section-heading section-heading--projects reveal">
-          <div>
-            <p class="section-kicker">Примеры работ</p>
-            <h2>Проекты СКБ</h2>
-          </div>
-          <p>Выполненные работы и текущие разработки показывают, какие задачи студенты могут решать вместе с наставниками.</p>
-        </div>
-
-        <div class="project-subheading reveal">
-          <p class="section-kicker">Текущая работа</p>
-          <h3>Проекты в разработке</h3>
-        </div>
-        <div class="project-grid">
-          <article class="project-card project-card--large reveal" data-category="industry">
-            <div class="project-card__visual project-card__visual--trainer">
-              <span class="visual-label">Учебный симулятор</span>
-              <span class="project-card__number">01</span>
-              <div class="project-card__hud" aria-hidden="true"><i></i><i></i><i></i><span>МОДЕЛЬ / ИСПЫТАНИЯ</span></div>
-              <svg viewBox="0 0 500 270" aria-hidden="true" focusable="false">
-                <path class="body" d="M100 205c8-78 59-126 150-126s142 48 150 126"/>
-                <path class="rib" d="M161 146c44-28 134-28 178 0M146 172c54-30 154-30 208 0M136 199c63-30 165-30 228 0"/>
-                <rect x="215" y="107" width="70" height="92" rx="17"/>
-                <circle cx="250" cy="147" r="13"/>
-              </svg>
-            </div>
-            <div class="project-card__body">
-              <div class="project-card__meta"><span>Медицинское обучение</span><span>В разработке</span></div>
-              <h3>Тренажёр диагностики пневмоторакса</h3>
-              <p>Учебный симулятор со сменными модулями для многократной отработки навыков.</p>
-              <ul class="project-card__results" aria-label="Результаты проекта"><li>Трёхмерная модель</li><li>Прототип</li><li>Испытания</li></ul>
-            </div>
-          </article>
-
-          <article class="project-card reveal" data-category="robotics digital">
-            <div class="project-card__visual project-card__visual--helmet">
-              <span class="visual-label">ИИ и электроника</span>
-              <span class="project-card__number">02</span>
-              <div class="project-card__hud" aria-hidden="true"><i></i><i></i><i></i><span>СИГНАЛЫ / АНАЛИЗ</span></div>
-              <svg viewBox="0 0 300 210" aria-hidden="true" focusable="false"><path d="M84 169V99c0-48 29-75 66-75s66 27 66 75v70"/><path d="M103 83c20-19 74-19 94 0M103 111h94M116 139h68"/><circle cx="104" cy="83" r="7"/><circle cx="196" cy="83" r="7"/><circle cx="150" cy="111" r="7"/></svg>
-            </div>
-            <div class="project-card__body">
-              <div class="project-card__meta"><span>Нейротехнологии</span><span>Опытный образец</span></div>
-              <h3>Нейрошлем</h3>
-              <p>Опытная система для регистрации и программного анализа сигналов.</p>
-              <ul class="project-card__results" aria-label="Результаты проекта"><li>Электроника</li><li>Данные</li><li>Рабочий образец</li></ul>
-            </div>
-          </article>
-        </div>
-
-        <section class="field-stories reveal" aria-labelledby="field-stories-title">
-          <div class="field-stories__heading">
-            <div>
-              <p class="section-kicker">Выполненные проекты лаборатории</p>
-              <h3 id="field-stories-title">От цифровой модели — до объекта в руках и на сцене</h3>
-            </div>
-            <p>Два проекта показывают весь путь от компьютерной модели до готового изделия.</p>
-          </div>
-
-          <div class="field-stories__grid">
-            <article class="field-story field-story--award">
-              <div class="field-story__cover">
-                <img src="assets/step3d/award-final.webp" width="800" height="600" loading="lazy" decoding="async" alt="Три награды премии Союза театральных деятелей, изготовленные в лаборатории Технопарка РГСУ">
-                <span class="field-story__source">Фото: лаборатория Технопарка РГСУ</span>
-              </div>
-              <div class="field-story__body">
-                <div class="field-story__meta"><span>Промышленный дизайн</span><span>10 дней</span></div>
-                <h4>Награда для премии СТД</h4>
-                <p>Команда реализовала проект от идеи и дизайна до серии готовых изделий в Технопарке РГСУ.</p>
-                <ul class="field-story__facts" aria-label="Этапы проекта"><li>Концепция</li><li>Трёхмерная модель</li><li>Производство</li></ul>
-                <figure class="field-story__proof">
-                  <img src="assets/step3d/award-stage.webp" width="800" height="533" loading="lazy" decoding="async" alt="Награда, изготовленная в лаборатории Технопарка РГСУ, на церемонии премии СТД">
-                  <figcaption>Готовое изделие на церемонии премии</figcaption>
-                </figure>
-              </div>
-            </article>
-
-            <article class="field-story field-story--theater">
-              <div class="field-story__body">
-                <div class="field-story__meta"><span>Трёхмерная печать для сцены</span><span>5 дней</span></div>
-                <h4>Светильники для мюзикла «Последняя сказка»</h4>
-                <p>Габаритные сценические объекты спроектировали, напечатали, собрали и установили в Московском дворце молодёжи.</p>
-              </div>
-              <div class="field-story__process" aria-label="Этапы создания сценических светильников">
-                <figure class="field-story__step">
-                  <img src="assets/step3d/theater-cad.webp" width="616" height="616" loading="lazy" decoding="async" alt="Компьютерная модель сценического светильника с основными размерами">
-                  <figcaption><b>01 · Проектирование</b><span>Модель и габариты</span></figcaption>
-                </figure>
-                <figure class="field-story__step">
-                  <img src="assets/step3d/theater-making.webp" width="800" height="450" loading="lazy" decoding="async" alt="Сборка и художественная отделка крупногабаритных деталей светильников в лаборатории Технопарка РГСУ">
-                  <figcaption><b>02 · Производство</b><span>Печать, сборка и отделка деталей</span></figcaption>
-                </figure>
-                <figure class="field-story__step">
-                  <img src="assets/step3d/theater-installation.webp" width="450" height="800" loading="lazy" decoding="async" alt="Монтаж напечатанных светильников над сценой Московского дворца молодёжи">
-                  <figcaption><b>03 · Монтаж</b><span>Установка на сцене</span></figcaption>
-                </figure>
-                <figure class="field-story__step">
-                  <img src="assets/step3d/theater-final.webp" width="450" height="800" loading="lazy" decoding="async" alt="Готовый декоративный светильник, изготовленный с применением трёхмерной печати">
-                  <figcaption><b>04 · Результат</b><span>Объект весом менее 5 кг</span></figcaption>
-                </figure>
-              </div>
-            </article>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="section pathways" id="partners">
-      <div class="container">
-        <article class="partner-panel reveal">
-          <div class="partner-panel__content">
-            <p class="section-kicker">Компаниям и подразделениям</p>
-            <h3>Заказать разработку или услугу</h3>
-            <p>Опишите задачу, желаемый результат и срок. Мы предложим этапы работы и условия сотрудничества.</p>
-            <button class="button button--light" type="button" data-open-form="partner">Обсудить задачу <span aria-hidden="true">↗</span></button>
-          </div>
-          <ul class="partner-panel__services"><li>Трёхмерное сканирование и моделирование</li><li>Прототипирование и производство</li><li>ИИ, виртуальная среда и программные решения</li><li>Робототехника и инженерные системы</li></ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="section section--soft nts" id="nts">
-      <div class="container">
-        <div class="section-heading reveal">
-          <div>
-            <p class="section-kicker">Научно-технический совет</p>
-            <h2>Новости и решения НТС</h2>
-          </div>
-          <p>Совет рассматривает проекты, проверяет выполнение поручений и принимает решения о следующих этапах.</p>
-        </div>
-
-        <div class="news-grid">
-          <article class="news-card news-card--featured reveal">
-            <time class="news-card__date" datetime="2026-07-09"><strong>09</strong><span>июля<br>2026</span></time>
-            <div>
-              <span class="tag">Заседание</span>
-              <h3>НТС №12: новые проекты и программы поддержки</h3>
-              <p>Статус лабораторных проектов, грантовые возможности и развитие учебных симуляторов.</p>
-              <span class="news-card__footer">Решения совета и статус проектов</span>
-            </div>
-          </article>
-
-          <article class="news-card reveal">
-            <time class="news-card__date" datetime="2026-06-26"><strong>26</strong><span>июня<br>2026</span></time>
-            <div>
-              <span class="tag">Протокол</span>
-              <h3>Контроль исполнения поручений НТС №11</h3>
-              <p>Паспорта проектов, планы лабораторий и подготовка заявок на внешние конкурсы.</p>
-              <span class="news-card__footer">Контроль поручений и план работ</span>
-            </div>
-          </article>
-
-          <article class="news-card reveal">
-            <time class="news-card__date" datetime="2026-06-18"><strong>18</strong><span>июня<br>2026</span></time>
-            <div>
-              <span class="tag">Проекты</span>
-              <h3>От идеи к паспорту технологического проекта</h3>
-              <p>Как СКБ отбирает инициативы, формирует команду и готовит проект к рассмотрению советом.</p>
-              <span class="news-card__footer">Методика проектного отбора</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section faq" id="faq">
-      <div class="container faq__grid">
-        <div class="faq__intro reveal"><p class="section-kicker">Частые вопросы</p><h2>До отправки темы</h2><p>Если здесь нет ответа, задайте вопрос в обращении.</p></div>
-        <div class="accordion reveal">
-          <details open><summary>Можно обратиться, если тема ещё не утверждена?</summary><p>Да. Опишите предварительную идею: мы поможем оценить, какой практический результат можно получить. Итоговую тему и формат необходимо согласовать с научным руководителем.</p></details>
-          <details><summary>СКБ выполняет курсовую или ВКР за студента?</summary><p>Нет. Студент лично участвует в разработке и самостоятельно готовит текст. СКБ предоставляет консультации, наставника, оборудование и помощь в создании и испытании практического результата.</p></details>
-          <details><summary>С какими проектами можно прийти?</summary><p>С задачами по трёхмерному моделированию и созданию прототипов, программным и ИИ-решениям, виртуальной среде, робототехнике, электронике и беспилотным системам.</p></details>
-          <details><summary>Что приложить к заявке?</summary><p>Тему, задание кафедры, комментарии руководителя, эскизы и исходные материалы — всё, что уже есть. Если материалов пока нет, достаточно описать идею и срок.</p></details>
-          <details><summary>Гарантирует ли заявка, что проект возьмут в работу?</summary><p>Нет. Команда проверит сроки, материалы и доступность оборудования. Затем сообщим, можем ли взять проект в работу и какой результат реалистичен.</p></details>
-          <details><summary>Сколько это стоит и когда лучше обратиться?</summary><p>После оценки сообщим, нужны ли платные материалы или работы. Лучше обратиться заранее: для создания и испытания прототипа потребуется время.</p></details>
-        </div>
-      </div>
-    </section>
-
-    <section class="section cta-section" id="contacts">
-      <div class="container">
-        <div class="cta reveal">
-          <p class="section-kicker">Первичная консультация</p>
-          <h2>Начните с того, что уже есть</h2>
-          <p>Предварительной темы достаточно. Мы оценим задачу и предложим следующий шаг.</p>
-          <div class="cta__actions">
-            <button class="button button--light" type="button" data-open-form="student">Обсудить практическую часть</button>
-            <button class="button button--outline-light" type="button" data-open-form="partner">Обсудить задачу организации</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <footer>
+      <span>Российский государственный социальный университет</span>
+      <span>Технопарк РГСУ · Москва</span>
+    </footer>
   </main>
-
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <a class="brand brand--footer" href="#top" aria-label="РГСУ — наверх">
-          <span class="brand__logo-badge"><span class="brand__logo-crop"><img class="brand__logo" src="assets/rgsu-logo.png" width="612" height="792" alt=""></span></span>
-          <span class="brand__text"><strong>Студенческое конструкторское бюро</strong><small>Технопарк РГСУ</small></span>
-        </a>
-        <p class="footer-note">Студенческое конструкторское бюро<br>Проектного центра «Технопарк РГСУ»</p>
-      </div>
-      <div>
-        <h3>Разделы</h3>
-        <a href="#labs">Лаборатории</a><a href="#projects">Проекты</a><a href="#nts">Новости НТС</a><a href="#partners">Сотрудничество</a>
-      </div>
-      <div>
-        <h3>Контакты</h3>
-        <a href="mailto:technopark@rgsu.net">technopark@rgsu.net</a>
-        <button class="copy-button" type="button" data-copy="technopark@rgsu.net">Скопировать электронную почту</button>
-        <a href="tel:+79168414516">+7 (916) 841-45-16</a>
-        <address>Москва, ул. Вильгельма Пика,<br>д. 4, стр. 8</address>
-      </div>
-      <div>
-        <h3>РГСУ</h3>
-        <a href="https://rgsu.net/" target="_blank" rel="noopener noreferrer">Основной сайт <span class="sr-only">(откроется в новой вкладке)</span> ↗</a>
-        <a href="https://technopark-rgsu.ru/" target="_blank" rel="noopener noreferrer">Технопарк <span class="sr-only">(откроется в новой вкладке)</span> ↗</a>
-      </div>
-    </div>
-    <div class="container footer-bottom"><span>© <span id="copyright-year">2026</span> РГСУ</span><a href="https://disk.yandex.ru/i/wegAVqvhEBJRDw" target="_blank" rel="noopener noreferrer">Политика обработки персональных данных<span class="sr-only"> — откроется в новой вкладке</span></a><span>СКБ Технопарка РГСУ</span></div>
-  </footer>
-
-  <dialog class="modal" id="application-modal" aria-labelledby="modal-title" aria-describedby="modal-description">
-    <button class="modal__close" type="button" aria-label="Закрыть форму">×</button>
-    <div class="modal__intro">
-      <p class="section-kicker">Заявка в СКБ</p>
-      <h2 id="modal-title">Расскажите о задаче</h2>
-      <p id="modal-description">Заполнение займёт около трёх минут. Обязательные поля отмечены звёздочкой.</p>
-      <div class="form-switch" role="group" aria-label="Тип заявителя">
-        <button class="is-active" type="button" data-form-type="partner" aria-pressed="true">Организация</button>
-        <button type="button" data-form-type="student" aria-pressed="false">Студент</button>
-      </div>
-      <p class="sr-only" id="form-mode-status" role="status" aria-live="polite"></p>
-    </div>
-    <form class="application-form" id="application-form" method="post" action="mailto:technopark@rgsu.net" enctype="text/plain" data-endpoint="" novalidate>
-      <input type="hidden" name="type" id="form-type" value="partner">
-      <input type="hidden" name="source_url" id="form-source-url" value="">
-      <input type="hidden" name="source_cta" id="form-source-cta" value="">
-      <input type="text" name="website" hidden tabindex="-1" autocomplete="off">
-      <label>Имя и фамилия *<input name="name" autocomplete="name" enterkeyhint="next" required placeholder="Как к вам обращаться"></label>
-      <div class="form-row">
-        <label>Электронная почта *<input name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" required placeholder="Ваш адрес электронной почты"></label>
-        <label>Телефон<input name="phone" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="next" placeholder="+7 900 000-00-00"></label>
-      </div>
-      <label class="organization-field">Организация *<input name="organization" autocomplete="organization" data-partner-required placeholder="Название компании или подразделения"></label>
-      <label class="student-only" hidden>Вид учебной работы *
-        <select name="student_work_type" data-student-required disabled>
-          <option value="">Выберите вариант</option>
-          <option>Курсовая работа / курсовой проект</option>
-          <option>ВКР / дипломный проект</option>
-          <option>Проектная практика</option>
-          <option>Собственная проектная идея</option>
-        </select>
-      </label>
-      <label class="student-only" hidden>Тема или предварительная идея *<input name="student_topic" maxlength="300" data-student-required disabled aria-describedby="student-topic-counter" placeholder="Укажите тему или опишите идею своими словами"><span class="field-counter" id="student-topic-counter" data-counter-for="student_topic">0 / 300</span></label>
-      <details class="form-optional student-only" hidden>
-        <summary>Дополнительные сведения</summary>
-        <div class="form-row">
-          <label>Институт и курс<input name="faculty" disabled placeholder="Например: ФИТ, 3 курс"></label>
-          <label>Научный руководитель<input name="supervisor" disabled placeholder="Имя руководителя, если он назначен"></label>
-        </div>
-        <label>Планируемый срок защиты<input name="deadline" type="date" disabled></label>
-      </details>
-      <label><span id="task-label">Кратко опишите задачу *</span><textarea name="task" rows="5" maxlength="2000" aria-describedby="task-counter" required placeholder="Опишите, что нужно разработать и какой результат вы ожидаете"></textarea><span class="field-counter" id="task-counter" data-counter-for="task">0 / 2000</span></label>
-      <label class="file-field" data-dropzone>Приложить материалы<input name="attachment" type="file" aria-describedby="file-help file-error" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.zip"><span>Выберите файл или перетащите его сюда</span><span id="file-help">Документ, презентация, изображение или архив — до 4 МБ</span><span class="file-error" id="file-error" role="alert"></span></label>
-      <label class="checkbox"><input name="consent" value="yes" type="checkbox" required><span>Согласен(на) с <a href="https://disk.yandex.ru/i/wegAVqvhEBJRDw" target="_blank" rel="noopener noreferrer">политикой обработки персональных данных<span class="sr-only"> — откроется в новой вкладке</span></a> *</span></label>
-      <div class="form-alert" id="form-alert" role="alert" tabindex="-1" hidden></div>
-      <button class="button" id="form-submit" type="submit"><span class="form-submit-label">Подготовить письмо</span><span aria-hidden="true">↗</span></button>
-      <p class="form-demo-note" id="form-submit-note">Откроется почтовая программа с заполненным письмом на technopark@rgsu.net.</p>
-    </form>
-    <div class="form-success" role="status" aria-live="polite" hidden>
-      <span aria-hidden="true">✓</span><h2 tabindex="-1">Обращение подготовлено</h2><p>Проверьте письмо и отправьте его из почтовой программы.</p>
-      <button class="button" type="button" data-close-form>Понятно</button>
-    </div>
-  </dialog>
-
-  <dialog class="modal modal--lab" id="lab-modal" aria-labelledby="lab-modal-title" aria-describedby="lab-modal-description">
-    <button class="modal__close" type="button" aria-label="Закрыть">×</button>
-    <p class="section-kicker" id="lab-modal-kicker">Лаборатория</p>
-    <h2 id="lab-modal-title" tabindex="-1"></h2>
-    <p id="lab-modal-description"></p>
-    <div class="lab-modal__cols">
-      <div><h3>Что делаем</h3><ul id="lab-modal-services"></ul></div>
-      <div><h3>Результат</h3><ul id="lab-modal-results"></ul></div>
-    </div>
-    <button class="button" type="button" data-open-form="partner">Предложить проект <span>↗</span></button>
-  </dialog>
-
-  <button class="back-to-top" type="button" aria-label="Вернуться к началу страницы">↑</button>
-  <div class="toast" role="status" aria-live="polite"></div>
-  <script src="script.js"></script>
 </body>
 </html>
