@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import * as THREE from '../vendor/three.module.min.js';
 import * as data from '../data.js';
+import * as experience from '../experience.js';
 
 // Execute the production state/event functions with small DOM stand-ins.
 // These tests do not render WebGL or claim to verify a physical VR headset.
@@ -21,11 +22,12 @@ function harness() {
     if (!elements.has(selector)) {
       const listeners = new Map();
       const attributes = new Map();
+      const classes = new Set();
       elements.set(selector, {
         id: selector.startsWith('#') ? selector.slice(1) : '',
         value: selector === '#system' ? 'all' : '',
-        hidden: false, innerHTML: '', textContent: '', style: {}, dataset: {},
-        classList: {add() {}, remove() {}, toggle() {}},
+        hidden: false, innerHTML: '', textContent: '', style: {setProperty(name,value){this[name]=value}}, dataset: {},
+        classList: {add(...v) {v.forEach(x=>classes.add(x))}, remove(...v) {v.forEach(x=>classes.delete(x))}, toggle(v,on) {on ??= !classes.has(v); if(on)classes.add(v);else classes.delete(v);return on},contains(v){return classes.has(v)}},
         querySelectorAll() { return []; },
         setAttribute(name, value) { attributes.set(name, value); },
         getAttribute(name) { return attributes.get(name); },
@@ -41,13 +43,15 @@ function harness() {
   }
   Object.assign(document, {
     querySelector: node,
+    createElement(tag) {return node('created-'+tag)},
+    addEventListener() {},
     querySelectorAll() { return []; },
     getElementById(id) { return node('#' + id); },
     body: node('body')
   });
   const storage = new Map();
   const context = vm.createContext({
-    THREE, ...data, assert, console, URL, URLSearchParams, document,
+    THREE, ...data, ...experience, assert, console, URL, URLSearchParams, document,
     location: {search: ''},
     localStorage: {getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v)},
     matchMedia: () => ({matches: false}),
@@ -189,6 +193,62 @@ test('Spatial quiz focuses the scene and physical WASD works on a Russian layout
   node('#viewport').dispatch('keydown', {key: 'ц', code: 'KeyW', preventDefault() {}});
   node('#viewport').dispatch('keydown', {key: 'в', code: 'KeyD', preventDefault() {}});
   run('assert.equal(keyboardPoint.y,.475);assert.equal(keyboardPoint.x,.525);');
+});
+
+
+test('All visual lessons reveal exact organ groups and lead to a relevant quiz', ({run, node}) => {
+  for (const item of experience.lessons) {
+    run(`startLesson(${JSON.stringify(item.id)});assert.equal(quiz,null);assert.equal(physio,null);`);
+    for (let step=0;step<item.steps.length;step++) {
+      run(`
+        assert.equal(lessonStep,${step});assert.equal(selected,lesson.steps[lessonStep].selected);
+        assert.equal(meshes.filter(m=>m.visible).map(m=>m.userData.organId).sort().join(','),[...lesson.steps[lessonStep].ids].sort().join(','));
+        assert.ok(view.toRadius>=.28);assert.ok(Number.isFinite(view.turn.to));
+      `);
+      node('#lesson-next').onclick();
+    }
+    run(`assert.equal(lesson,null);assert.equal(quiz.type,'function');assert.equal(quiz.items.length,${new Set(item.steps.flatMap(s=>s.ids)).size});assert.ok(progress.lessons.includes(${JSON.stringify(item.id)}));`);
+  }
+});
+
+test('Ghost context cannot steal picks and restores opaque materials on exit', ({run, node}) => {
+  run(`select('heart');isolated=true;renderCard();`);
+  node('#context').onclick();
+  run(`
+    assert.equal(contextMode,true);assert.equal(meshes.filter(m=>m.visible).length,16);
+    assert.equal(organMeshes.get('heart')[0].material.opacity,1);
+    assert.equal(organMeshes.get('lungR')[0].material.opacity,.075);
+    const originalIntersect=raycaster.intersectObjects;
+    raycaster.intersectObjects=()=>[{object:organMeshes.get('lungR')[0]},{object:organMeshes.get('heart')[0]}];
+    pick({clientX:400,clientY:300});assert.equal(selected,'heart');
+    raycaster.intersectObjects=originalIntersect;home();
+    assert.ok(meshes.every(m=>m.material.opacity===1&&!m.material.transparent&&m.material.depthWrite));
+    assert.equal(contextMode,false);
+  `);
+});
+
+test('Physiology sliders calculate live and equal products match', ({run, node}) => {
+  run('physiology();');
+  for(const [hr,sv]of [[100,50],[50,100]]){
+    node('#hr').value=hr;node('#sv').value=sv;node('#hr').oninput();
+    run(`assert.equal(physio.hr,${hr});assert.equal(physio.sv,${sv});assert.equal($('#co').textContent,'5,00');`);
+  }
+  node('#physio-back').onclick();
+  run(`assert.equal(physio,null);assert.equal(isolated,false);assert.ok(!document.body.classList.contains('in-physio'));assert.equal(meshes.filter(m=>m.visible).length,16);`);
+});
+
+test('New modes clear safely when switching to quiz, atlas, and an organ', ({run, node}) => {
+  run(`startLesson('depth');startQuiz('find',['heart']);assert.equal(lesson,null);assert.equal(contextMode,false);assert.ok(document.body.classList.contains('spatial-practice'));exitQuiz();assert.ok(!document.body.classList.contains('spatial-practice'));physiology();select('liver');assert.equal(physio,null);assert.equal(selected,'liver');`);
+  run(`startLesson('lungs');pick({clientX:400,clientY:300});assert.equal(lesson.id,'lungs');`);node('#home').onclick();
+  run(`assert.equal(lesson,null);assert.equal(isolated,false);assert.ok(!document.body.classList.contains('in-lesson'));`);
+});
+
+test('Stage controls hide and restore panels and catalog closes before practice', ({run, node}) => {
+  run(`toggleCatalog(true);assert.equal($('#catalog').hidden,false);setSceneOnly(true);assert.equal($('#catalog').hidden,true);assert.ok(document.body.classList.contains('only-scene'));startQuiz('find',['heart']);assert.ok(!document.body.classList.contains('only-scene'));assert.equal($('#scene-only').getAttribute('aria-pressed'),'false');`);
+});
+
+test('Camera transition takes the shortest arc and ends at the requested view', ({run}) => {
+  run(`view.theta=Math.PI*2-.1;turnTo(.1,1.6);assert.ok(Math.abs(view.turn.to-view.turn.from)<.21);for(let i=0;i<60;i++)cameraUpdate(1/60);assert.equal(view.turn,null);assert.ok(Math.abs(view.theta-(Math.PI*2+.1))<1e-8);assert.ok(Math.abs(view.phi-1.6)<1e-8);`);
 });
 
 // A failed renderer attachment must not leave an immersive session running.
