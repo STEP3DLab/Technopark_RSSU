@@ -89,3 +89,6 @@ node scripts/regression.mjs
 ## Лицензии
 
 Код этого приложения — MIT (`LICENSE`). Модели имеют отдельные Creative Commons условия; исходное уведомление перечисляет в том числе компоненты с некоммерческими ограничениями. Лицензия кода не распространяется на модели. Учебные формулировки и задания составлены для приложения; учебник используется как источник фактов, его иллюстрации и упражнения не копировались.
+
+### Teaching polish 1.3.2
+Direct projector link: `?mode=cards&lesson=heart&view=lesson` (also `lungs`, `kidneys`). Closed projector dialogs remain hidden; lesson navigation restores keyboard focus. Changing organs or reopening clears abandoned attempt points. Desktop quiz options use two columns; mobile remains single-column.

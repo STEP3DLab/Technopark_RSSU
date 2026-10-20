@@ -13,3 +13,7 @@
 @media(min-width:851px) and (max-height:720px){.teach-projector-head{padding-top:14px;padding-bottom:10px}.teach-projector-head h2{font-size:26px!important}.teach-guide-progress{padding-bottom:10px}.teach-projector-grid{padding:12px 26px;gap:24px}.teach-projector-grid .teach-diagram svg{max-height:260px}.teach-projector-copy h3{font-size:27px}.teach-projector-copy>p{font-size:19px;margin-top:12px!important}.teach-projector-prompt{font-size:16px;margin-top:14px}.teach-projector-foot{padding:10px 26px}.teach-order>div{padding:7px 10px}.teach-order>div>span{font-size:18px}}
 
 .teach-offline-download{display:inline-block;padding:8px 0;margin-bottom:8px;font-size:12px;color:#c9e7d6}.teach-offline-note{margin-bottom:10px!important;color:#c9e7d6}
+
+/* Closed dialogs must never override the native hidden state. */
+#teaching-lab:not([open]){display:none!important}
+@media(min-width:851px){#teaching-lab.teach-quizzing:not(.teach-projector) .teach-head{padding:14px 26px 12px}#teaching-lab.teach-quizzing .teach-head h2{font-size:24px}#teaching-lab.teach-quizzing .teach-toolbar{padding:10px 26px}#teaching-lab.teach-quizzing .teach-tabs{padding-bottom:10px}#teaching-lab.teach-quizzing .teach-quiz{max-width:960px;padding:20px 30px}.teach-quizzing .teach-answers{grid-template-columns:1fr 1fr}.teach-quizzing .teach-answers button{min-height:64px}.teach-quizzing .teach-progress{margin:10px 0 16px}.teach-quizzing .teach-quiz-hint{margin:10px 0 16px!important}.teach-quizzing .teach-feedback{padding:14px;margin-top:14px}.teach-quizzing .teach-next{margin-top:12px}}
