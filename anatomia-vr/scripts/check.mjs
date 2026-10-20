@@ -17,3 +17,14 @@ const sk=fs.readFileSync(path.join(dist,'models/skeleton-context.glb'));const sk
 const files=fs.readdirSync(dist,{recursive:true}).filter(f=>f.endsWith('.js'));for(const f of files){const s=fs.readFileSync(path.join(dist,f),'utf8');for(const m of s.matchAll(/(?:from\s*|import\s*)['"](\.\.?\/[^'"]+)['"]/g)){assert.ok(fs.existsSync(path.resolve(dist,path.dirname(f),m[1])),`Missing import ${f}: ${m[1]}`)}}
 for(const [hr,sv,co] of [[75,70,5.25],[100,50,5],[50,100,5],[160,130,20.8]])assert.equal(hr*sv/1000,co);
 console.log(JSON.stringify({status:'passed',visualLessons:lessons.length,organs:count,triangles,spatialTasks:findTasks.length,functionQuestions:organs.length,caseQuestions:cases.length,imports:'resolved',leftRight:'verified',models:'parsed with Three.js r'+THREE.REVISION}));
+
+// Preview integrity is part of release readiness, not a claim of WebGL rendering.
+let previewBytes=0;
+for(const id of ['overview',...organs.map(o=>o.id)]){
+ const image=fs.readFileSync(path.join(root,'previews',id+'.webp'));
+ assert.equal(image.subarray(0,4).toString(),'RIFF');assert.equal(image.subarray(8,12).toString(),'WEBP');previewBytes+=image.length;
+}
+assert.ok(previewBytes<1200000,'Preview payload exceeds 1.2 MB');
+const entry=fs.readFileSync(path.join(root,'index.html'),'utf8');const version=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
+assert.ok(entry.includes('style.css?v='+version));assert.ok(entry.includes('app.js?v='+version));
+console.log(JSON.stringify({previewFiles:17,previewBytes,entryVersion:version,status:'passed'}));

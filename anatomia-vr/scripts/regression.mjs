@@ -251,6 +251,41 @@ test('Camera transition takes the shortest arc and ends at the requested view', 
   run(`view.theta=Math.PI*2-.1;turnTo(.1,1.6);assert.ok(Math.abs(view.turn.to-view.turn.from)<.21);for(let i=0;i<60;i++)cameraUpdate(1/60);assert.equal(view.turn,null);assert.ok(Math.abs(view.theta-(Math.PI*2+.1))<1e-8);assert.ok(Math.abs(view.phi-1.6)<1e-8);`);
 });
 
+// Resilience tests exercise the same production functions without a renderer.
+test('Unavailable WebGL removes the loading gate and keeps educational tools usable', ({run, node}) => {
+  run(`activateFallback('Test: WebGL unavailable');assert.equal(fallbackMode,true);assert.equal(loaded,false);assert.equal($('#loading').hidden,true);assert.equal($('#fallback-view').hidden,false);assert.equal($('#fallback-status').hidden,false);assert.equal($('#front').disabled,true);startQuiz('function',['heart']);assert.equal(quiz.items[0],'heart');answerChoice(byId('heart').answer);nextQuestion();assert.equal(quiz.finished,true);assert.equal(quiz.score,1);`);
+});
+test('Fallback calculator retains arithmetic and both comparison presets', ({run, node}) => {
+  run(`activateFallback('Test');physiology();assert.equal(physio.hr,75);assert.equal($('#co').textContent,'5,25');`);
+  for(const [hr,sv] of [[100,50],[50,100],[160,130]]){
+    node('#hr').value=hr;node('#sv').value=sv;node('#hr').oninput();
+    run(`assert.equal(physio.hr*physio.sv/1000,${hr*sv/1000});`);
+  }
+  node('#physio-back').onclick();run(`assert.equal(physio,null);assert.equal(fallbackMode,true);`);
+});
+test('Fallback never pretends that spatial search and routes are available', ({run}) => {
+  run(`activateFallback('Test');startQuiz('find',['heart']);assert.equal(quiz,null);startLesson('lungs');assert.equal(lesson,null);practice();assert.ok($('#modal-content').innerHTML.includes('disabled'));`);
+});
+test('Fallback uses known model previews and never reveals an unanswered quiz target', ({run}) => {
+  for(const organ of data.organs)run(`activateFallback('Test');select(${JSON.stringify(organ.id)},true);assert.equal($('#fallback-image').getAttribute('src'),'./previews/${organ.id}.webp');`);
+  run(`startQuiz('function',['heart']);assert.equal($('#fallback-image').getAttribute('src'),'./previews/overview.webp');answerChoice(byId('heart').answer);assert.equal($('#fallback-image').getAttribute('src'),'./previews/heart.webp');nextQuestion();assert.equal(quiz.finished,true);assert.equal($('#fallback-image').getAttribute('src'),'./previews/overview.webp');`);
+});
+test('Fallback survives every educational case through completion', ({run}) => {
+  run(`activateFallback('Test');startQuiz('case');while(!quiz.finished){answerChoice(current().answer);inspectAnswer();nextQuestion()}assert.equal(quiz.score,cases.length);assert.equal(progress.lastAttempt.total,cases.length);`);
+});
+test('Five-step fallback demonstration can repeat, go back, finish and reset', ({run, node}) => {
+  run(`activateFallback('Test');startDemo();assert.equal(demoStep,0);assert.equal($('#demo-bar').hidden,false);`);
+  for(let i=1;i<5;i++){node('#demo-next').onclick();run(`assert.equal(demoStep,${i});`);}
+  run(`assert.equal(quiz.items.length,2);showDemoStep(3);assert.equal(physio.hr,75);showDemoStep(4);assert.equal(quiz.score,0);`);
+  node('#demo-next').onclick();run(`assert.equal(demoStep,-1);assert.equal($('#demo-bar').hidden,true);startDemo();resetExperience();assert.equal(demoStep,-1);assert.equal(quiz,null);assert.equal(physio,null);assert.equal(selected,'heart');assert.equal($('#system').value,'all');assert.equal(isolated,false);`);
+});
+test('Reset preserves saved progress, while clearing all display and practice modes', ({run}) => {
+  run(`activateFallback('Test');progress.viewed=['heart'];progress.best.function=7;const before=JSON.stringify(progress);startQuiz('function',['heart']);resetExperience();assert.equal(JSON.stringify(progress),before);assert.equal(quiz,null);assert.equal(reviewedQuiz,null);assert.equal(lesson,null);assert.equal(autoRotate,false);assert.equal(contextMode,false);assert.equal($('#search').value,'');`);
+});
+test('Context loss exits unsupported spatial practice safely and is idempotent', ({run}) => {
+  run(`startQuiz('find',['heart']);activateFallback('Context lost');assert.equal(quiz,null);assert.ok(!document.body.classList.contains('spatial-practice'));startQuiz('function',['heart']);activateFallback('Again');assert.equal(quiz.type,'function');`);
+});
+
 // A failed renderer attachment must not leave an immersive session running.
 try {
   const {run} = harness();

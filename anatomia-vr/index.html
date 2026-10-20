@@ -1,11 +1,13 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b171e"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA — анатомия в пространстве</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.1.0"></head>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b171e"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA — анатомия в пространстве</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.2.0"></head>
 <body>
+<a class="skip-link" href="#detail">К карточке и заданию</a>
 <header class="topbar">
   <a class="brand" href="./" aria-label="ANATOMIA — главная"><span class="brand-icon">a<span>+</span></span><span>ANATOMIA<small>АНАТОМИЯ В ПРОСТРАНСТВЕ</small></span></a>
   <nav aria-label="Режимы"><button class="nav active" data-tab="atlas" aria-pressed="true">Исследовать</button><button class="nav" data-tab="practice" aria-pressed="false">Практика</button></nav>
-  <div class="header-actions"><button class="icon-button nav" data-tab="sources" title="Об атласе и управление" aria-label="Об атласе и управление" data-icon="info"></button><button id="vr" class="vr-btn" title="Войти в VR на совместимом устройстве"><span data-icon="vr"></span><span>Войти в VR</span></button></div>
+  <div class="header-actions"><button id="demo-start" class="demo-start" title="Пять шагов для демонстрации">Показ<span> · 2 мин</span></button><button id="reset" class="icon-button" title="Начать заново без удаления прогресса" aria-label="Сбросить вид и режим" data-icon="home"></button><button class="icon-button nav" data-tab="sources" title="Об атласе и управление" aria-label="Об атласе и управление" data-icon="info"></button><button id="vr" class="vr-btn" title="Войти в VR на совместимом устройстве"><span data-icon="vr"></span><span>Войти в VR</span></button></div>
 </header>
+<section id="demo-bar" class="demo-bar" aria-label="Сценарий демонстрации" hidden><div><span id="demo-count" class="eyebrow"></span><b id="demo-title"></b><p id="demo-hint"></p></div><div class="demo-controls"><button id="demo-prev" aria-label="Предыдущий шаг показа">←</button><button id="demo-next">Далее →</button><button id="demo-exit" aria-label="Завершить показ">×</button></div></section>
 <main class="workspace">
 <section class="stage" aria-label="Интерактивная анатомическая модель">
   <div class="stage-glow" aria-hidden="true"></div><div class="stage-grid" aria-hidden="true"></div>
@@ -14,6 +16,7 @@
   <div class="view-badge"><span class="small-dot"></span><span id="view-name">ВИД СПЕРЕДИ</span></div>
   <button id="catalog-toggle" class="catalog-toggle" aria-expanded="false" aria-controls="catalog"><span data-icon="grid"></span><span>Органы</span><small>16</small></button>
   <button id="scene-only" class="scene-only icon-button" title="Скрыть панели" aria-label="Скрыть панели" aria-pressed="false" data-icon="focus"></button>
+  <div id="fallback-view" class="fallback-view" hidden><img id="fallback-image" decoding="async" alt="Статичный обзор исходной анатомической модели" width="720" height="900"><p id="fallback-caption"></p></div><div id="fallback-status" class="fallback-status" role="status" hidden><span>Резервный режим: карточки, тесты и расчёт доступны.</span><button id="retry-3d">Повторить 3D</button></div>
   <div id="labels" aria-hidden="true"></div><div id="keyboard-cursor" aria-hidden="true">+</div>
   <div class="side-marker left-marker">П<small>ПРАВО</small></div><div class="side-marker right-marker">Л<small>ЛЕВО</small></div>
   <div class="stage-tools" aria-label="Управление видом">
@@ -25,7 +28,8 @@
     <button id="rotate" aria-pressed="false" title="Автовращение" data-icon="play" aria-label="Автовращение"></button>
   </div>
   <div class="stage-foot"><span>Потяните, чтобы повернуть</span><span class="model-tag">Z-ANATOMY / 3D</span></div>
-  <div id="loading" class="loading"><div class="loader-ring"></div><b>ANATOMIA</b><span id="load-status">Загружаем анатомию…</span><button id="retry" hidden>Повторить</button></div>
+  <div id="loading" class="loading"><div class="loader-ring"></div><b>ANATOMIA</b><span id="load-status">Загружаем анатомию…</span><button id="continue-flat">Продолжить без 3D</button><button id="retry" hidden>Повторить</button></div>
+  <p class="education-label">Учебная модель · не для диагностики</p>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </section>
 <aside class="library" id="catalog" aria-label="Каталог органов" hidden>
@@ -34,8 +38,8 @@
   <div class="filter-row"><select id="system" aria-label="Система органов"><option value="all">Все системы</option><option value="cardio">Сердечно-сосудистая</option><option value="resp">Дыхательная</option><option value="digest">Пищеварительная</option><option value="urinary">Мочевыделительная</option><option value="nervous">Нервная</option><option value="immune">Лимфатическая</option><option value="endocrine">Эндокринная</option></select></div>
   <div id="organ-list" class="organ-list"></div><button id="mobile-about" class="text-button">Об атласе и управление</button>
 </aside>
-<aside class="detail" id="detail" aria-label="Орган или учебное задание"><div id="organ-card"></div></aside>
+<aside class="detail" id="detail" tabindex="-1" aria-label="Орган или учебное задание"><div id="organ-card"></div></aside>
 </main>
 <dialog id="modal" aria-label="Информация и учебные режимы"><button id="close-modal" class="close icon-button" aria-label="Закрыть" data-icon="close"></button><div id="modal-content"></div></dialog>
-<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.1.0"></script>
+<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.2.0"></script>
 </body></html>
