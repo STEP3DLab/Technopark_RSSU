@@ -19,3 +19,6 @@
 @media(max-width:380px){.brand-icon{display:none}.brand{font-size:11px}.topbar nav .nav{font-size:9px;padding:9px 6px}.demo-start{font-size:9px;padding:8px}.vr-btn{padding:6px}.demo-bar{padding:10px 12px;gap:9px}.demo-controls{width:96px}.demo-controls #demo-next{min-width:96px}.fallback-status{align-items:flex-start}}
 @media(max-height:650px) and (min-width:701px){.workspace{min-height:500px}.demo-active .workspace{min-height:500px}.fallback-view{top:80px;bottom:110px}.detail{max-height:calc(100% - 140px)}.stage-caption h1{font-size:23px}}
 .practice-footer{flex-wrap:wrap;gap:10px}.fallback-mode .education-label{color:#c1d5d8}
+
+/* Keep catalog content inside its panel even at browser zoom / short viewports. */
+.library{min-height:300px}

@@ -36,7 +36,7 @@ function select(id,focus=false){
   if(lesson||physio)clearStudyModes();selected=id;if(fallbackMode&&focus)isolated=true;const filter=$('#system');if(filter.value!=='all'&&byId(id).system!==filter.value)filter.value='all';
   if(xrActive&&isolated)xrFocusOrgan();if(!progress.viewed.includes(id)){progress.viewed.push(id);save()}
   renderList();renderCard();applyAppearance();if(focus)focusOrgan();updateXRPanel();
-  if(focus)toggleCatalog(false);
+  if(focus){toggleCatalog(false);if(fallbackMode&&matchMedia('(max-width:700px)').matches)$('#detail').scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'})}
 }
 
 function focusOrgan(){
