@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {teachingModules} from '../teaching-content.js';
+assert.equal(Object.keys(teachingModules).length,3);
+let questions=0;
+const ids=new Set();
+for(const [id,m] of Object.entries(teachingModules)){
+ assert.equal(m.questions.length,3);assert.equal(m.spots.length,3);assert.ok(m.caution&&m.normalText&&m.diseaseText);
+ for(const q of m.questions){assert.ok(!ids.has(q.id));ids.add(q.id);questions++;assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<4);assert.ok(q.explanation.length>30);}
+ for(const s of m.sources)assert.match(s.url,/^https:\/\/www\.(nhlbi|niddk)\.nih\.gov\//);
+}
+const css=fs.readFileSync(new URL('../teaching.css',import.meta.url),'utf8');assert.ok(css.includes('prefers-reduced-motion'));assert.ok(css.includes('animation-play-state:paused'));
+const entry=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');assert.ok(entry.includes('teaching.js'));assert.ok(entry.includes('teaching.css'));
+console.log(JSON.stringify({status:'passed',organs:3,questions,sources:'NIH URLs declared; source verification documented separately',scope:'Teaching content shape and accessibility hooks, not clinical validation'}));
