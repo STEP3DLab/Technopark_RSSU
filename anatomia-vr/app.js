@@ -23,8 +23,8 @@ function renderCard(){
   if(quiz){renderQuiz();return}if(lesson){renderLesson();return}if(physio){renderPhysio();return}
   const focusId=document.activeElement?.id,o=byId(selected);
   document.body.classList.toggle('is-isolated',isolated);
-  $('#organ-card').innerHTML=`<div class="card-kicker"><span>В ФОКУСЕ</span><div class="card-pager"><button id="organ-prev" aria-label="Предыдущий орган">‹</button><span class="number">${String(organs.indexOf(o)+1).padStart(2,'0')} / 16</span><button id="organ-next" aria-label="Следующий орган">›</button></div></div><h2>${o.name}</h2><div class="latin">${o.latin}</div><p class="brief">${briefs[o.id]}</p><div class="card-actions"><button class="primary" id="isolate">${icon(isolated?'layers':'focus')}${isolated?'Все органы':fallbackMode?'Отдельный вид':'Изолировать'}</button><button class="icon-button" id="focus" title="Приблизить" aria-label="Приблизить орган">${icon('search')}</button></div>${isolated&&!fallbackMode?`<button class="context-button" id="context" aria-pressed="${contextMode}">${icon('layers')}Соседние органы</button>`:''}<div class="card-links"><button class="text-button" id="organ-info">${icon('info')}Подробнее</button><button class="text-button" id="quick-quiz">Проверить себя ${icon('arrow')}</button></div>${reviewedQuiz?'<button class="secondary" id="back-results">← К результатам</button>':''}`;
-  $('#isolate').onclick=()=>{isolated=!isolated;contextMode=false;applyAppearance();if(isolated){focusOrgan();if(xrActive)xrFocusOrgan()}else home();renderCard();updateXRPanel()};
+  $('#organ-card').innerHTML=`<div class="card-kicker"><span>В ФОКУСЕ</span><div class="card-pager"><button id="organ-prev" aria-label="Предыдущий орган">‹</button><span class="number">${String(organs.indexOf(o)+1).padStart(2,'0')} / 16</span><button id="organ-next" aria-label="Следующий орган">›</button></div></div><h2>${o.name}</h2><div class="latin">${o.latin}</div><p class="brief">${briefs[o.id]}</p><div class="card-actions"><button class="primary" id="isolate">${icon(isolated?'layers':'focus')}${fallbackMode?'Выбрать другой орган':isolated?'Все органы':'Изолировать'}</button><button class="icon-button" id="focus" title="Приблизить" aria-label="Приблизить орган">${icon('search')}</button></div>${isolated&&!fallbackMode?`<button class="context-button" id="context" aria-pressed="${contextMode}">${icon('layers')}Соседние органы</button>`:''}<div class="card-links"><button class="text-button" id="organ-info">${icon('info')}Подробнее</button><button class="text-button" id="quick-quiz">Проверить себя ${icon('arrow')}</button></div>${reviewedQuiz?'<button class="secondary" id="back-results">← К результатам</button>':''}`;
+  $('#isolate').onclick=()=>{if(fallbackMode){toggleCatalog(true);return}isolated=!isolated;contextMode=false;applyAppearance();if(isolated){focusOrgan();if(xrActive)xrFocusOrgan()}else home();renderCard();updateXRPanel()};
   $('#focus').onclick=()=>{if(fallbackMode){isolated=true;renderCard()}else focusOrgan()};$('#quick-quiz').onclick=()=>startQuiz('function',[o.id]);$('#organ-info').onclick=()=>organInfo(o.id);
   $('#organ-prev').onclick=()=>cycleOrgan(-1);$('#organ-next').onclick=()=>cycleOrgan(1);
   if(isolated&&!fallbackMode)$('#context').onclick=()=>{contextMode=!contextMode;applyAppearance();renderCard()};
@@ -35,7 +35,7 @@ function select(id,focus=false){
   if(!byId(id))return;if(quiz){if(quiz.type==='find'&&!quiz.answered&&!quiz.finished)answerFind(id);return}
   if(lesson||physio)clearStudyModes();selected=id;if(fallbackMode&&focus)isolated=true;const filter=$('#system');if(filter.value!=='all'&&byId(id).system!==filter.value)filter.value='all';
   if(xrActive&&isolated)xrFocusOrgan();if(!progress.viewed.includes(id)){progress.viewed.push(id);save()}
-  renderList();renderCard();applyAppearance();if(focus)focusOrgan();updateXRPanel();
+  renderList();renderCard();applyAppearance();if(fallbackMode)syncStagePrompt();if(focus)focusOrgan();updateXRPanel();
   if(focus){toggleCatalog(false);if(fallbackMode&&matchMedia('(max-width:700px)').matches)$('#detail').scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'})}
 }
 
@@ -95,7 +95,7 @@ function syncStagePrompt(){
   $('#scene-mode').textContent=fallbackMode?'РЕЗЕРВНЫЙ УЧЕБНЫЙ РЕЖИМ':lesson?'ВИЗУАЛЬНЫЙ МАРШРУТ':physio?'ФИЗИОЛОГИЯ':quiz?'ПРАКТИКА':'ИНТЕРАКТИВНЫЙ 3D-АТЛАС';
   if(lesson){h.textContent=lesson.name;sub.textContent=`Шаг ${lessonStep+1} / ${lesson.steps.length}`;return}
   if(physio){h.textContent='Сердце в работе';sub.textContent='Изменяйте частоту и объём';return}
-  if(!quiz){h.textContent=fallbackMode?'Продолжайте изучать.':'Исследуйте тело.';sub.textContent=fallbackMode?'Выберите орган в каталоге':'Коснитесь органа или начните показ';return}
+  if(!quiz){h.textContent=fallbackMode?byId(selected).name:'Исследуйте тело.';sub.textContent=fallbackMode?'Статичный вид исходной модели':'Коснитесь органа или начните показ';return}
   h.textContent=quiz.finished?`Готово: ${quiz.score} / ${quiz.items.length}`:quiz.type==='find'?`Найдите: ${current().name}`:'Проверьте себя';
   sub.textContent=quiz.finished?'':quiz.type==='find'?(quiz.answered?(quiz.correct?'Верно ✓':`Ответ: ${current().name}`):'Коснитесь органа на модели'):`Вопрос ${quiz.index+1} / ${quiz.items.length}`;
   if(quiz.answered&&!quiz.finished){controls.innerHTML='<button id="stage-inspect">Показать</button><button id="stage-next">Далее →</button>';$('#stage-inspect').onclick=inspectAnswer;$('#stage-next').onclick=nextQuestion}
@@ -168,7 +168,7 @@ function updatePhysio(){if(!physio)return;updateFallback();const {hr,sv}=physio,
 // Static views are rendered from the bundled licensed model, never synthetic anatomy.
 function updateFallback(){
   if(!fallbackMode)return;
-  const id=quiz?quiz.answered?(quiz.type==='case'?current()?.target:current()?.id):'overview':isolated||physio?selected:'overview';
+  const id=quiz?quiz.answered?(quiz.type==='case'?current()?.target:current()?.id):'overview':selected;
   const safeId=byId(id)?id:'overview',o=byId(safeId),image=$('#fallback-image');
   const src=`./previews/${safeId}.webp`;if(image.getAttribute('src')!==src){image.hidden=false;image.setAttribute('src',src);}
   image.alt=o?`${o.name}: статичный вид исходной 3D-модели`:'Статичный обзор исходной анатомической модели';
@@ -180,7 +180,7 @@ function activateFallback(reason){
   if(xrActive)renderer?.xr.getSession()?.end().catch(()=>{});
   if(lesson)clearStudyModes();if(quiz?.type==='find')exitQuiz();
   autoRotate=false;document.body.classList.add('fallback-mode');
-  $('#loading').hidden=true;$('#fallback-view').hidden=false;$('#fallback-status').hidden=false;
+  $('#loading').hidden=true;$('#viewport').hidden=true;$('#fallback-view').hidden=false;$('#fallback-status').hidden=false;
   $('#fallback-status span').textContent=`${reason}. Карточки, вопросы и расчёт работают.`;
   for(const id of ['front','skeleton','labels-toggle','rotate','scene-only']){const el=$('#'+id);el.disabled=true;el.title='Требуется режим 3D'}
   $('#viewport').setAttribute('aria-label','Статичный режим. Выберите орган в каталоге или перейдите к карточке.');

@@ -266,6 +266,8 @@ test('Fallback calculator retains arithmetic and both comparison presets', ({run
 test('Fallback never pretends that spatial search and routes are available', ({run}) => {
   run(`activateFallback('Test');startQuiz('find',['heart']);assert.equal(quiz,null);startLesson('lungs');assert.equal(lesson,null);practice();assert.ok($('#modal-content').innerHTML.includes('disabled'));`);
 });
+test('Fallback opens the selected heart, including after reset', ({run}) => {run(`activateFallback('Test');assert.equal($('#fallback-image').getAttribute('src'),'./previews/heart.webp');assert.equal($('#scene-heading').textContent,'Сердце');assert.equal($('#viewport').hidden,true);select('pancreas',true);assert.equal($('#fallback-image').getAttribute('src'),'./previews/pancreas.webp');assert.equal($('#scene-heading').textContent,'Поджелудочная железа');resetExperience();assert.equal($('#fallback-image').getAttribute('src'),'./previews/heart.webp');`);});
+
 test('Fallback uses known model previews and never reveals an unanswered quiz target', ({run}) => {
   for(const organ of data.organs)run(`activateFallback('Test');select(${JSON.stringify(organ.id)},true);assert.equal($('#fallback-image').getAttribute('src'),'./previews/${organ.id}.webp');`);
   run(`startQuiz('function',['heart']);assert.equal($('#fallback-image').getAttribute('src'),'./previews/overview.webp');answerChoice(byId('heart').answer);assert.equal($('#fallback-image').getAttribute('src'),'./previews/heart.webp');nextQuestion();assert.equal(quiz.finished,true);assert.equal($('#fallback-image').getAttribute('src'),'./previews/overview.webp');`);
