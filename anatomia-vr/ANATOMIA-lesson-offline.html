@@ -1,0 +1,325 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ANATOMIA · учебная лаборатория без интернета</title><meta name="description" content="Автономные учебные схемы сердца, лёгких и почек, вопросы и режим преподавателя. Не для диагностики."><style>:root{color-scheme:dark;--mint:#bce7cf}*{box-sizing:border-box}body{margin:0;background:#0b171e;color:#edf5f1;font:14px Arial,sans-serif}button,input{font:inherit}button{cursor:pointer;background:none;color:inherit;border:1px solid #bad8df40;border-radius:12px}button:disabled{opacity:.5;cursor:default}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #bce7cf;outline-offset:3px}button:hover:not(:disabled){background:#bce7cf15}a{color:#bce7cf}dialog{color:inherit}dialog:not([open]){display:none!important}.offline-home{max-width:800px;margin:10vh auto;padding:24px}.offline-home h1{font-size:42px;font-weight:500;letter-spacing:-1px}.offline-home p{font-size:17px;line-height:1.7;color:#b8d1d6}.offline-home button{padding:15px 25px;margin:10px 10px 0 0;font-size:16px}summary{cursor:pointer}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* Teaching laboratory. Independent of WebGL; shared atlas palette. */
+.teach-launch{border:0;padding:11px 18px;font-size:12px;color:var(--mint);background:#bce7cf12;white-space:nowrap}.teach-card-launch{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 14px;margin-top:14px;background:#bce7cf13;color:#d8f3e2;font-size:12px}.teach-card-launch span{font-size:10px;color:#a9c4ca}.teach-card-launch:hover{background:#bce7cf25}
+#teaching-lab{width:min(1180px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);padding:0;color:#edf5f1;background:#10232b;border:1px solid #45606a;border-radius:24px;box-shadow:0 35px 120px #0009;overflow:auto}#teaching-lab::backdrop{background:#041016df;backdrop-filter:blur(10px)}#teaching-lab button,#teaching-lab summary{touch-action:manipulation}#teaching-lab h2,#teaching-lab h3,#teaching-lab p{margin:0}#teaching-lab button{min-height:44px}#teaching-lab button:disabled{opacity:1;cursor:default}#teaching-lab .teach-head{padding:25px 30px 20px;display:flex;justify-content:space-between;gap:18px;align-items:start;border-bottom:1px solid #bcdce020}.teach-eyebrow{display:block;font-size:10px;letter-spacing:1.6px;font-weight:600;color:#adc9cd;margin-bottom:10px}#teaching-lab h2{font-size:30px;line-height:1.2;letter-spacing:-.8px}.teach-close{width:44px;flex-shrink:0;font-size:28px;background:#bce7cf0b}.teach-toolbar{padding:16px 30px;display:flex;justify-content:space-between;gap:20px;align-items:center}.teach-organs{display:flex;gap:8px}.teach-organs button{display:flex;align-items:center;gap:9px;padding:11px 16px;font-size:14px}.teach-organs button>span{font-size:25px;line-height:1;color:#a9dbc3}.teach-organs button[aria-pressed=true]{background:#bce7cf;color:#15362d;border-color:#bce7cf}.teach-organs button[aria-pressed=true]>span{color:#15362d}.teach-toggle{display:flex;align-items:center;gap:8px;color:#c7d9db;font-size:12px;cursor:pointer}.teach-toggle input{accent-color:#bce7cf;width:18px;height:18px}.teach-tabs{display:flex;align-items:center;gap:8px;padding:0 30px 16px;border-bottom:1px solid #bcdce020}.teach-tabs button{border-color:transparent;padding:9px 14px;font-size:13px;color:#a8bdc4}.teach-tabs button[aria-pressed=true]{border-color:#8bb9a0;color:#d5f4e1;background:#bce7cf0a}.teach-local{margin-left:auto;color:#a8bdc4;font-size:11px}.teach-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:0}.teach-visual{padding:24px;border-right:1px solid #bcdce020;background:radial-gradient(ellipse at 45% 38%,#254550,#10252e 65%)}.teach-visual-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.teach-switch{display:flex;gap:4px;padding:4px;background:#0a1b22;border-radius:13px}.teach-switch button{font-size:12px;padding:7px 14px;border-color:transparent;min-height:36px!important}.teach-switch button[aria-pressed=true]{background:#c0e5cf;color:#13332a}.teach-switch button[data-state=disease][aria-pressed=true]{background:#e7b79a;color:#3f2421}.teach-pause{font-size:12px;padding:8px 12px;color:#c6dbe0}.teach-diagram{margin:18px 0 4px;min-width:0}.teach-diagram svg{width:100%;height:auto;max-height:360px;display:block;overflow:visible}.teach-diagram text{fill:#e3eeed;font:15px Arial,sans-serif}.teach-diagram .teach-svg-small{font-size:13px;fill:#cadde0}.teach-diagram path,.teach-diagram circle{transition:all .45s ease}.teach-flow{stroke:#bde5d1;stroke-dasharray:8 15;animation:teachFlow 1.6s linear infinite}.teach-flow.blood{stroke:#f4b8a3}.teach-flow.urine{stroke:#eacd8d}.teach-flow.air{animation:teachAir 3.5s ease-in-out infinite}.teach-heart{transform-origin:145px 143px;animation:teachBeat 2s ease-in-out infinite}.teach-paused .teach-flow,.teach-paused .teach-heart{animation-play-state:paused}.teach-schematic-note{font-size:10px;line-height:1.5;color:#afc5ce;max-width:480px}.teach-spots{display:flex;gap:6px;margin-top:22px}.teach-spots button{flex:1;font-size:11px;padding:8px 6px;min-height:38px!important}.teach-spots button[aria-pressed=true]{background:#bce7cf15;border-color:#8bb9a0;color:#e5f5ec}.teach-spot-answer{margin-top:12px!important;padding:14px 15px;background:#07182088;border-radius:12px;font-size:13px;line-height:1.6;min-height:92px;color:#d2e2e4}.teach-explain{padding:26px 28px;display:flex;flex-direction:column;align-items:start}.teach-explain h3{font:500 26px/1.2 Manrope,Arial,sans-serif;letter-spacing:-.6px}.teach-lead{font-size:14px;line-height:1.7;color:#c7dbdd;margin-top:15px!important}.teach-cause{margin:22px 0;padding:14px 16px;border-left:2px solid #bce7cf;background:#bce7cf0a;width:100%}.teach-cause>span,.teach-question>span{font-size:9px;letter-spacing:1.2px;color:#b5ccd1}.teach-cause p{font-size:14px;line-height:1.5;margin-top:7px!important}.teach-question{margin-bottom:20px;font-size:13px;line-height:1.6;width:100%}.teach-question>p{margin-top:7px!important;color:#e5edeb}.teach-question details{margin-top:10px}.teach-question summary{font-size:12px;color:#bce7cf;padding:6px 0;cursor:pointer}.teach-question details p{margin-top:8px!important;color:#c3d9dc}#teaching-lab .teach-primary{background:#bce7cf;color:#102e25;border-color:#bce7cf;padding:12px 20px;font-weight:600;font-size:13px}#teaching-lab .teach-primary:hover{background:#dbf5e5}.teach-secondary{padding:12px 18px;font-size:13px}.teach-time{font-size:10px;color:#9eb9c1;margin-top:9px!important}.teach-foot{padding:18px 30px 24px;border-top:1px solid #bcdce020;font-size:11px;line-height:1.6;color:#aac3ca}.teach-foot>p{max-width:900px}.teach-foot details{margin-top:10px}.teach-foot summary{cursor:pointer;color:#cce5d5;padding:6px 0}.teach-sources{display:flex;gap:12px;flex-wrap:wrap;padding:9px 0}.teach-sources a{color:#c8e6d4}.teach-quiz-intro,.teach-result,.teach-quiz{max-width:800px;margin:auto;padding:40px 30px}.teach-quiz-intro h3{font-size:32px;font-weight:500;letter-spacing:-.8px}.teach-quiz-intro>p{font-size:15px;line-height:1.7;color:#c7dcdf;max-width:600px;margin-top:16px!important}.teach-result-actions{display:flex;gap:10px;flex-wrap:wrap;margin:25px 0}.teach-score-note{font-size:11px!important;color:#a8c0c7!important;line-height:1.65!important}.teach-quiz-meta{display:flex;justify-content:space-between;color:#bfd7dc;font-size:12px;gap:15px}.teach-progress{height:3px;border-radius:3px;background:#bce7cf19;margin:14px 0 27px}.teach-progress i{display:block;background:#bce7cf;height:100%;transition:width .3s}.teach-quiz h3{font:500 28px/1.35 Manrope,Arial,sans-serif;letter-spacing:-.4px}.teach-quiz-hint{font-size:12px;color:#b1c9cf;margin:14px 0 22px!important;line-height:1.6}.teach-answers{display:grid;gap:10px}.teach-answers button{display:flex;align-items:center;text-align:left;gap:14px;padding:16px;font-size:15px;line-height:1.45;background:#152e37}.teach-answers button>span{display:grid;place-items:center;min-width:30px;width:30px;height:30px;border:1px solid #bce7cf38;border-radius:8px;font-size:12px;color:#bfd7d9}.teach-answers button b{margin-left:auto;color:#bee9ce}.teach-answers .is-correct{border-color:#aad9b8;background:#bce7cf10}.teach-answers .is-wrong{border-color:#e7b79a;background:#e7b79a10}.teach-text{padding:10px 0;border:0;color:#b9d5d2;font-size:12px;margin-top:12px;margin-right:18px;text-decoration:underline;text-underline-offset:4px}.teach-feedback{padding:18px;margin-top:20px;border:1px solid #e7b79a80;border-radius:12px;background:#e7b79a08}.teach-feedback.correct{border-color:#bce7cf80;background:#bce7cf08}.teach-feedback b{font-size:14px}.teach-feedback p{margin-top:8px!important;font-size:14px;line-height:1.6;color:#d4e4e3}.teach-next{display:block;margin-top:18px}.teach-result h3{font:500 64px Manrope,Arial,sans-serif;letter-spacing:-2px}.teach-result>p{color:#c2d8d8;font-size:14px;line-height:1.6;margin-top:12px!important}.teach-result details{border-top:1px solid #bce7cf30;padding-top:20px;margin-bottom:25px}.teach-result summary{color:#d6eade;cursor:pointer}.teach-result article{padding:16px 0;border-bottom:1px solid #bce7cf19;font-size:13px;line-height:1.6}.teach-result article p{margin-top:7px!important;color:#b7d0d4}.teach-success{padding:20px;background:#bce7cf0c;border-radius:14px}.teach-teacher .teach-quiz h3{font-size:32px}.teach-teacher .teach-answers button{font-size:17px;padding:18px}
+@keyframes teachFlow{to{stroke-dashoffset:-46}}@keyframes teachAir{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-46}}@keyframes teachBeat{0%,50%,100%{transform:scale(1)}15%{transform:scale(1.035)}30%{transform:scale(.99)}}
+@media(max-width:850px){.teach-toolbar{align-items:start;flex-direction:column;gap:12px}.teach-grid{grid-template-columns:1fr}.teach-visual{border-right:0;border-bottom:1px solid #bcdce020}.teach-explain{padding:24px}.teach-explain h3{font-size:26px}.teach-lead{max-width:650px}.teach-local{display:none}.teach-diagram svg{max-height:340px}.teach-toggle{align-self:flex-start}.teach-teacher .teach-quiz h3{font-size:26px}}
+@media(max-width:700px){.topbar{height:auto;min-height:64px;flex-wrap:wrap;padding:10px 12px;gap:8px}.topbar nav{order:3;width:100%;justify-content:center}.topbar nav .nav,.topbar nav .teach-launch{flex:1;padding:9px 10px;font-size:12px;min-height:39px}.header-actions{margin-left:auto}.brand{font-size:14px}.teach-card-launch{font-size:12px}.teach-card-launch span{font-size:10px}#teaching-lab{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:18px}#teaching-lab .teach-head{padding:19px 16px 16px}.teach-eyebrow{font-size:8px;letter-spacing:1.2px;margin-bottom:8px}#teaching-lab h2{font-size:22px;letter-spacing:-.5px}.teach-close{width:40px;min-height:40px!important;font-size:24px}.teach-toolbar{padding:14px 16px}.teach-organs{width:100%;gap:6px}.teach-organs button{flex:1;padding:8px 10px;gap:6px;font-size:12px}.teach-organs button>span{font-size:21px}.teach-toggle{font-size:11px}.teach-tabs{padding:0 16px 14px;gap:6px}.teach-tabs button{flex:1;font-size:12px;padding:8px 6px}.teach-visual{padding:16px}.teach-visual-top{gap:7px}.teach-switch button{font-size:11px;padding:7px 10px}.teach-pause{font-size:11px;padding:8px}.teach-diagram{margin:14px -7px 6px}.teach-diagram svg{min-height:210px}.teach-schematic-note{font-size:10px}.teach-spots{gap:5px;margin-top:16px}.teach-spots button{font-size:10px;min-height:40px!important}.teach-spot-answer{font-size:12px;min-height:0}.teach-explain{padding:22px 18px}.teach-explain h3{font-size:24px}.teach-lead{font-size:14px}.teach-cause{margin:18px 0}.teach-foot{padding:18px;font-size:10px}.teach-quiz-intro,.teach-result,.teach-quiz{padding:28px 18px}.teach-quiz-intro h3{font-size:27px}.teach-quiz h3{font-size:23px}.teach-quiz-meta{font-size:11px}.teach-answers button{font-size:14px;padding:13px;gap:10px}.teach-answers button>span{width:27px;min-width:27px;height:27px}.teach-feedback p{font-size:13px}.teach-result h3{font-size:56px}.teach-teacher .teach-answers button{font-size:15px;padding:14px}.teach-teacher .teach-quiz h3{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.teach-heart,.teach-flow{animation:none!important}.teach-diagram path,.teach-diagram circle{transition:none}}
+
+.teach-breath-in{animation:teachBreath 4s ease-in-out infinite}.teach-breath-out{animation:teachBreath 4s ease-in-out infinite reverse}.teach-paused .teach-breath-in,.teach-paused .teach-breath-out{animation-play-state:paused}@keyframes teachBreath{0%,40%{opacity:1}55%,90%{opacity:.22}100%{opacity:1}}@media(prefers-reduced-motion:reduce){.teach-breath-in,.teach-breath-out{animation:none!important}}
+.teach-projector-launch{font-size:12px;padding:10px 13px;color:#cce8d7;background:#bce7cf0b}.teach-organ-results{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.teach-organ-results span{border:1px solid #bce7cf30;padding:10px 14px;border-radius:12px;font-size:13px;color:#d0e3df}
+#teaching-lab.teach-projector{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);height:calc(100dvh - 16px);max-width:1600px;display:flex;flex-direction:column;padding:0;border-radius:16px}.teach-projector-head{display:flex;justify-content:space-between;align-items:start;gap:20px;padding:20px 26px 14px}.teach-projector-head .teach-eyebrow{font-size:11px}.teach-projector-controls{display:flex;gap:8px}.teach-projector-controls button{font-size:12px;padding:8px 12px}.teach-projector-controls .teach-close{padding:0;font-size:26px}.teach-guide-progress{display:flex;gap:7px;padding:0 26px 14px;border-bottom:1px solid #bce7cf20}.teach-guide-progress span{flex:1;padding:9px 12px;color:#9eb9c1;border-radius:8px;background:#bce7cf08;font-size:13px}.teach-guide-progress .active{background:#bce7cf;color:#15342b}.teach-projector-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:30px;align-items:center;padding:20px 30px;flex:1;min-height:0}.teach-projector-grid>.teach-diagram{min-height:0;margin:0;align-self:center;text-align:center}.teach-projector-grid .teach-diagram svg{max-height:330px;max-width:630px;margin:auto}.teach-projector-caption{font-size:19px;margin:8px 0!important}.teach-projector-grid small{font-size:11px;color:#aec7cd}.teach-projector-copy h3{font:500 32px/1.3 Manrope,Arial,sans-serif;letter-spacing:-.5px}.teach-projector-copy>p{font-size:22px;line-height:1.5;margin-top:18px!important;color:#c7dfe0}.teach-projector-prompt{font-size:19px;line-height:1.5;border-left:2px solid #bce7cf;padding-left:18px;color:#c0d9d4;margin-top:22px}.teach-projector-foot{display:flex;align-items:center;gap:12px;padding:14px 26px;border-top:1px solid #bce7cf20}.teach-projector-foot>span{margin-left:auto;font-size:11px;color:#b0c6cc}.teach-projector-foot>button{padding:10px 18px}.teach-projector-foot .teach-text{margin:0;padding:10px 5px}.teach-order{display:grid;gap:9px;margin:15px 0}.teach-order>div{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:13px;background:#bce7cf0c}.teach-order>div>b{color:#a8cdb7;font-size:20px}.teach-order>div>span{font-size:20px;line-height:1.3;flex:1}.teach-order>div>div{display:flex;gap:5px}.teach-order button{width:38px;min-height:38px!important;font-size:18px}.teach-projector-copy .teach-order-feedback,.teach-projector-copy .teach-order-help{font-size:15px;line-height:1.5;margin-top:14px!important;color:#c7e1d2}
+@media(max-width:850px){#teaching-lab.teach-projector{height:auto;max-height:calc(100dvh - 16px);display:block}.teach-projector-head{padding:18px 16px;flex-wrap:wrap}.teach-projector-controls{width:100%;justify-content:flex-end}.teach-projector-controls .teach-close{margin-left:auto;order:-1}.teach-guide-progress{padding:0 16px 14px;gap:4px}.teach-guide-progress span{padding:8px 4px;font-size:10px;text-align:center}.teach-projector-grid{grid-template-columns:1fr;padding:18px;gap:23px}.teach-projector-grid .teach-diagram svg{max-height:270px}.teach-projector-copy h3{font-size:25px}.teach-projector-copy>p{font-size:18px}.teach-projector-prompt{font-size:16px}.teach-projector-foot{padding:14px 16px;flex-wrap:wrap;gap:7px}.teach-projector-foot>span{width:100%;order:3;text-align:center;margin:0}.teach-projector-foot .teach-primary{margin-left:auto}.teach-order>div>span{font-size:17px}.teach-projector-caption{font-size:16px}}
+@media(min-width:851px) and (max-height:720px){.teach-projector-head{padding-top:14px;padding-bottom:10px}.teach-projector-head h2{font-size:26px!important}.teach-guide-progress{padding-bottom:10px}.teach-projector-grid{padding:12px 26px;gap:24px}.teach-projector-grid .teach-diagram svg{max-height:260px}.teach-projector-copy h3{font-size:27px}.teach-projector-copy>p{font-size:19px;margin-top:12px!important}.teach-projector-prompt{font-size:16px;margin-top:14px}.teach-projector-foot{padding:10px 26px}.teach-order>div{padding:7px 10px}.teach-order>div>span{font-size:18px}}
+
+.teach-offline-download{display:inline-block;padding:8px 0;margin-bottom:8px;font-size:12px;color:#c9e7d6}.teach-offline-note{margin-bottom:10px!important;color:#c9e7d6}
+</style></head><body data-offline="true"><main class="offline-home"><small>ANATOMIA / ЛОКАЛЬНАЯ КОПИЯ 1.3.1</small><h1>Понять, а не угадать.</h1><p>Схемы, мини-занятия и девять вопросов работают без интернета. Это отдельная учебная лаборатория, без 3D-атласа. Ссылки на источники требуют подключения.</p><button data-teaching="heart">Сердце</button><button data-teaching="lungs">Лёгкие</button><button data-teaching="kidneys">Почки</button><p>Схемы упрощены и не предназначены для диагностики или выбора лечения.</p></main><script type="module">// Medical facts verified against linked NIH sources, 2026-10-20. Original wording and schematic artwork.
+const teachingModules = {
+  "heart": {
+    "symbol": "♡",
+    "diseaseShort": "Сужение",
+    "normalTitle": "Кровь питает саму мышцу",
+    "normalChain": "Аорта → коронарные артерии → миокард",
+    "diseaseChain": "Бляшка → меньше просвет → возможная нехватка кровоснабжения",
+    "discuss": "Почему кровь внутри камер сердца не заменяет коронарное кровоснабжение?",
+    "discussAnswer": "Миокард — ткань, которой нужна доставка кислорода по собственным сосудам. Коронарные артерии снабжают сердечную мышцу кровью.",
+    "spots": [
+      {
+        "title": "Мышца",
+        "text": "Миокард сокращается и обеспечивает насосную функцию сердца. На схеме показан условный силуэт, а не камеры и клапаны."
+      },
+      {
+        "title": "Артерия",
+        "text": "Увеличенный фрагмент — коронарная артерия, которая питает миокард. Это не полость сердца."
+      },
+      {
+        "title": "Просвет",
+        "text": "Сравните открытый просвет и условную бляшку. Сужение может ограничивать кровоснабжение, но не означает автоматически инфаркт."
+      }
+    ],
+    "name": "Сердце",
+    "normalText": "Правая половина сердца направляет кровь к лёгким, левая — к органам тела. Клапаны препятствуют обратному току. Сам миокард получает кислород с кровью по коронарным артериям, отходящим от аорты.",
+    "diseaseTitle": "Сужение коронарной артерии",
+    "diseaseText": "Атеросклеротическая бляшка уменьшает просвет артерии. Доставка крови к участку миокарда может стать недостаточной для его потребности в кислороде: возникает ишемия. Это не то же самое, что сужение клапана.",
+    "caution": "Показан один механизм ишемии. Сужение коронарной артерии не означает автоматически инфаркт; существуют и другие механизмы нарушения кровоснабжения.",
+    "sources": [
+      {
+        "label": "NHLBI: How Blood Flows through the Heart",
+        "url": "https://www.nhlbi.nih.gov/health/heart/blood-flow"
+      },
+      {
+        "label": "NHLBI: Coronary Heart Disease — Causes and Prevention",
+        "url": "https://www.nhlbi.nih.gov/health/coronary-heart-disease/causes"
+      }
+    ],
+    "questions": [
+      {
+        "id": "heart-1",
+        "question": "Какие сосуды непосредственно снабжают миокард кислородом?",
+        "options": [
+          "Полые вены",
+          "Коронарные артерии",
+          "Лёгочные артерии",
+          "Лимфатические сосуды"
+        ],
+        "correct": 1,
+        "explanation": "Коронарные артерии отходят от аорты и доставляют кровь к сердечной мышце."
+      },
+      {
+        "id": "heart-2",
+        "question": "Какой механизм показан при сужении коронарной артерии?",
+        "options": [
+          "Кровь перестаёт проходить через митральный клапан",
+          "Лёгкие прекращают газообмен",
+          "Доставка крови к миокарду может стать недостаточной",
+          "Миокард начинает получать кислород из воздуха"
+        ],
+        "correct": 2,
+        "explanation": "Сужение может ограничить коронарный кровоток. Здесь показано кровоснабжение мышцы, а не движение крови через клапан."
+      },
+      {
+        "id": "heart-3",
+        "question": "Куда правый желудочек направляет кровь?",
+        "options": [
+          "В аорту",
+          "В левое предсердие напрямую",
+          "В полые вены",
+          "В лёгочную артерию и далее к лёгким"
+        ],
+        "correct": 3,
+        "explanation": "Правый желудочек направляет кровь к лёгким. После насыщения кислородом она возвращается по лёгочным венам в левое предсердие."
+      }
+    ]
+  },
+  "lungs": {
+    "symbol": "◡",
+    "diseaseShort": "Астма",
+    "normalTitle": "Воздуху нужен открытый путь",
+    "normalChain": "Дыхательные пути → воздух в лёгких → газообмен",
+    "diseaseChain": "Мышцы + отёк + слизь → сужение → труднее выдох",
+    "discuss": "Почему сужение бронха и нарушение газообмена — не одно и то же?",
+    "discussAnswer": "Бронх проводит воздух. Газообмен происходит в лёгких между воздухом и кровью; схема бронха показывает прежде всего механическое затруднение вентиляции.",
+    "spots": [
+      {
+        "title": "Стенка",
+        "text": "Внешнее кольцо условно обозначает мышечный слой, внутреннее — стенку. При обострении сокращение мышц и отёк могут сужать просвет."
+      },
+      {
+        "title": "Просвет",
+        "text": "Воздух движется вдоль бронха, перпендикулярно плоскости среза. Символ ⊙ означает движение к наблюдателю, ⊗ — от него. Сравните просвет в двух режимах."
+      },
+      {
+        "title": "Слизь",
+        "text": "Жёлтые участки в режиме астмы обозначают избыток слизи. Это не жидкость в альвеолах и не схема пневмонии."
+      }
+    ],
+    "name": "Лёгкие",
+    "normalText": "Дыхательные пути проводят воздух в лёгкие и обратно. При газообмене кислород переходит из воздуха в кровь, а углекислый газ — из крови в лёгкие и выводится с выдохом.",
+    "diseaseTitle": "Бронхиальная астма: сужение дыхательных путей",
+    "diseaseText": "При обострении просвет дыхательных путей может уменьшаться из-за сокращения окружающих мышц, отёка стенки и избытка слизи. Воздуху труднее проходить, особенно при выдохе.",
+    "caution": "Схема показывает механизм сужения бронха, а не все проявления астмы. По ней нельзя определить диагноз или тяжесть состояния.",
+    "sources": [
+      {
+        "label": "NHLBI: How the Lungs Work",
+        "url": "https://www.nhlbi.nih.gov/health/lungs"
+      },
+      {
+        "label": "NHLBI: What Is Asthma?",
+        "url": "https://www.nhlbi.nih.gov/health/asthma"
+      },
+      {
+        "label": "NHLBI: What is Asthma? — educational fact sheet",
+        "url": "https://www.nhlbi.nih.gov/sites/default/files/publications/WhatisAsthmaFINAL.pdf"
+      }
+    ],
+    "questions": [
+      {
+        "id": "lungs-1",
+        "question": "Какие изменения могут одновременно сужать просвет бронха при обострении астмы?",
+        "options": [
+          "Расслабление мышц и уменьшение отёка",
+          "Сокращение мышц, отёк стенки и избыток слизи",
+          "Расширение бронха и уменьшение слизи",
+          "Только сокращение сердечной мышцы"
+        ],
+        "correct": 1,
+        "explanation": "Сокращение мышц, воспалительный отёк и слизь могут совместно уменьшать просвет дыхательных путей."
+      },
+      {
+        "id": "lungs-2",
+        "question": "Что непосредственно затрудняется при сужении бронха?",
+        "options": [
+          "Переход кислорода через стенку альвеолы как единственный механизм",
+          "Движение крови по лёгочной вене",
+          "Прохождение воздуха по дыхательным путям",
+          "Образование углекислого газа в тканях"
+        ],
+        "correct": 2,
+        "explanation": "Бронх проводит воздух. При астме сужение дыхательных путей особенно затрудняет его выход при выдохе."
+      },
+      {
+        "id": "lungs-3",
+        "question": "Как направлен газообмен в лёгких?",
+        "options": [
+          "Кислород идёт в кровь, углекислый газ — из крови в лёгкие",
+          "Кислород идёт из крови в лёгкие, углекислый газ — в кровь",
+          "Оба газа только поступают в кровь",
+          "Оба газа только покидают кровь"
+        ],
+        "correct": 0,
+        "explanation": "Кровь получает кислород из вдыхаемого воздуха и отдаёт углекислый газ, который удаляется с выдохом."
+      }
+    ]
+  },
+  "kidneys": {
+    "symbol": "◒",
+    "diseaseShort": "Препятствие",
+    "normalTitle": "Фильтровать, возвращать, выводить",
+    "normalChain": "Фильтрация → возврат воды и веществ → отток мочи",
+    "diseaseChain": "Камень в мочеточнике → препятствие → затруднение оттока",
+    "discuss": "Почему мочеточник нельзя перепутать с почечной артерией?",
+    "discussAnswer": "По артерии к почке приходит кровь. По мочеточнику от почки к мочевому пузырю оттекает моча. На этой схеме показан только мочевой путь.",
+    "spots": [
+      {
+        "title": "Почка",
+        "text": "Фильтрация и дальнейшая обработка фильтрата происходят в нефронах. На обзорной схеме нефроны не изображены."
+      },
+      {
+        "title": "Мочеточник",
+        "text": "Показанная трубка проводит мочу от почки к мочевому пузырю. Это не кровеносный сосуд."
+      },
+      {
+        "title": "Камень",
+        "text": "Камень может застрять в мочеточнике и мешать оттоку. На схеме показан один вариант; не каждый камень вызывает блокаду."
+      }
+    ],
+    "name": "Почки",
+    "normalText": "В нефроне клубочек фильтрует жидкость из крови, а канальцы возвращают нужные вещества и большую часть воды в кровоток. Образующаяся моча по мочеточнику поступает в мочевой пузырь.",
+    "diseaseTitle": "Камень в мочеточнике: препятствие оттоку мочи",
+    "diseaseText": "Камень, образовавшийся в почке, может переместиться и застрять в мочеточнике. Это может частично или полностью перекрыть отток мочи. Не каждый камень вызывает такую блокаду.",
+    "caution": "Показан один возможный вариант нарушения оттока. Расположение и влияние камней различаются; схема не описывает конкретного пациента.",
+    "sources": [
+      {
+        "label": "NIDDK: Your Kidneys & How They Work",
+        "url": "https://www.niddk.nih.gov/health-information/kidney-disease/kidneys-how-they-work"
+      },
+      {
+        "label": "NIDDK: Definition & Facts for Kidney Stones",
+        "url": "https://www.niddk.nih.gov/health-information/urologic-diseases/kidney-stones/definition-facts"
+      }
+    ],
+    "questions": [
+      {
+        "id": "kidneys-1",
+        "question": "Что происходит с фильтратом в канальцах нефрона?",
+        "options": [
+          "Он целиком превращается в клетки крови",
+          "Он минует дальнейшую обработку",
+          "Он поступает непосредственно в лёгкие",
+          "Часть воды и нужных веществ возвращается в кровь"
+        ],
+        "correct": 3,
+        "explanation": "Канальцы возвращают в кровь большую часть воды и нужные вещества. Оставшаяся жидкость с выводимыми веществами образует мочу."
+      },
+      {
+        "id": "kidneys-2",
+        "question": "По какому пути моча поступает из почки в мочевой пузырь?",
+        "options": [
+          "По почечной артерии",
+          "По мочеточнику",
+          "По почечной вене",
+          "По аорте"
+        ],
+        "correct": 1,
+        "explanation": "Мочеточник соединяет почку с мочевым пузырём. Артерия и вена относятся к пути крови."
+      },
+      {
+        "id": "kidneys-3",
+        "question": "Что непосредственно нарушает камень, застрявший в мочеточнике?",
+        "options": [
+          "Приток крови по почечной артерии",
+          "Возврат веществ из канальца в кровь как непосредственный механизм",
+          "Отток мочи из почки",
+          "Отток крови по почечной вене"
+        ],
+        "correct": 2,
+        "explanation": "Камень может стать механическим препятствием для оттока мочи. Наличие камня само по себе не означает, что отток всегда полностью перекрыт."
+      }
+    ]
+  }
+};
+
+
+const $ = (s, root=document) => root.querySelector(s);
+const aliases={heart:'heart',lungR:'lungs',lungL:'lungs',airway:'lungs',kidneyR:'kidneys',kidneyL:'kidneys',bladder:'kidneys'};
+const storageKey='anatomia-teaching-v1';
+let saved={best:0};try{const v=JSON.parse(localStorage.getItem(storageKey)||'{}');if(Number.isFinite(v.best)&&v.best>=0&&v.best<=900)saved.best=v.best;}catch{}
+const state={organ:'heart',disease:false,paused:matchMedia('(prefers-reduced-motion: reduce)').matches,teacher:false,tab:'explore',spot:0,questions:[],index:0,answers:[],score:0,finished:false,scope:'heart',projector:false,guideStep:0,order:[2,0,1],orderChecked:false};
+const dialog=document.createElement('dialog');dialog.id='teaching-lab';dialog.setAttribute('aria-labelledby','teach-title');document.body.append(dialog);
+let opener=null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const moduleFor=()=>teachingModules[state.organ];
+function shuffle(items){return [...items].sort(()=>Math.random()-.5)}
+function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved))}catch{}}
+function sourceList(m){return m.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join('');}
+function flowLine(path,cls=''){return `<path class="teach-flow ${cls}" d="${path}" fill="none" stroke-width="5" stroke-linecap="round"/>`;}
+function schematic(){const disease=state.disease;const label=moduleFor().name;let content='';
+if(state.organ==='heart')content=`<defs><linearGradient id="heart-g" x2="1" y2="1"><stop stop-color="#eaa88b"/><stop offset="1" stop-color="#b65659"/></linearGradient></defs><path class="teach-heart" fill="url(#heart-g)" d="M144 70 C103 55 67 89 81 139 C88 170 123 196 149 215 C179 192 217 158 216 117 C214 76 175 55 144 70Z"/><path d="M144 89 Q127 134 155 190 M144 113 Q183 110 193 135" stroke="#f8ddd0" stroke-width="5" fill="none"/><text x="143" y="249" text-anchor="middle" class="teach-svg-small">Миокард</text><path d="M199 110 L248 69" stroke="#88a9b3" stroke-dasharray="4 5"/><text x="374" y="45" text-anchor="middle">Коронарная артерия · фрагмент</text><rect x="254" y="70" width="264" height="140" rx="25" fill="#bd6867"/><rect x="254" y="88" width="264" height="104" rx="12" fill="#512f3a"/>${disease?'<path d="M254 88 H518 V106 Q425 109 405 136 Q367 163 336 116 Q300 99 254 106Z" fill="#f1c178"/><text x="386" y="239" text-anchor="middle" class="teach-svg-small">Бляшка сужает просвет</text>':'<text x="386" y="239" text-anchor="middle" class="teach-svg-small">Открытый просвет артерии</text>'}${flowLine('M270 163 H500','blood')}<path d="M490 154 L503 163 L490 172" fill="none" stroke="#efbba7" stroke-width="3"/><text x="387" y="282" text-anchor="middle" class="teach-svg-small">Кровь → к сердечной мышце</text>`;
+if(state.organ==='lungs')content=`<text x="280" y="42" text-anchor="middle">Бронх · поперечный срез</text><circle cx="235" cy="163" r="109" fill="#8b657b"/><circle cx="235" cy="163" r="${disease?91:94}" fill="#e5a4a4"/><circle cx="235" cy="163" r="${disease?54:82}" fill="#163b46"/>${disease?'<path d="M197 126 Q218 146 205 165 Q184 160 183 145Z M272 161 Q250 176 267 196 Q285 183 287 168Z" fill="#e7c985"/>':''}<path d="M${disease?292:319} 153 H400" stroke="#d6eee9" stroke-width="2"/><text x="413" y="148" class="teach-svg-small">Просвет</text><text x="413" y="169" class="teach-svg-small">бронха</text><path d="M320 83 L401 65" stroke="#d6eee9" stroke-width="2"/><text x="413" y="61" class="teach-svg-small">Стенка</text><text x="413" y="81" class="teach-svg-small">и мышцы</text><g class="teach-breath-in"><circle cx="213" cy="163" r="14" fill="none" stroke="#bce7cf" stroke-width="2"/><circle cx="213" cy="163" r="4" fill="#bce7cf"/></g><g class="teach-breath-out"><circle cx="254" cy="163" r="14" fill="none" stroke="#bce7cf" stroke-width="2"/><path d="M247 156 L261 170 M261 156 L247 170" stroke="#bce7cf" stroke-width="2"/></g><text x="235" y="286" text-anchor="middle" class="teach-svg-small">Воздух вдоль бронха: ⊙ к нам · ⊗ от нас</text><text x="235" y="316" text-anchor="middle" class="teach-svg-small">${disease?'Просвет уже · воздуху пройти труднее':'Просвет открыт · движение воздуха'}</text>`;
+if(state.organ==='kidneys')content=`<text x="172" y="34" text-anchor="middle">Почка · условный разрез</text><path d="M183 57 C92 29 67 116 83 190 C92 244 163 266 195 216 C210 195 182 181 174 155 C166 131 214 91 183 57Z" fill="#c88e95"/><path d="M174 96 Q126 100 129 152 Q131 196 174 207 L155 156Z" fill="#e8c4af"/><path d="M153 129 Q177 139 186 156 Q174 172 153 183 L165 155Z" fill="#f0d49a"/><path d="M183 156 C250 157 259 172 282 210 S312 274 385 274" stroke="#d0ae71" stroke-width="24" fill="none"/><path d="M183 156 C250 157 259 172 282 210 S312 274 385 274" stroke="#385254" stroke-width="12" fill="none"/>${flowLine(disease?'M185 156 C225 156 249 165 264 181':'M185 156 C250 157 259 172 282 210 S312 274 385 274','urine')}${disease?'<path d="M267 181 L280 178 L290 190 L285 208 L267 207 L260 194Z" fill="#ecc77f" stroke="#fff1cd" stroke-width="2"/><path d="M290 191 H390" stroke="#d6eee9"/><text x="402" y="188" class="teach-svg-small">Камень</text><text x="402" y="209" class="teach-svg-small">в мочеточнике</text>':''}<path d="M226 166 L297 101" stroke="#d6eee9"/><text x="309" y="98" class="teach-svg-small">Мочеточник</text><text x="327" y="311" text-anchor="middle" class="teach-svg-small">Моча → к мочевому пузырю</text><text x="92" y="291" class="teach-svg-small">Не сосуд</text>`;
+return `<svg viewBox="0 0 560 340" role="img" aria-label="${esc(label)}. ${esc(disease?moduleFor().diseaseTitle:'Нормальная функция')}. Упрощённая учебная схема.">${content}</svg>`;}
+function render(){const m=moduleFor(),current=state.questions[state.index];dialog.classList.toggle('teach-projector',state.projector);if(state.projector){renderProjector(m);return;}dialog.classList.toggle('teach-paused',state.paused||document.hidden);dialog.classList.toggle('teach-teacher',state.teacher);dialog.innerHTML=`<header class="teach-head"><div><span class="teach-eyebrow">ANATOMIA / УЧЕБНАЯ ЛАБОРАТОРИЯ</span><h2 id="teach-title">От строения к пониманию</h2></div><button class="teach-close" data-action="close" aria-label="Закрыть учебную лабораторию">×</button></header><div class="teach-toolbar"><div class="teach-organs" role="group" aria-label="Выберите орган">${Object.entries(teachingModules).map(([id,o])=>`<button data-organ-lesson="${id}" aria-pressed="${state.organ===id}"><span>${o.symbol}</span>${esc(o.name)}</button>`).join('')}</div><button class="teach-projector-launch" data-action="projector">Урок на экране ↗</button><label class="teach-toggle"><input type="checkbox" id="teach-teacher" ${state.teacher?'checked':''}> Режим преподавателя</label></div><div class="teach-tabs" role="group" aria-label="Режим занятия"><button data-tab-lesson="explore" aria-pressed="${state.tab==='explore'}">01 · Разобраться</button><button data-tab-lesson="quiz" aria-pressed="${state.tab==='quiz'}">02 · Проверить себя</button><span class="teach-local">${state.tab==='quiz'?`${state.score} баллов за попытку`:'3 органа · 9 вопросов'}</span></div><div id="teach-body">${state.tab==='explore'?`<div class="teach-grid"><section class="teach-visual"><div class="teach-visual-top"><div class="teach-switch" role="group" aria-label="Состояние"><button data-state="normal" aria-pressed="${!state.disease}">Норма</button><button data-state="disease" aria-pressed="${state.disease}">${esc(m.diseaseShort)}</button></div><button class="teach-pause" data-action="pause" aria-pressed="${state.paused}" aria-label="${state.paused?'Запустить':'Остановить'} анимацию">${state.paused?'▶ Движение':'Ⅱ Пауза'}</button></div><div class="teach-diagram ${state.disease?'is-disease':''}">${schematic()}</div><p class="teach-schematic-note">Условная схема, не медицинское изображение. Скорость и масштаб не количественные.</p><div class="teach-spots" role="group" aria-label="Разбор схемы">${m.spots.map((s,i)=>`<button data-spot="${i}" aria-pressed="${state.spot===i}">${i+1}. ${esc(s.title)}</button>`).join('')}</div><p class="teach-spot-answer" aria-live="polite">${esc(m.spots[state.spot].text)}</p></section><aside class="teach-explain"><span class="teach-eyebrow">${state.disease?'ЧТО МЕНЯЕТСЯ':'КАК РАБОТАЕТ'}</span><h3>${esc(state.disease?m.diseaseTitle:m.normalTitle)}</h3><p class="teach-lead">${esc(state.disease?m.diseaseText:m.normalText)}</p><div class="teach-cause"><span>ЗАПОМНИТЕ СВЯЗЬ</span><p>${esc(state.disease?m.diseaseChain:m.normalChain)}</p></div><div class="teach-question"><span>ВОПРОС ДЛЯ ОБСУЖДЕНИЯ</span><p>${esc(m.discuss)}</p><details><summary>Показать объяснение</summary><p>${esc(m.discussAnswer)}</p></details></div><button class="teach-primary" data-action="quiz-organ">Три вопроса об органе →</button><p class="teach-time">3–5 минут на мини-занятие</p></aside></div><footer class="teach-foot">${document.body.dataset.offline?'<p class="teach-offline-note">Локальная копия: схемы и вопросы работают без сети. Источники открываются только с интернетом.</p>':'<a class="teach-offline-download" href="./ANATOMIA-lesson-offline.html" download>↓ Скачать занятие без интернета</a>'}<p>${esc(m.caution)}</p><details><summary>Источники и границы модели</summary><div class="teach-sources">${sourceList(m)}</div><p>Содержание сверено с указанными источниками. Перед использованием для оценивания нужна проверка преподавателем. Не для диагностики, назначения лечения или моделирования состояния пациента.</p></details></footer>`:renderQuiz(current)}</div>`;
+}
+function renderQuiz(q){if(state.finished){const wrong=state.questions.filter((_,i)=>state.answers[i]!==true);return `<section class="teach-result"><span class="teach-eyebrow">САМОПРОВЕРКА ЗАВЕРШЕНА</span><h3>${state.answers.filter(a=>a===true).length} из ${state.questions.length}</h3><p>${state.score} баллов · ${state.answers.filter(a=>a==='revealed').length?'Часть ответов открыта без начисления баллов.':'100 баллов за верный ответ с первой попытки.'}</p><div class="teach-result-actions"><button class="teach-primary" data-action="quiz-organ">Повторить орган</button><button class="teach-secondary" data-action="quiz-all">Все 9 вопросов</button><button class="teach-secondary" data-tab-lesson="explore">К схемам</button>${wrong.length?'<button class="teach-secondary" data-action="quiz-mistakes">Повторить ошибки</button>':''}</div>${wrong.length?`<details open><summary>Что стоит повторить (${wrong.length})</summary>${wrong.map(q=>`<article><b>${esc(q.question)}</b><p>${esc(q.explanation)}</p></article>`).join('')}</details>`:'<p class="teach-success">Все ответы верны. Попробуйте объяснить причинную связь своими словами.</p>'}<div class="teach-organ-results">${Object.entries(teachingModules).filter(([id])=>state.questions.some(q=>q.organ===id)).map(([id,m])=>`<span>${esc(m.name)}: ${state.questions.filter((q,i)=>q.organ===id&&state.answers[i]===true).length} / ${state.questions.filter(q=>q.organ===id).length}</span>`).join('')}</div><p class="teach-score-note">Лучший результат среди полных попыток: ${saved.best} / 900. Сохраняется только на этом устройстве. Это не оценка квалификации.</p><button class="teach-text" data-action="clear-score">Сбросить сохранённый рекорд</button></section>`;}
+if(!q)return `<section class="teach-quiz-intro"><span class="teach-eyebrow">ВЫБЕРИТЕ МАСШТАБ</span><h3>Не угадать, а понять.</h3><p>После каждого ответа есть объяснение. Можно обсудить вопрос всей группой и открыть ответ без баллов.</p><div class="teach-result-actions"><button class="teach-primary" data-action="quiz-organ">${esc(moduleFor().name)} · 3 вопроса</button><button class="teach-secondary" data-action="quiz-all">Все органы · 9 вопросов</button></div><p class="teach-score-note">Без таймера и рейтинга людей. Баллы хранятся только в вашем браузере.</p></section>`;
+const answer=state.answers[state.index],answered=answer!==undefined;return `<section class="teach-quiz"><div class="teach-quiz-meta"><span>${esc(teachingModules[q.organ].name)} · ${state.index+1} / ${state.questions.length}</span><span>${state.score} / ${state.questions.length*100} баллов</span></div><div class="teach-progress" aria-hidden="true"><i style="width:${(state.index+(answered?1:0))/state.questions.length*100}%"></i></div><h3>${esc(q.question)}</h3><p class="teach-quiz-hint">${state.teacher?'Обсудите с группой. Выберите ответ или откройте объяснение без баллов.':'Выберите один ответ. Изменить его после проверки нельзя.'}</p><div class="teach-answers">${q.options.map((o,i)=>`<button data-answer="${i}" ${answered?'disabled':''} class="${answered&&o.correct?'is-correct':answered&&o.chosen?'is-wrong':''}"><span>${String.fromCharCode(65+i)}</span>${esc(o.text)}${answered&&o.correct?'<b>✓</b>':''}</button>`).join('')}</div>${answered?`<div class="teach-feedback ${answer===true?'correct':''}" role="status"><b>${answer===true?'Верно · +100 баллов':answer==='revealed'?'Разбор · без баллов':'Разберём вместе'}</b><p>${esc(q.explanation)}</p></div><button class="teach-primary teach-next" data-action="next">${state.index===state.questions.length-1?'Посмотреть результат':'Следующий вопрос →'}</button>`:'<button class="teach-text" data-action="reveal">Открыть ответ без баллов</button>'}<button class="teach-text" data-action="restart-quiz">Начать новую попытку</button></section>`;}
+
+function renderProjector(m){
+ const titles=['Как работает норма?','Предскажите изменение','Сравните механизм','Соберите причинную цепочку'];
+ const predict={heart:'Что изменится при сужении артерии, питающей миокард?',lungs:'Что произойдёт с прохождением воздуха, если стенка бронха отечёт?',kidneys:'Что нарушится, если камень застрянет в мочеточнике?'};
+ const chain=m.diseaseChain.split(' → ');
+ const normal=state.guideStep<2;
+ dialog.classList.toggle('teach-paused',state.paused||document.hidden);
+ dialog.innerHTML=`<div class="teach-projector-head"><div><span class="teach-eyebrow">УРОК НА ЭКРАНЕ · ${esc(m.name)}</span><h2 id="teach-title">${titles[state.guideStep]}</h2></div><div class="teach-projector-controls"><button data-action="pause" aria-pressed="${state.paused}">${state.paused?'▶ Движение':'Ⅱ Пауза'}</button><button data-action="guide-exit">Выйти из урока</button><button class="teach-close" data-action="close" aria-label="Закрыть учебную лабораторию">×</button></div></div>
+ <div class="teach-guide-progress">${titles.map((t,i)=>`<span class="${i===state.guideStep?'active':''}">${i+1}. ${['Норма','Гипотеза','Изменение','Проверка'][i]}</span>`).join('')}</div>
+ <div class="teach-projector-grid"><div class="teach-diagram ${normal?'':'is-disease'}">${schematic()}<p class="teach-projector-caption">${normal?'Нормальная функция':esc(m.diseaseTitle)}</p><small>Упрощённая схема, не в масштабе · не диагностика</small></div>
+ <section class="teach-projector-copy">${state.guideStep===0?`<span class="teach-eyebrow">ОБЪЯСНИТЕ СВОИМИ СЛОВАМИ</span><h3>${esc(m.normalTitle)}</h3><p>${esc(m.normalChain)}</p><div class="teach-projector-prompt">Назовите структуру и направление движения.</div>`:state.guideStep===1?`<span class="teach-eyebrow">СНАЧАЛА ВАША ГИПОТЕЗА</span><h3>${esc(predict[state.organ])}</h3><div class="teach-projector-prompt">Обсудите в паре: что изменится и почему?<br>Ответ откроется на следующем шаге.</div>`:state.guideStep===2?`<span class="teach-eyebrow">ОБЪЯСНЕНИЕ МЕХАНИЗМА</span><h3>${esc(m.diseaseChain)}</h3><p>${esc(m.caution)}</p><div class="teach-projector-prompt">Где ваша гипотеза совпала со схемой?</div>`:`<span class="teach-eyebrow">ОТ ПРИЧИНЫ К СЛЕДСТВИЮ</span><div class="teach-order">${state.order.map((v,i)=>`<div><b>${i+1}</b><span>${esc(chain[v])}</span><div><button data-action="order-up" data-index="${i}" ${i===0?'disabled':''} aria-label="Переместить пункт ${i+1} вверх">↑</button><button data-action="order-down" data-index="${i}" ${i===2?'disabled':''} aria-label="Переместить пункт ${i+1} вниз">↓</button></div></div>`).join('')}</div><button class="teach-primary" data-action="order-check">Проверить последовательность</button>${state.orderChecked?`<p class="teach-order-feedback" role="status">${state.order.every((v,i)=>v===i)?'Верно. Причина → изменение → следствие.':'Пока не так. Начните с причины, затем объясните изменение и его следствие.'}</p>`:'<p class="teach-order-help">Переставьте пункты стрелками. Это обсуждение, без баллов.</p>'}`}</section></div>
+ <footer class="teach-projector-foot"><button data-action="guide-prev" ${state.guideStep===0?'disabled':''}>← Назад</button><button class="teach-text" data-action="guide-reset">С начала</button><span>${state.guideStep+1} / 4 · темп выбирает преподаватель</span><button class="teach-primary" data-action="guide-next">${state.guideStep===3?'Три вопроса →':'Далее →'}</button></footer>`;
+}
+
+function startQuiz(scope){const ids=scope==='all'?Object.keys(teachingModules):[state.organ];state.questions=ids.flatMap(id=>teachingModules[id].questions.map(q=>({...q,organ:id,options:shuffle(q.options.map((text,i)=>({text,correct:i===q.correct})))})));state.scope=scope;state.index=0;state.answers=[];state.score=0;state.finished=false;state.tab='quiz';render();focusContent();}
+function focusContent(){const el=$('#teach-body',dialog)||dialog;el.setAttribute('tabindex','-1');el.focus({preventScroll:true});dialog.scrollTop=0;}
+function answer(index,revealed=false){if(state.finished||state.answers[state.index]!==undefined)return;const q=state.questions[state.index];if(!q)return;if(revealed)state.answers[state.index]='revealed';else{const opt=q.options[index];if(!opt)return;opt.chosen=true;state.answers[state.index]=opt.correct;if(opt.correct)state.score+=100;}render();$('.teach-next',dialog)?.focus({preventScroll:true});}
+function openTeaching(organ='heart'){opener=document.activeElement;state.organ=aliases[organ]||organ in teachingModules&&organ||'heart';state.tab='explore';state.spot=0;state.disease=false;state.questions=[];state.finished=false;state.projector=false;render();if(!dialog.open)dialog.showModal();$('.teach-close',dialog).focus({preventScroll:true});}
+document.addEventListener('click',e=>{const trigger=e.target.closest('[data-teaching]');if(trigger)openTeaching(trigger.dataset.teaching||'heart');});
+dialog.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const organ=b.dataset.organLesson,tab=b.dataset.tabLesson,mode=b.dataset.state,action=b.dataset.action;
+if(organ){state.organ=organ;state.tab='explore';state.spot=0;state.disease=false;state.questions=[];state.finished=false;render();$(`[data-organ-lesson="${organ}"]`,dialog).focus();}
+else if(tab){state.tab=tab;render();$(`[data-tab-lesson="${tab}"]`,dialog).focus();}
+else if(mode){state.disease=mode==='disease';render();$(`[data-state="${mode}"]`,dialog).focus();}
+else if(b.dataset.spot!==undefined){state.spot=Number(b.dataset.spot);render();$(`[data-spot="${state.spot}"]`,dialog).focus();}
+else if(b.dataset.answer!==undefined)answer(Number(b.dataset.answer));
+else if(action==='close')dialog.close();
+else if(action==='projector'){state.projector=true;state.guideStep=0;state.disease=false;state.order=[2,0,1];state.orderChecked=false;render();}
+else if(action==='guide-exit'){state.projector=false;render();}
+else if(action==='guide-next'){if(state.guideStep<3){state.guideStep++;state.disease=state.guideStep>=2;render();}else{state.projector=false;startQuiz(state.organ);}}
+else if(action==='guide-prev'){state.guideStep=Math.max(0,state.guideStep-1);state.disease=state.guideStep>=2;render();}
+else if(action==='guide-reset'){state.guideStep=0;state.disease=false;state.order=[2,0,1];state.orderChecked=false;render();}
+else if(action==='order-up'||action==='order-down'){const i=Number(b.dataset.index),j=action==='order-up'?i-1:i+1;if(j>=0&&j<3){[state.order[i],state.order[j]]=[state.order[j],state.order[i]];state.orderChecked=false;render();$(`[data-action="${action}"][data-index="${j}"]`,dialog)?.focus();}}
+else if(action==='order-check'){state.orderChecked=true;render();}
+else if(action==='quiz-mistakes'){const missed=state.questions.filter((_,i)=>state.answers[i]!==true).map(q=>({...q,options:shuffle(q.options.map(o=>({text:o.text,correct:o.correct})))}));state.questions=missed;state.scope='mistakes';state.index=0;state.answers=[];state.score=0;state.finished=false;render();focusContent();}
+
+else if(action==='pause'){state.paused=!state.paused;render();$('[data-action="pause"]',dialog).focus();}
+else if(action==='quiz-organ')startQuiz(state.organ);
+else if(action==='quiz-all')startQuiz('all');
+else if(action==='reveal')answer(0,true);
+else if(action==='restart-quiz')startQuiz(state.scope==='all'?'all':state.organ);
+else if(action==='next'){if(state.answers[state.index]===undefined)return;if(state.index===state.questions.length-1){state.finished=true;if(state.scope==='all'){saved.best=Math.max(saved.best,state.score);persist();}}else state.index++;render();focusContent();}
+else if(action==='clear-score'){saved.best=0;persist();render();}
+});
+dialog.addEventListener('change',e=>{if(e.target.id==='teach-teacher'){state.teacher=e.target.checked;render();$('#teach-teacher',dialog).focus();}});
+dialog.addEventListener('close',()=>{opener?.focus?.({preventScroll:true});});
+document.addEventListener('visibilitychange',()=>dialog.classList.toggle('teach-paused',state.paused||document.hidden));
+const requested=new URLSearchParams(location.search).get('lesson');if(requested&&(['heart','lungs','kidneys'].includes(requested)))openTeaching(requested);
+
+if(!requested)openTeaching('heart');</script></body></html>
