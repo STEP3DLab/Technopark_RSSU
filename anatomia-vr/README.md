@@ -92,3 +92,6 @@ node scripts/regression.mjs
 
 ### Teaching polish 1.3.2
 Direct projector link: `?mode=cards&lesson=heart&view=lesson` (also `lungs`, `kidneys`). Closed projector dialogs remain hidden; lesson navigation restores keyboard focus. Changing organs or reopening clears abandoned attempt points. Desktop quiz options use two columns; mobile remains single-column.
+
+### Classroom activities 1.4.0
+The teaching lab adds simultaneous normal/pathology comparison for three reviewed organs, visibility controls for schematic outline/wall, motion and labels, nine numbered structure-identification prompts with hints/explanations, and three mechanism cases. These are original schematic overlays, not segmented 3D anatomy or histological sections. In projector mode use Left/Right to change steps, Home to restart, B to hide/restore the scene. Mechanism explanation is revealed explicitly. Existing whole-organ 3D practice remains unchanged. All new activities are included in the standalone offline HTML.
