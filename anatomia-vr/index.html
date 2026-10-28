@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA · Колледж МЕДСИ</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.4.2"><link rel="stylesheet" href="./teaching.css?v=1.4.2"><link rel="stylesheet" href="./medsi.css?v=1.4.2"></head>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA · Колледж МЕДСИ</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.5.0"><link rel="stylesheet" href="./teaching.css?v=1.5.0"><link rel="stylesheet" href="./medsi.css?v=1.5.0"><link rel="stylesheet" href="./learning.css?v=1.5.0"></head>
 <body>
 <a class="skip-link" href="#detail">К карточке и заданию</a>
 <header class="topbar">
   <a class="brand" href="./" aria-label="ANATOMIA · Колледж МЕДСИ — главная"><img class="brand-logo" src="./assets/medsi-college-logo.png" width="2048" height="504" alt="Колледж МЕДСИ"><span class="brand-title">ANATOMIA<small>Совместный проект с колледжем МЕДСИ</small></span></a>
-  <nav aria-label="Режимы"><button class="nav active" data-tab="atlas" aria-pressed="true">Исследовать</button><button class="nav" data-tab="practice" aria-pressed="false">Практика</button><button class="teach-launch" data-teaching="heart">Занятие</button></nav>
+  <nav aria-label="Режимы"><button class="nav active" data-tab="atlas" aria-pressed="true">Исследовать</button><button class="nav" data-tab="practice" aria-pressed="false">Практика</button><button class="learning-launch" id="learning-launch">Учебный центр</button></nav>
   <div class="header-actions"><button id="demo-start" class="demo-start" title="Пять шагов для демонстрации">Показ<span> · 2 мин</span></button><button id="reset" class="icon-button" title="Начать заново без удаления прогресса" aria-label="Сбросить вид и режим" data-icon="home"></button><button class="icon-button nav" data-tab="sources" title="Об атласе и управление" aria-label="Об атласе и управление" data-icon="info"></button><button id="vr" class="vr-btn" title="Войти в VR на совместимом устройстве"><span data-icon="vr"></span><span>Войти в VR</span></button></div>
 </header>
 <section id="demo-bar" class="demo-bar" aria-label="Сценарий демонстрации" hidden><div><span id="demo-count" class="eyebrow"></span><b id="demo-title"></b><p id="demo-hint"></p></div><div class="demo-controls"><button id="demo-prev" aria-label="Предыдущий шаг показа">←</button><button id="demo-next">Далее →</button><button id="demo-exit" aria-label="Завершить показ">×</button></div></section>
@@ -41,5 +41,5 @@
 <aside class="detail" id="detail" tabindex="-1" aria-label="Орган или учебное задание"><div id="organ-card"></div></aside>
 </main>
 <dialog id="modal" aria-label="Информация и учебные режимы"><button id="close-modal" class="close icon-button" aria-label="Закрыть" data-icon="close"></button><div id="modal-content"></div></dialog>
-<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.4.2"></script>
-<script type="module" src="./teaching.js?v=1.4.2"></script></body></html>
+<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.5.0"></script>
+<script type="module" src="./teaching.js?v=1.5.0"></script><script type="module" src="./learning.js?v=1.5.0"></script></body></html>

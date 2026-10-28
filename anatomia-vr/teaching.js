@@ -3,14 +3,14 @@ import { teachingActivities } from './teaching-activities.js';
 const $ = (s, root=document) => root.querySelector(s);
 const aliases={heart:'heart',lungR:'lungs',lungL:'lungs',airway:'lungs',kidneyR:'kidneys',kidneyL:'kidneys',bladder:'kidneys'};
 const storageKey='anatomia-teaching-v1';
-let saved={best:0};try{const v=JSON.parse(localStorage.getItem(storageKey)||'{}');if(Number.isFinite(v.best)&&v.best>=0&&v.best<=900)saved.best=v.best;}catch{}
+let saved={best:0};try{const v=JSON.parse(localStorage.getItem(storageKey)||'{}');if(Number.isFinite(v.best)&&v.best>=0&&v.best<=900)saved.best=v.best;if(v.lastAttempt&&Number.isInteger(v.lastAttempt.total)&&v.lastAttempt.total>0&&v.lastAttempt.total<=9&&Number.isInteger(v.lastAttempt.correct)&&v.lastAttempt.correct>=0&&v.lastAttempt.correct<=v.lastAttempt.total)saved.lastAttempt={total:v.lastAttempt.total,correct:v.lastAttempt.correct};}catch{}
 const state={organ:'heart',disease:false,paused:matchMedia('(prefers-reduced-motion: reduce)').matches,teacher:false,tab:'explore',spot:0,questions:[],index:0,answers:[],score:0,finished:false,scope:'heart',projector:false,guideStep:0,order:[2,0,1],orderChecked:false,guideReveal:false,curtain:false,activityIndex:0,activityOrder:[0,1,2],activityAnswer:null,activityHint:false,caseAnswer:null,caseOrder:[0,1,2],layers:{shell:true,flow:true,labels:true}};
 const dialog=document.createElement('dialog');dialog.id='teaching-lab';dialog.setAttribute('aria-labelledby','teach-title');document.body.append(dialog);
 let opener=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const moduleFor=()=>teachingModules[state.organ];
 function shuffle(items){const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
-function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved))}catch{}}
+function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved))}catch{}if(typeof CustomEvent!=='undefined')document.dispatchEvent(new CustomEvent('anatomia:lab-progress',{detail:saved}));}
 function sourceList(m){return m.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join('');}
 function flowLine(path,cls=''){return `<path class="teach-flow ${cls}" d="${path}" fill="none" stroke-width="5" stroke-linecap="round"/>`;}
 function schematic({disease=state.disease,prefix='single',labels=true}={}){const label=moduleFor().name;let content='';
@@ -86,13 +86,15 @@ else if(action==='quiz-organ')startQuiz(state.organ);
 else if(action==='quiz-all')startQuiz('all');
 else if(action==='reveal')answer(0,true);
 else if(action==='restart-quiz'){if(state.scope==='mistakes'){state.questions=state.questions.map(q=>({...q,options:shuffle(q.options.map(o=>({text:o.text,correct:o.correct})))}));state.index=0;state.answers=[];state.score=0;state.finished=false;render();focusContent();}else startQuiz(state.scope==='all'?'all':state.organ);}
-else if(action==='next'){if(state.answers[state.index]===undefined)return;if(state.index===state.questions.length-1){state.finished=true;if(state.scope==='all'){saved.best=Math.max(saved.best,state.score);persist();}}else state.index++;render();focusContent();}
+else if(action==='next'){if(state.answers[state.index]===undefined)return;if(state.index===state.questions.length-1){state.finished=true;saved.lastAttempt={total:state.questions.length,correct:state.answers.filter(a=>a===true).length};if(state.scope==='all')saved.best=Math.max(saved.best,state.score);persist();}else state.index++;render();focusContent();}
 else if(action==='clear-score'){saved.best=0;persist();render();}
 });
 dialog.addEventListener('change',e=>{if(e.target.id==='teach-teacher'){state.teacher=e.target.checked;render();$('#teach-teacher',dialog).focus();}});
-dialog.addEventListener('close',()=>{opener?.focus?.({preventScroll:true});});
+dialog.addEventListener('close',()=>{const target=opener?.isConnected&&!opener.closest('dialog:not([open])')?opener:document.querySelector('#learning-launch')||document.querySelector('[data-teaching]');target?.focus?.({preventScroll:true});});
 document.addEventListener('visibilitychange',()=>dialog.classList.toggle('teach-paused',state.paused||document.hidden));
 const requested=new URLSearchParams(location.search).get('lesson');if(requested&&(['heart','lungs','kidneys'].includes(requested))){openTeaching(requested);if(new URLSearchParams(location.search).get('view')==='lesson')launchProjector();}
 
 // Shortcuts only belong to the open teaching dialog, never the atlas.
 dialog.addEventListener('keydown',e=>{if(!dialog.open||!state.projector||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const action=e.key==='ArrowRight'?'guide-next':e.key==='ArrowLeft'?'guide-prev':e.key==='Home'?'guide-reset':e.code==='KeyB'?'curtain':null;if(action){e.preventDefault();$(`[data-action="${action}"]`,dialog)?.click();}});
+
+document.addEventListener('anatomia:teaching',e=>{const {organ,view,teacher}=e.detail||{};openTeaching(organ);state.teacher=teacher===true;if(view==='lesson')launchProjector();else{render();focusContent();}});
