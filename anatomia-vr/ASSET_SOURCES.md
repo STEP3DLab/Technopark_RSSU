@@ -22,3 +22,10 @@ Model units are metres. Y is superior (up); +X is the subject's anatomical left;
 The small-intestine category represents the duodenum and jejunum supplied by the source. The large-intestine category represents the selected colon segments and vermiform appendix; it is not a complete bowel reconstruction. The heart category includes chambers, selected valves and major proximal vessels. The brain category includes cortical structures, cerebellum and selected brainstem surfaces; it is not a complete neuroanatomical atlas.
 
 Redistributed mesh derivatives retain the applicable Creative Commons conditions from their sources. This file records attribution and modifications; it does not replace those licences.
+
+## College MEDSI logo
+
+`assets/medsi-college-logo.png`: original transparent PNG supplied by the user
+on 2026-10-28 for the requested college branding. Used byte-for-byte unchanged;
+2048 × 504 pixels. The college mark is not covered by this application's MIT
+license. No logo was generated or substituted.

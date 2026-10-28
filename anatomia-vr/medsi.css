@@ -1,0 +1,128 @@
+/* College MEDSI presentation. The supplied logo is used unchanged.
+   Teal/blue observed on the college website; dark text shades are accessible
+   adaptations, not a claim to an official brandbook. Anatomical colors remain. */
+:root {
+  color-scheme: light;
+  --bg: #f4f9fb;
+  --panel: #ffffff;
+  --line: #b9d1dc;
+  --text: #16324f;
+  --muted: #496375;
+  --mint: #087f83;
+  --peach: #6853a3;
+  --sans: 'Helvetica Neue', Arial, sans-serif;
+  --brand-gradient: linear-gradient(100deg, #00abaa, #258ac0 60%, #7a80fb);
+}
+body { background: var(--bg); }
+h1,h2,h3,.brand,.loading b,.score,.physio-result>span { font-family: var(--sans); }
+button:hover:not(:disabled) { background: #e3f2f4; border-color: #087f83; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible {
+  outline: 3px solid #04558a; outline-offset: 3px;
+}
+a { color: #04558a; }
+.topbar { background: #fff; border-bottom: 1px solid var(--line); height: 86px; gap: 18px; }
+.topbar::after { content: ''; position: absolute; bottom: -1px; height: 3px; left: 0; right: 0; background: var(--brand-gradient); }
+.brand { gap: 16px; flex-shrink: 0; letter-spacing: 1px; font-size: 15px; }
+.brand-logo { display: block; width: 170px; height: auto; flex-shrink: 0; }
+.brand-title { border-left: 1px solid var(--line); padding-left: 16px; }
+.brand small { color: var(--muted); font-size: 8px; letter-spacing: .6px; line-height: 1.4; }
+.topbar nav { background: #f1f7f9; border-color: #d2e2e9; }
+.nav.active { color: #04558a; background: #dceef3; }
+.workspace { height: calc(100dvh - 86px); }
+.stage,.only-scene .stage { background: radial-gradient(ellipse at 45% 42%, #fff 0, #e5f3f4 42%, #eef0fc 100%); }
+.stage-glow { background: radial-gradient(ellipse,#00abaa0d,transparent 65%); box-shadow: none; }
+.stage-grid { opacity: .65; }
+#viewport:focus-visible { outline: 3px solid #04558a; outline-offset: -4px; }
+.catalog-toggle,.scene-only,.stage-tools,.label { background: #fffffff2; color: var(--text); border-color: var(--line); }
+.stage-tools,.detail,.library { box-shadow: 0 12px 38px #16324f12; }
+.stage-tools button { color: #496375; }
+.stage-tools button[aria-pressed=true],.context-button[aria-pressed=true],.organ-item.active {
+  background: #dceef3; color: #04558a; border-color: #087f83;
+}
+.side-marker,.stage-foot,.education-label,.fallback-mode .education-label { color: #496375; }
+.detail,.library,dialog { background: #fff; border-color: var(--line); }
+.detail { border-top: 3px solid #00abaa; }
+.detail :is(p,.brief,.number,.text-button,.slider-label,.feedback,.quiz-question,.lesson-text),
+dialog :is(p,li,.lesson-text,.source-link),.demo-bar p { color: #496375; }
+.primary,.vr-btn,.skip-link,.scene-only[aria-pressed=true],#stage-quiz button:last-child,.demo-controls #demo-next {
+  background: #087f83; color: #fff; border-color: #087f83;
+}
+.primary:hover:not(:disabled),.vr-btn:hover:not(:disabled) { background: #066a70; color: #fff; }
+select { color: var(--text); background: #f3f8fa; }
+.organ-item .idx { color: #496375; }
+.organ-item.active small { color: #6853a3; }
+.label.active { color: #04558a; border-color: #087f83; }
+.loading { background: #f4f9fbfa; }
+.loader-ring { border-color: #bfdcdf; border-top-color: #087f83; }
+.toast { background: #16324f; color: #fff; border-color: #04558a; }
+dialog::backdrop,#teaching-lab::backdrop { background: #16324f90; backdrop-filter: blur(6px); }
+.exercise,.lesson-tile { background: #f2f8fa; border-color: #c9dee7; }
+.exercise.accent { background: #e5f3f4; border-color: #a6d7d8; }
+.lesson-count i,.quiz-progress,.quiz-progress-mini i,.physio-bar { background: #c9dee7; }
+#stage-quiz button { background: #fff; color: var(--text); }
+.answer.correct { background: #e3f4eb; color: #195538; border-color: #448667; }
+.answer.wrong { background: #fff0e9; color: #823d25; border-color: #ab674b; }
+.score-ring { background: conic-gradient(var(--mint) var(--score), #d4e5eb 0); }
+.score-ring .score { background: #fff; }
+.spatial-practice .stage-caption { background: linear-gradient(90deg,#f4f9fbf2,transparent); }
+.demo-start,.teach-launch,.teach-card-launch { background: #e3f2f4; color: #04558a; border-color: #9ccbd5; }
+.demo-start span,.teach-card-launch span { color: #496375; }
+.demo-bar { background: linear-gradient(100deg,#e4f5f3,#eceffc); border-color: #b9d1dc; }
+.demo-controls button { background: #fff; }
+.demo-active .workspace { height: calc(100dvh - 178px); }
+.fallback-view p { color: #496375; }
+.fallback-status { background: #e3f2f4; color: #16324f; border-color: #9ccbd5; }
+.fallback-status button { color: #04558a; border-color: #8db9c6; background: #fff; }
+/* Keep the schematic's original anatomical/flow colors on its dark canvas;
+   all surrounding teaching content adopts the light college presentation. */
+#teaching-lab { color: var(--text); background: #fff; border-color: #b9d1dc; }
+#teaching-lab :where(h2,h3,h4,p,small,label,summary,span,b,a,button,div) { color: #16324f; }
+#teaching-lab :is(.teach-eyebrow,.teach-local,.teach-time,.teach-schematic-note,.teach-layer-note,.teach-quiz-hint) { color: #496375; }
+#teaching-lab .teach-score-note,#teaching-lab .teach-offline-note { color: #496375!important; }
+#teaching-lab :is(.teach-head,.teach-tabs,.teach-foot,.teach-guide-progress,.teach-projector-foot,.teach-activity-sources) { border-color: #c9dee7; }
+#teaching-lab :is(.teach-head,.teach-projector-head) { background: linear-gradient(100deg,#f4fbfb,#f1f2fd); }
+#teaching-lab :is(.teach-close,.teach-switch,.teach-projector-launch,.teach-atlas-return,.teach-answers button,.teach-case-options button,.teach-order>div,.teach-guide-progress span) { background: #f1f7f9; border-color: #b9d1dc; }
+#teaching-lab :is(.teach-visual,.teach-compare-pair article) { background: #f2f8fa; border-color: #c9dee7; }
+#teaching-lab .teach-compare-pair article:last-child { background: #fff6ef; border-color: #d9bba9; }
+#teaching-lab :is(.teach-spot-answer,.teach-cause,.teach-success,.teach-compare-summary) { background: #e9f5f5; border-color: #087f83; }
+#teaching-lab :is(.teach-organs button[aria-pressed=true],.teach-tabs button[aria-pressed=true],.teach-spots button[aria-pressed=true],.teach-layer-controls button[aria-pressed=true],.teach-guide-progress .active) { background: #dceef3; color: #04558a; border-color: #087f83; }
+#teaching-lab .teach-organs button[aria-pressed=true]>span { color: #04558a; }
+#teaching-lab .teach-switch button[aria-pressed=true] { background: #e0f2e8; color: #195538; }
+#teaching-lab .teach-switch button[data-state=disease][aria-pressed=true] { background: #ffe7d7; color: #823d25; }
+#teaching-lab .teach-primary { background: #087f83; border-color: #087f83; color: #fff; }
+#teaching-lab .teach-primary:hover { background: #066a70; color: #fff; }
+#teaching-lab button:hover:not(:disabled) { border-color: #087f83; }
+#teaching-lab :is(.teach-sources a,.teach-activity-sources a,.teach-offline-download,.teach-text,summary) { color: #04558a; }
+#teaching-lab :is(.teach-progress,.teach-answers button>span) { background: #dcebf0; border-color: #b9d1dc; }
+#teaching-lab .teach-progress i { background: #087f83; }
+#teaching-lab :is(.teach-feedback,.teach-answers .is-wrong) { background: #fff0e9; border-color: #ab674b; }
+#teaching-lab :is(.teach-feedback.correct,.teach-answers .is-correct,.teach-case-options .is-correct) { background: #e3f4eb; border-color: #448667; }
+#teaching-lab :is(.teach-result details,.teach-result article,.teach-identify-feedback,.teach-organ-results span,.teach-projector-prompt) { border-color: #b9d1dc; }
+#teaching-lab .teach-diagram,.teach-target-board { background: #18323b; border-radius: 14px; }
+#teaching-lab .teach-diagram :is(p,small) { color: #e3eeed; }
+#teaching-lab .teach-marker { color: #18372e!important; }
+#teaching-lab.teach-curtain::after { color: #16324f; }
+.teach-brand-logo { display: block; width: 140px; height: auto; margin-bottom: 14px; }
+.offline-home { color: #16324f; }
+.offline-home p { color: #496375; }
+.offline-home>.brand-logo { width: 220px; }
+.offline-home button { color: #fff; background: #087f83; border-color: #087f83; }
+@media(max-width:1100px) {
+  .brand-title { display: none; }
+  .topbar { gap: 12px; }
+}
+@media(max-width:700px) {
+  .topbar { height: auto; min-height: 108px; padding: 12px; gap: 10px; }
+  .brand-logo { width: 158px; }
+  .workspace,.demo-active .workspace { height: auto; }
+  .topbar nav { width: 100%; }
+  .detail { background: #fff; }
+  .catalog-toggle { background: #fff; }
+  .teach-brand-logo { width: 120px; margin-bottom: 12px; }
+  .only-scene .stage { height: calc(100dvh - 108px); }
+}
+@media(max-width:360px) { .brand-logo { width: 140px; } }
+@media(forced-colors:active) { .topbar::after { background: CanvasText; } .brand-logo,.teach-brand-logo { forced-color-adjust: none; background: #fff; } }
+/* Keep white labels readable on solid primary surfaces during pointer hover. */
+.scene-only[aria-pressed=true]:hover:not(:disabled),.offline-home button:hover:not(:disabled) { background: #066a70; color: #fff; }
+.teach-card-launch { flex-wrap: wrap; gap: 5px 10px; text-align: left; }

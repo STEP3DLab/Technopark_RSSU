@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b171e"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA — анатомия в пространстве</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.4.1"><link rel="stylesheet" href="./teaching.css?v=1.4.1"></head>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA · Колледж МЕДСИ</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.4.2"><link rel="stylesheet" href="./teaching.css?v=1.4.2"><link rel="stylesheet" href="./medsi.css?v=1.4.2"></head>
 <body>
 <a class="skip-link" href="#detail">К карточке и заданию</a>
 <header class="topbar">
-  <a class="brand" href="./" aria-label="ANATOMIA — главная"><span class="brand-icon">a<span>+</span></span><span>ANATOMIA<small>АНАТОМИЯ В ПРОСТРАНСТВЕ</small></span></a>
+  <a class="brand" href="./" aria-label="ANATOMIA · Колледж МЕДСИ — главная"><img class="brand-logo" src="./assets/medsi-college-logo.png" width="2048" height="504" alt="Колледж МЕДСИ"><span class="brand-title">ANATOMIA<small>Совместный проект с колледжем МЕДСИ</small></span></a>
   <nav aria-label="Режимы"><button class="nav active" data-tab="atlas" aria-pressed="true">Исследовать</button><button class="nav" data-tab="practice" aria-pressed="false">Практика</button><button class="teach-launch" data-teaching="heart">Занятие</button></nav>
   <div class="header-actions"><button id="demo-start" class="demo-start" title="Пять шагов для демонстрации">Показ<span> · 2 мин</span></button><button id="reset" class="icon-button" title="Начать заново без удаления прогресса" aria-label="Сбросить вид и режим" data-icon="home"></button><button class="icon-button nav" data-tab="sources" title="Об атласе и управление" aria-label="Об атласе и управление" data-icon="info"></button><button id="vr" class="vr-btn" title="Войти в VR на совместимом устройстве"><span data-icon="vr"></span><span>Войти в VR</span></button></div>
 </header>
@@ -29,7 +29,7 @@
   </div>
   <div class="stage-foot"><span>Потяните, чтобы повернуть</span><span class="model-tag">Z-ANATOMY / 3D</span></div>
   <div id="loading" class="loading"><div class="loader-ring"></div><b>ANATOMIA</b><span id="load-status">Загружаем анатомию…</span><button id="continue-flat">Продолжить без 3D</button><button id="retry" hidden>Повторить</button></div>
-  <p class="education-label">Учебная модель · не для диагностики</p>
+  <p class="education-label">Совместный проект с колледжем МЕДСИ · Учебная модель · не для диагностики</p>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </section>
 <aside class="library" id="catalog" aria-label="Каталог органов" hidden>
@@ -41,5 +41,5 @@
 <aside class="detail" id="detail" tabindex="-1" aria-label="Орган или учебное задание"><div id="organ-card"></div></aside>
 </main>
 <dialog id="modal" aria-label="Информация и учебные режимы"><button id="close-modal" class="close icon-button" aria-label="Закрыть" data-icon="close"></button><div id="modal-content"></div></dialog>
-<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.4.1"></script>
-<script type="module" src="./teaching.js?v=1.4.1"></script></body></html>
+<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.4.2"></script>
+<script type="module" src="./teaching.js?v=1.4.2"></script></body></html>

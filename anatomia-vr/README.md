@@ -95,3 +95,19 @@ Direct projector link: `?mode=cards&lesson=heart&view=lesson` (also `lungs`, `ki
 
 ### Classroom activities 1.4.0
 The teaching lab adds simultaneous normal/pathology comparison for three reviewed organs, visibility controls for schematic outline/wall, motion and labels, nine numbered structure-identification prompts with hints/explanations, and three mechanism cases. These are original schematic overlays, not segmented 3D anatomy or histological sections. In projector mode use Left/Right to change steps, Home to restart, B to hide/restore the scene. Mechanism explanation is revealed explicitly. Existing whole-organ 3D practice remains unchanged. All new activities are included in the standalone offline HTML.
+
+### College MEDSI presentation 1.4.2
+
+Совместный проект с колледжем МЕДСИ.
+
+The supplied college logo is used unchanged in `assets/medsi-college-logo.png`.
+`medsi.css` is a presentation-only layer shared by the atlas and standalone
+teaching download. The anatomical model, schematic colors, questions, scoring,
+local storage keys, VR controls and existing credits are unchanged.
+The college site's observed teal/blue colors inspired the accents; darker text
+and button colors are accessibility adaptations, not official brandbook tokens.
+No remote fonts are requested. Branding does not change the educational scope
+or imply college review, accreditation or clinical endorsement.
+
+Rebuild the self-contained lesson after presentation changes with
+`node scripts/build-teaching-offline.mjs`, then run `npm run check`.

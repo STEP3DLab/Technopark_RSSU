@@ -1,10 +1,10 @@
 {
   "name": "anatomia-med-vr",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "type": "module",
   "private": true,
   "scripts": {
-    "check": "node scripts/check.mjs && node scripts/regression.mjs && node scripts/teaching-check.mjs",
+    "check": "node scripts/check.mjs && node scripts/regression.mjs && node scripts/teaching-check.mjs && node scripts/brand-check.mjs",
     "start": "python3 -m http.server 8080 --directory ."
   }
 }
