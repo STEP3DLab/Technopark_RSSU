@@ -34,6 +34,14 @@
 .stage-caption .eyebrow { color: #46717c; font-size: 10px; letter-spacing: 1.5px; font-weight: 600; }
 .stage-caption h1 { color: var(--showcase-ink); font-size: 32px; font-weight: 600; line-height: 1.16; letter-spacing: -1px; margin: 10px 0 7px; }
 .stage-caption p { color: var(--showcase-muted); font-size: 13px; line-height: 1.55; }
+.anatomy-quickstart { display:flex; flex-wrap:wrap; gap:6px; margin-top:0; }
+.anatomy-quickstart button { display:inline-flex; align-items:center; gap:8px; min-height:38px; padding:7px 10px; border:1px solid #b9d5da; border-radius:9px; background:#fff; color:#175967; font-family:inherit; font-size:12px; font-weight:600; line-height:1.2; cursor:pointer; }
+.anatomy-quickstart button span { color:#087f83; font-size:9px; letter-spacing:.6px; background:#e4f4f0; border-radius:4px; padding:3px 4px; }
+.anatomy-quickstart button:hover { border-color:#087f83; background:#f0f9f7; }
+.anatomy-quickstart button:focus-visible { outline:3px solid #159a9c; outline-offset:3px; }
+.studio-view .anatomy-quickstart button { background:#123f4c; border-color:#52838f; color:#e8f5f6; }
+.studio-view .anatomy-quickstart button span { background:#1f615f; color:#c5f6eb; }
+.in-practice .anatomy-quickstart,.in-physio .anatomy-quickstart,.spatial-practice .anatomy-quickstart { display:none; }
 .view-badge { color: #426b79; font-size: 9px; letter-spacing: 1px; }
 .side-marker { color: #547981; font-size: 18px; }
 .side-marker small { font-size: 8px; letter-spacing: 1.2px; }
@@ -276,3 +284,8 @@ body.studio-view .stage, body.studio-view.only-scene .stage {
   .studio-view .system-dock button, .atlas-shortcuts #scene-tools-toggle { color: ButtonText; background: ButtonFace; border-color: ButtonText; }
   .studio-view .system-dock button[aria-pressed="true"], .atlas-shortcuts #scene-tools-toggle:focus-visible { outline: 2px solid Highlight; }
 }
+
+/* Direct entrances to detailed source models share the existing tool rail. */
+.atlas-shortcuts .anatomy-quickstart { grid-column:1/-1; display:flex; gap:6px; }
+.atlas-shortcuts .anatomy-quickstart button { flex:1; justify-content:center; min-height:44px; padding:9px 6px; font-size:12px; border-radius:10px; }
+@media(min-width:701px) and (max-height:720px) { .atlas-shortcuts .anatomy-quickstart { display:none; } }

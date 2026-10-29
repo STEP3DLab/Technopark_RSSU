@@ -29,3 +29,8 @@ Redistributed mesh derivatives retain the applicable Creative Commons conditions
 on 2026-10-28 for the requested college branding. Used byte-for-byte unchanged;
 2048 × 504 pixels. The college mark is not covered by this application's MIT
 license. No logo was generated or substituted.
+
+
+## Detailed organs added in 1.10
+
+The independent 3D laboratory uses the original Human Reference Atlas / HuBMAP heart (v1.3) and brain (v1.4) GLB files under CC BY 4.0. Authors, reviewers, DOI identifiers, exact checksums, the brain source mirroring limitation and its display-axis normalization are documented in [models/hra/ATTRIBUTION.md](models/hra/ATTRIBUTION.md). These terms apply to the new HRA files and do not replace the licences of the original Z-Anatomy / BodyParts3D atlas.

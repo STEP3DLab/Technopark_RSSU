@@ -1,9 +1,11 @@
 import * as THREE from './vendor/three.module.min.js';
 import {GLTFLoader} from './vendor/GLTFLoader.js';
-import {organs,sources,systemNames,findTasks,cases} from './data.js';
+import {organs,sources,systemNames,findTasks,cases} from './data.js?v=1.10.0';
 import {briefs,lessons,icon} from './experience.js';
 import {openPracticeHub} from './practice-hub.js';
-import {normalizeScene,scenePresets} from './scene-state.js';
+import {normalizeScene,scenePresets} from './scene-state.js?v=1.10.0';
+import {defaultSectionConfig,normalizeSectionSnapshot,patchSectionConfig,sectionAxes} from './section-state.js';
+import {createSectionRenderer} from './section-renderer.js';
 import {normalizeGraphicsQuality,resolveGraphicsProfile,surfaceProfile,studioLightProfile,selectionProfile,safeSceneFrame,fittedSceneRadius} from './render-profile.js';
 const $=s=>document.querySelector(s), byId=id=>organs.find(o=>o.id===id);
 const rootURL=new URL('.',import.meta.url), q=new URLSearchParams(location.search);
@@ -11,7 +13,8 @@ let scene,renderer,camera,modelRoot,anatomy,skeleton,raycaster,selected='heart',
 let lesson=null,lessonStep=0,physio=null,contextMode=false,comparison3D=null;
 const hiddenOrgans=new Set();
 let contextOpacity=.075,sceneFit=null,sceneZoomLimit=3.7,sceneStateQueued=false;
-let fallbackMode=false,loadingTimer,demoStep=-1;
+let sectionEnabled=false,sectionConfig={...defaultSectionConfig},sectionView=null,sectionInfo=null;
+let fallbackMode=false,loadingTimer,demoStep=-1,anatomyLabOpen=false;
 let viewerLoad='idle',viewerEpoch=0,viewerImagePreference=false,viewerResizeObserver=null,orbitAbort=null,skeletonLoad='idle',vrSupported=null;
 let initialSceneApplied=false,initialDemoHandled=false,imageScale=1,imageOffset={x:0,y:0},theatreMode=false;
 let graphicsQuality='auto',graphicsPersistent=true,graphicsResolution=null,graphicsMaxSize=8192,cameraFrameState=null,initialPresentationFramed=false,initialPresentationPending=false;
@@ -63,11 +66,11 @@ function renderCard(){
   const focusId=document.activeElement?.id,o=byId(selected);
   if((loaded||fallbackMode)&&!progress.viewed.includes(o.id)){progress.viewed.push(o.id);save();}
   document.body.classList.toggle('is-isolated',isolated);
-  $('#organ-card').innerHTML=`<div class="card-kicker"><span>В ФОКУСЕ</span><div class="card-pager"><button id="organ-prev" aria-label="Предыдущий орган">‹</button><span class="number">${String(organs.indexOf(o)+1).padStart(2,'0')} / 16</span><button id="organ-next" aria-label="Следующий орган">›</button></div></div><span class="organ-system-tag">${systemNames[o.system]}</span><h2>${o.name}</h2><div class="latin">${o.latin}</div><p class="brief">${briefs[o.id]}</p><p class="organ-location-preview">${o.location}</p><div class="card-actions"><button class="primary" id="isolate">${icon(isolated?'layers':'focus')}${fallbackMode?'Выбрать другой орган':isolated?'Все органы':'Изолировать'}</button><button class="icon-button" id="focus" title="Приблизить" aria-label="Приблизить орган">${icon('search')}</button></div>${isolated&&!fallbackMode?`<button class="context-button" id="context" aria-pressed="${contextMode}">${icon('layers')}Соседние органы</button>`:''}${loaded&&!fallbackMode&&!xrActive?`<div class="structure-tools"><button id="hide-organ" ${hiddenOrgans.size>=organs.length-1?'disabled':''}>Скрыть орган</button>${hiddenOrgans.size?`<button id="restore-organs">Вернуть скрытые <b>${hiddenOrgans.size}</b></button>`:''}</div>`:''}<div class="card-links"><button class="text-button" id="organ-info">${icon('info')}Подробнее</button><button class="text-button" id="quick-quiz">Проверить себя ${icon('arrow')}</button></div>${['heart','lungR','lungL','airway','kidneyR','kidneyL','bladder'].includes(o.id)?`<button class="teach-card-launch" data-teaching="${o.id}">Изучить работу органа <span>Схемы · вопросы →</span></button>`:''}${reviewedQuiz?'<button class="secondary" id="back-results">← К результатам</button>':''}<div class="card-study-tools"><button data-save-organ="${o.id}" aria-pressed="false"><span aria-hidden="true">☆</span><span>Сохранить</span></button><button data-learning>Мой учебный план →</button></div><button class="organ-share" id="organ-share">${icon('link')} Ссылка на этот орган</button><input id="organ-share-url" class="organ-share-url" readonly hidden aria-label="Ссылка на выбранный орган"><p class="organ-share-status" id="organ-share-status" role="status"></p>`;
+  $('#organ-card').innerHTML=`<div class="card-kicker"><span>В ФОКУСЕ</span><div class="card-pager"><button id="organ-prev" aria-label="Предыдущий орган">‹</button><span class="number">${String(organs.indexOf(o)+1).padStart(2,'0')} / 16</span><button id="organ-next" aria-label="Следующий орган">›</button></div></div><span class="organ-system-tag">${systemNames[o.system]}</span><h2>${o.name}</h2><div class="latin">${o.latin}</div><p class="brief">${briefs[o.id]}</p><p class="organ-location-preview">${o.location}</p><div class="card-actions"><button class="primary" id="isolate">${icon(isolated?'layers':'focus')}${fallbackMode?'Выбрать другой орган':isolated?'Все органы':'Изолировать'}</button><button class="icon-button" id="focus" title="Приблизить" aria-label="Приблизить орган">${icon('search')}</button></div>${isolated&&!fallbackMode?`<button class="context-button" id="context" aria-pressed="${contextMode}">${icon('layers')}Соседние органы</button>`:''}${loaded&&!fallbackMode&&!xrActive?`<button class="section-card-launch" id="organ-section">${icon('layers')} Срез и слои <span>Исследовать в 3D →</span></button><div class="structure-tools"><button id="hide-organ" ${hiddenOrgans.size>=organs.length-1?'disabled':''}>Скрыть орган</button>${hiddenOrgans.size?`<button id="restore-organs">Вернуть скрытые <b>${hiddenOrgans.size}</b></button>`:''}</div>`:''}${['heart','brain'].includes(o.id)?`<button class="lab-card-launch" id="organ-lab">${icon('layers')} Внутренние структуры · 3D <span>${o.id==='heart'?'Камеры, клапаны и мышцы':'Отделы и глубокие структуры'} →</span></button>`:''}<div class="card-links"><button class="text-button" id="organ-info">${icon('info')}Подробнее</button><button class="text-button" id="quick-quiz">Проверить себя ${icon('arrow')}</button></div>${['heart','lungR','lungL','airway','kidneyR','kidneyL','bladder'].includes(o.id)?`<button class="teach-card-launch" data-teaching="${o.id}">Изучить работу органа <span>Схемы · вопросы →</span></button>`:''}${reviewedQuiz?'<button class="secondary" id="back-results">← К результатам</button>':''}<div class="card-study-tools"><button data-save-organ="${o.id}" aria-pressed="false"><span aria-hidden="true">☆</span><span>Сохранить</span></button><button data-learning>Мой учебный план →</button></div><button class="organ-share" id="organ-share">${icon('link')} Ссылка на этот орган</button><input id="organ-share-url" class="organ-share-url" readonly hidden aria-label="Ссылка на выбранный орган"><p class="organ-share-status" id="organ-share-status" role="status"></p>`;
   $('#isolate').onclick=()=>{if(fallbackMode){toggleCatalog(true);return}isolated=!isolated;contextMode=false;applyAppearance();if(isolated){focusOrgan();if(xrActive)xrFocusOrgan()}else home();renderCard();updateXRPanel()};
   $('#focus').onclick=()=>{if(fallbackMode){isolated=true;renderCard()}else focusOrgan()};$('#quick-quiz').onclick=()=>startQuiz('function',[o.id]);$('#organ-info').onclick=()=>organInfo(o.id);
   $('#organ-share').onclick=()=>shareOrgan(o.id);
-  $('#hide-organ')?.addEventListener('click',hideSelectedOrgan);$('#restore-organs')?.addEventListener('click',restoreHiddenOrgans);
+  $('#organ-lab')?.addEventListener('click',()=>notifyLearning('lab-open',{organ:o.id}));$('#organ-section')?.addEventListener('click',()=>openOrganSection());$('#hide-organ')?.addEventListener('click',hideSelectedOrgan);$('#restore-organs')?.addEventListener('click',restoreHiddenOrgans);
   $('#organ-prev').onclick=()=>cycleOrgan(-1);$('#organ-next').onclick=()=>cycleOrgan(1);
   if(isolated&&!fallbackMode)$('#context').onclick=()=>{contextMode=!contextMode;applyAppearance();renderCard()};
   notifyLearning('card',{id:o.id});$('#back-results')?.addEventListener('click',restoreResults);if(focusId)document.getElementById(focusId)?.focus({preventScroll:true});
@@ -126,6 +129,61 @@ function handleGraphicsCommand(detail){
 }
 document.addEventListener('anatomia:graphics-command',event=>handleGraphicsCommand(event.detail));
 
+function getSectionSnapshot(){return {enabled:sectionEnabled,config:{...sectionConfig}};}
+function restoreSectionSnapshot(value){
+  const next=normalizeSectionSnapshot(value);sectionEnabled=next?.enabled??false;sectionConfig=next?.config||{...defaultSectionConfig};
+}
+function sectionAffected(){
+  const visible=visibleSceneIds();return sectionConfig.scope==='selected'?visible.filter(id=>id===selected):visible;
+}
+function publishSectionState(){
+  const blocked=sceneBlocked(),axis=sectionAxes[sectionConfig.axis];
+  const positionLabel=sectionConfig.mode==='slab'?`${Math.round(sectionConfig.position*100)}% пути · слой ${Math.round(sectionConfig.thickness*100)}%`:`${Math.round(sectionConfig.position*100)}% · ${axis.from} ${axis.to}`;
+  notifyLearning('section-state',{available:!blocked,reason:sceneReason(blocked),enabled:sectionEnabled,config:{...sectionConfig},selected,affected:sectionAffected(),positionLabel,capAvailable:!!sectionView?.capAvailable});
+}
+function updateSectionView(){
+  // Exercises and immersive sessions always start with the original whole surfaces.
+  if(quiz||lesson||physio||xrActive)sectionEnabled=false;
+  const active=sectionEnabled&&!sceneBlocked();
+  if(active&&!sectionView&&scene&&renderer)sectionView=createSectionRenderer({scene,renderer,meshes});
+  if(sectionView)sectionInfo=sectionView.update({enabled:active,config:sectionConfig,affected:sectionAffected()});
+  document.body.classList.toggle('section-active',active);
+  publishSectionState();
+}
+function handleSectionCommand(detail){
+  if(!detail||typeof detail!=='object')return;
+  if(detail.action==='request'){publishSectionState();return;}
+  if(sceneBlocked()){publishSectionState();return;}
+  if(detail.action==='enable'){
+    if(typeof detail.value!=='boolean')return;
+    sectionEnabled=detail.value;
+  }else if(detail.action==='config'){
+    const next=patchSectionConfig(sectionConfig,detail.patch);if(!next)return;sectionConfig=next;
+  }else if(detail.action==='reset'){
+    sectionEnabled=false;sectionConfig={...defaultSectionConfig};
+  }else return;
+  updateSectionView();scheduleSceneState();
+}
+function focusStudyOrgan(id){
+  if(sceneBlocked()||!byId(id))return false;
+  stopDemo();clearStudyModes();selected=id;hiddenOrgans.delete(id);$('#system').value='all';$('#search').value='';
+  isolated=true;contextMode=false;autoRotate=false;
+  select(id,true);focusScene();return true;
+}
+function openOrganSection(){
+  if(!focusStudyOrgan(selected))return;
+  sectionConfig={...sectionConfig,scope:'selected'};sectionEnabled=true;updateSectionView();
+  notifyLearning('open-section',{selected});scheduleSceneState();
+}
+document.addEventListener('anatomia:section-command',event=>handleSectionCommand(event.detail));
+document.addEventListener('anatomia:lab-visibility',event=>{
+  if(typeof event.detail?.open!=='boolean')return;
+  anatomyLabOpen=event.detail.open;prevTime=0;
+  if(anatomyLabOpen)renderer?.setAnimationLoop?.(null);
+  else if(loaded&&!fallbackMode&&!xrActive)renderer?.setAnimationLoop?.(renderFrame);
+  updateSectionView();syncViewerControls();publishSceneState();if(!anatomyLabOpen)resize();
+});
+
 function readCameraFrame(){
   const viewport=$('#viewport'),realLayout=typeof getComputedStyle==='function',r=viewport.getBoundingClientRect();
   const height=viewport.clientHeight||(realLayout?r.height:0)||600;
@@ -180,7 +238,7 @@ function home(){
 }
 
 function applyAppearance(){
-  updateFallback();scheduleSceneState();if(!loaded||fallbackMode)return;const filter=$('#system').value,focus=focusedIds();
+  updateFallback();scheduleSceneState();if(!loaded||fallbackMode){updateSectionView();return;}const filter=$('#system').value,focus=focusedIds();
   const revealed=quiz?.answered&&!quiz.finished?(quiz.type==='case'?(current().targets||[current().target]):[current().id]):null;
   for(const [id,list]of organMeshes){const o=byId(id),ghost=isolated&&contextMode&&!focus.includes(id);list.forEach(m=>{
     m.visible=!hiddenOrgans.has(id)&&(!isolated||focus.includes(id)||contextMode)&&(!!quiz||!!lesson||filter==='all'||o.system===filter);
@@ -194,12 +252,13 @@ function applyAppearance(){
   })}
   if(skeleton)skeleton.visible=showSkeleton&&(!isolated||contextMode);
   $('#skeleton').setAttribute('aria-pressed',String(showSkeleton));$('#labels-toggle').setAttribute('aria-pressed',String(showLabels));$('#rotate').setAttribute('aria-pressed',String(autoRotate));
+  updateSectionView();
 }
 
 function showModal(html){$('#modal-content').innerHTML=html;const title=$('#modal-content h2');if(title){title.id='modal-title';$('#modal').setAttribute('aria-labelledby','modal-title')}$('#modal').showModal()}
 function practice(){setNav('practice');openPracticeHub({fallbackMode:fallbackMode||!loaded,viewed:progress.viewed.length});}
 
-function about(){setNav('sources');showModal(`<div class="modal-eyebrow">ОБ АТЛАСЕ / ВЕРСИЯ 1.9</div><h2>Анатомия, которую<br>можно рассмотреть.</h2><p>Учебный 3D-атлас для медицинского колледжа. 16 органов и групп структур, пространственный практикум, задания на функции и WebXR. Отбор структур предназначен для вводного изучения макроанатомии.</p><p><b>Как работать:</b> выберите орган в каталоге или на модели; вращайте перетаскиванием, приближайте колесом или щипком. Shift + перетаскивание, правая кнопка мыши или движение двумя пальцами перемещают вид. Стрелки вращают вид, + / − меняют масштаб, H возвращает общий вид. После фокуса на сцене WASD перемещают прицел, Enter выбирает орган. Латеральность указана относительно тела. Скелет служит ориентиром; цвет органов условный.</p><p><b>Качество 3D:</b> в настройках сцены доступны «Авто», «Высокое» и «Экономное». Они меняют разрешение изображения; выбор сохраняется на этом устройстве. Студийный свет и параметры поверхности помогают читать форму исходной модели. В показе стрелки ← / → переключают шаги, Home / End ведут к первому / последнему шагу, Esc завершает показ — когда фокус находится в его панели.</p><p><b>VR:</b> откройте сайт по HTTPS в браузере совместимого шлема и нажмите «Войти в VR». Триггер выбирает орган или кнопку панели; стик вращает модель. Кнопки на панели: предыдущий / следующий орган, изоляция, поиск, выход. В шлеме доступен пространственный поиск; тесты с вариантами и расчётная модель доступны в обычном режиме. Доступность VR зависит от устройства и браузера.</p><p><b>Границы модели:</b> это образовательная визуализация, не диагностический инструмент и не тренажёр выполнения вмешательств. Не все отделы и микроструктуры представлены; размеры и расположение отражают исходную модель, а не варианты нормы у конкретного человека. Перед применением в оценивании содержание следует согласовать с преподавателем.</p><h3>Источники и лицензии</h3><ul class="source-list"><li>Геометрия: <a href="https://github.com/Z-Anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D, DBCLS; WebGL-экспорт: <a href="https://github.com/nqwrc/3d-anatomy" target="_blank" rel="noopener">nqwrc/3d-anatomy</a>. Компоненты имеют разные лицензии, в том числе модели почек — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a> с некоммерческими условиями. Модели отобраны, объединены и оптимизированы; лицензии и авторство сохранены в <a href="./models/License.txt" target="_blank">исходном уведомлении</a> и <a href="./ASSET_SOURCES.md" target="_blank">описании источников</a>.</li><li>Учебные факты сверены с OpenStax, <i>Anatomy and Physiology 2e</i>, Betts et al. Ссылки на разделы приведены в каждой карточке. Формулировки карточек и задания составлены для этого атласа; изображения и задания учебника не копировались.</li><li>Рендеринг: <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> (MIT). Ключи и аккаунты не требуются. Данные о пациентах не используются.</li></ul><button class="secondary" id="export">Скачать мой результат</button>`);$('#export').onclick=()=>{const b=new Blob([JSON.stringify({application:'ANATOMIA',version:'1.9.0',exported:new Date().toISOString(),...progress},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='anatomia-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}}
+function about(){setNav('sources');showModal(`<div class="modal-eyebrow">ОБ АТЛАСЕ / ВЕРСИЯ 1.9</div><h2>Анатомия, которую<br>можно рассмотреть.</h2><p>Учебный 3D-атлас для медицинского колледжа. 16 органов и групп структур, пространственный практикум, задания на функции и WebXR. Отбор структур предназначен для вводного изучения макроанатомии.</p><p><b>Как работать:</b> выберите орган в каталоге или на модели; вращайте перетаскиванием, приближайте колесом или щипком. Shift + перетаскивание, правая кнопка мыши или движение двумя пальцами перемещают вид. Стрелки вращают вид, + / − меняют масштаб, H возвращает общий вид. После фокуса на сцене WASD перемещают прицел, Enter выбирает орган. Латеральность указана относительно тела. Скелет служит ориентиром; цвет органов условный.</p><p><b>Качество 3D:</b> в настройках сцены доступны «Авто», «Высокое» и «Экономное». Они меняют разрешение изображения; выбор сохраняется на этом устройстве. Студийный свет и параметры поверхности помогают читать форму исходной модели. В показе стрелки ← / → переключают шаги, Home / End ведут к первому / последнему шагу, Esc завершает показ — когда фокус находится в его панели.</p><p><b>VR:</b> откройте сайт по HTTPS в браузере совместимого шлема и нажмите «Войти в VR». Триггер выбирает орган или кнопку панели; стик вращает модель. Кнопки на панели: предыдущий / следующий орган, изоляция, поиск, выход. В шлеме доступен пространственный поиск; тесты с вариантами и расчётная модель доступны в обычном режиме. Доступность VR зависит от устройства и браузера.</p><p><b>Границы модели:</b> это образовательная визуализация, не диагностический инструмент и не тренажёр выполнения вмешательств. Не все отделы и микроструктуры представлены; размеры и расположение отражают исходную модель, а не варианты нормы у конкретного человека. Перед применением в оценивании содержание следует согласовать с преподавателем.</p><h3>Источники и лицензии</h3><ul class="source-list"><li>Геометрия: <a href="https://github.com/Z-Anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D, DBCLS; WebGL-экспорт: <a href="https://github.com/nqwrc/3d-anatomy" target="_blank" rel="noopener">nqwrc/3d-anatomy</a>. Компоненты имеют разные лицензии, в том числе модели почек — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a> с некоммерческими условиями. Модели отобраны, объединены и оптимизированы; лицензии и авторство сохранены в <a href="./models/License.txt" target="_blank">исходном уведомлении</a> и <a href="./ASSET_SOURCES.md" target="_blank">описании источников</a>.</li><li>Детальное сердце и мозг: Human Reference Atlas / HuBMAP, модели Visible Human и Allen. Отдельные структуры доступны в 3D-лаборатории. Авторы Kristen Browne и Heidi Schlehlein, лицензия CC BY 4.0; версии, DOI и ограничения приведены в <a href="./models/hra/ATTRIBUTION.md" target="_blank" rel="noopener">атрибуции детальных моделей</a>.</li><li>Учебные факты сверены с OpenStax, <i>Anatomy and Physiology 2e</i>, Betts et al. Ссылки на разделы приведены в каждой карточке. Формулировки карточек и задания составлены для этого атласа; изображения и задания учебника не копировались.</li><li>Рендеринг: <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> (MIT). Ключи и аккаунты не требуются. Данные о пациентах не используются.</li></ul><button class="secondary" id="export">Скачать мой результат</button>`);$('#export').onclick=()=>{const b=new Blob([JSON.stringify({application:'ANATOMIA',version:'1.10.0',exported:new Date().toISOString(),...progress},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='anatomia-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}}
 function startQuiz(type,items,scope){if(type==='find'&&(!loaded||fallbackMode)){toast('Пространственный поиск доступен после загрузки 3D. В резервном режиме работают вопросы и ситуации.');return}clearStudyModes();toggleCatalog(false);setSceneOnly(false);$('#modal').close();reviewedQuiz=null;quiz={type,items:items||(type==='find'?shuffle(organs.map(o=>o.id)).slice(0,8):type==='case'?cases:shuffle(organs.map(o=>o.id)).slice(0,8)),index:0,score:0,answered:false,last:null,custom:!!items,scope:scope==='review'?'review':items?'custom':'standard',history:[],optionOrder:null};document.body.classList.add('in-practice');isolated=false;autoRotate=false;$('#system').value='all';$('#search').value='';setNav('practice');renderList();renderQuiz();if(type==='find')publishSceneState();home();updateXRPanel();if(type!=='find')focusQuestion();else focusScene()}
 function current(){if(!quiz)return null;return quiz.type==='case'?quiz.items[quiz.index]:byId(quiz.items[quiz.index])}
 function renderQuiz(){
@@ -236,7 +295,7 @@ function answerChoice(index){if(!quiz||quiz.answered||quiz.finished)return;quiz.
 function nextQuestion(){if(!quiz?.answered||quiz.finished)return;quiz.index++;if(quiz.index>=quiz.items.length){quiz.finished=true;if(!quiz.custom)progress.best[quiz.type]=Math.max(Number(progress.best[quiz.type])||0,quiz.score);progress.lastAttempt={type:quiz.type,score:quiz.score,total:quiz.items.length,date:new Date().toISOString(),completedAt:new Date().toISOString(),scope:quiz.scope||'custom',answers:quiz.history};save();renderQuiz();focusQuestion();updateXRPanel();return}quiz.answered=false;quiz.last=null;quiz.optionOrder=null;renderQuiz();home();if(quiz.type!=='find')focusQuestion();else focusScene();updateXRPanel()}
 function exitQuiz(){quiz=null;document.body.classList.remove('in-practice','spatial-practice','quiz-finished');isolated=false;setNav('atlas');renderList();renderCard();home();syncStagePrompt();updateXRPanel();$(fallbackMode?'#detail':'#viewport').focus({preventScroll:true})}
 function createLabels(){for(const o of organs){const d=document.createElement('div');d.className='label';d.textContent=o.name;$('#labels').append(d);labelNodes.set(o.id,d)}}
-function updateLabels(){if(!camera)return;const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;let used=[];for(const o of organs){const d=labelNodes.get(o.id);const active=o.id===selected||comparison3D?.ids.includes(o.id);const allowed=!hiddenOrgans.has(o.id)&&showLabels&&!quiz&&!xrActive&&(active||(!isolated&&['brain','lungR','liver','bladder'].includes(o.id)));const m=organMeshes.get(o.id)?.[0];if(!allowed||!m?.visible){d.hidden=true;continue}const pos=centers.get(o.id).clone();modelRoot.localToWorld(pos);const p=pos.project(camera);let x=(p.x*.5+.5)*w,y=(-p.y*.5+.5)*h;const left=o.id.endsWith('R')||o.id==='liver'||o.id==='brain';x+=left?-74:74;const clash=used.some(v=>Math.abs(v[1]-y)<30&&Math.abs(v[0]-x)<135);if(clash&&!active){d.hidden=true;continue}d.hidden=p.z>1||p.z<0||x<45||x>w-45||y<145||y>h-140;if(!d.hidden){used.push([x,y]);d.style.left=x+'px';d.style.top=y+'px';d.classList.toggle('active',active)}}}
+function updateLabels(){if(!camera)return;const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;let used=[];for(const o of organs){const d=labelNodes.get(o.id);const active=o.id===selected||comparison3D?.ids.includes(o.id);const allowed=!hiddenOrgans.has(o.id)&&showLabels&&!quiz&&!xrActive&&(active||(!isolated&&['brain','lungR','liver','bladder'].includes(o.id)));const m=organMeshes.get(o.id)?.[0];if(!allowed||!m?.visible||sectionView&&!sectionView.hasVisible(m)){d.hidden=true;continue}const pos=centers.get(o.id).clone();modelRoot.localToWorld(pos);const p=pos.project(camera);let x=(p.x*.5+.5)*w,y=(-p.y*.5+.5)*h;const left=o.id.endsWith('R')||o.id==='liver'||o.id==='brain';x+=left?-74:74;const clash=used.some(v=>Math.abs(v[1]-y)<30&&Math.abs(v[0]-x)<135);if(clash&&!active){d.hidden=true;continue}d.hidden=p.z>1||p.z<0||x<45||x>w-45||y<145||y>h-140;if(!d.hidden){used.push([x,y]);d.style.left=x+'px';d.style.top=y+'px';d.classList.toggle('active',active)}}}
 function resize(){
   if(!renderer||!camera||xrActive||fallbackMode)return;
   const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;if(!w||!h)return;
@@ -260,7 +319,7 @@ function cameraUpdate(dt){if(xrActive)return;if(view.turn){const t=view.turn;t.t
   $('#view-name').textContent={front:'ВИД СПЕРЕДИ',right:'ВИД СПРАВА',back:'ВИД СЗАДИ',left:'ВИД СЛЕВА',top:'ВИД СВЕРХУ',bottom:'ВИД СНИЗУ',free:'СВОБОДНЫЙ ОБЗОР'}[angle];
   const control=$('#viewer-angle');if(control&&!view.turn&&control.value!==angle)control.value=angle;
 }
-function pick(event){if(!loaded||fallbackMode||xrActive||lesson||physio)return;const r=renderer.domElement.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1),camera);const hits=raycaster.intersectObjects(meshes,false).filter(h=>h.object.visible&&!hiddenOrgans.has(h.object.userData.organId)&&h.object.material.opacity>.3);if(hits[0]){const id=hits[0].object.userData.organId;if(comparison3D){if(comparison3D.ids.includes(id)){selected=id;renderCard();applyAppearance();}}else select(id)}}
+function pick(event){if(!loaded||fallbackMode||xrActive||lesson||physio)return;const r=renderer.domElement.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1),camera);const hits=raycaster.intersectObjects(meshes,false).filter(h=>h.object.visible&&!hiddenOrgans.has(h.object.userData.organId)&&h.object.material.opacity>.3&&(!sectionView||sectionView.allows(h.object,h.point)));if(hits[0]){const id=hits[0].object.userData.organId;if(comparison3D){if(comparison3D.ids.includes(id)){selected=id;renderCard();applyAppearance();}}else select(id)}}
 function manualCameraChange(){sceneFit=null;if(comparison3D)comparison3D.fitAutomatic=false;autoRotate=false;}
 function panScene(dx,dy,canvas=renderer?.domElement){
   if(!loaded||fallbackMode||xrActive||!camera||!Number.isFinite(dx)||!Number.isFinite(dy))return;
@@ -376,7 +435,8 @@ function syncViewerControls(){
   const vr=$('#vr');if(vr)vr.hidden=fallbackMode||!loaded||vrSupported===false;
   const retry=$('#retry-3d');if(retry){retry.disabled=busy;retry.textContent=busy?'Загрузка…':loaded?'Вернуться в 3D':'Попробовать 3D';}
   document.body.classList.toggle('viewer-loading',busy);
-  syncZoomControls();syncFullscreenButton();scheduleSceneState();publishGraphicsState();
+  syncZoomControls();syncFullscreenButton();scheduleSceneState();publishGraphicsState();publishSectionState();
+  document.querySelectorAll('[data-focus-organ],[data-section-launch]').forEach(button=>{button.disabled=!!sceneBlocked();});
 }
 function syncFullscreenButton(){
   const b=$('#viewer-fullscreen');if(!b)return;const active=!!document.fullscreenElement||theatreMode;
@@ -400,6 +460,8 @@ function bindViewerControls(){
   document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('viewer-native-fullscreen',!!document.fullscreenElement);syncFullscreenButton();resize();if(fallbackMode)setImageTransform();});
   globalThis.addEventListener?.('resize',()=>{resize();if(fallbackMode)setImageTransform();});
   document.addEventListener('anatomia:scene-layout',()=>resize());
+  document.querySelectorAll('[data-focus-organ]').forEach(button=>button.addEventListener('click',()=>focusStudyOrgan(button.dataset.focusOrgan)));
+  document.querySelectorAll('[data-section-launch]').forEach(button=>button.addEventListener('click',()=>openOrganSection()));
   const image=$('#fallback-image');if(!image)return;image.setAttribute('tabindex','0');image.setAttribute('draggable','false');image.title='Клавиши + / − — масштаб, стрелки — перемещение увеличенного изображения, H — сброс';
   let drag=null;
   image.addEventListener('pointerdown',e=>{if(!fallbackMode||imageScale<=1||e.button>0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,offset:{...imageOffset}};image.setPointerCapture(e.pointerId);e.preventDefault();});
@@ -424,11 +486,11 @@ function disposeObject(object){
 function disposeViewer(){
   clearTimeout(loadingTimer);orbitAbort?.abort();orbitAbort=null;viewerResizeObserver?.disconnect();viewerResizeObserver=null;
   try{renderer?.setAnimationLoop?.(null);}catch{}
-  disposeObject(scene);xrTexture?.dispose?.();renderer?.dispose?.();renderer?.domElement?.remove?.();
+  sectionView?.dispose();sectionView=null;sectionInfo=null;disposeObject(scene);xrTexture?.dispose?.();renderer?.dispose?.();renderer?.domElement?.remove?.();
   meshes.length=0;organMeshes.clear();centers.clear();labelNodes.clear();controllers.length=0;xrButtons.length=0;
   $('#labels').innerHTML='';scene=renderer=camera=modelRoot=anatomy=skeleton=raycaster=null;
   xrPanel=xrCanvas=xrCtx=xrTexture=xrInspectCenter=null;xrHover=-1;xrActive=false;loaded=false;skeletonLoad='idle';
-  graphicsResolution=null;graphicsMaxSize=8192;cameraFrameState=null;publishGraphicsState();
+  graphicsResolution=null;graphicsMaxSize=8192;cameraFrameState=null;publishGraphicsState();publishSectionState();
 }
 function applyInitialScene(){
   if(initialSceneApplied)return;initialSceneApplied=true;
@@ -436,7 +498,7 @@ function applyInitialScene(){
 }
 function runInitialDemo(){if(initialDemoHandled)return;initialDemoHandled=true;if(q.get('demo')==='1')startDemo();}
 function renderFrame(time){
-  if(fallbackMode||!loaded||!renderer||document.hidden&&!xrActive)return;
+  if(fallbackMode||!loaded||!renderer||anatomyLabOpen||document.hidden&&!xrActive)return;
   const dt=Math.min(.05,(time-prevTime)/1000||.016);prevTime=time;cameraUpdate(dt);
   if(xrActive){const session=renderer.xr.getSession();for(const input of session?.inputSources||[]){const axes=input.gamepad?.axes;if(axes?.length>=4&&Math.abs(axes[2])>.15)modelRoot.rotation.y-=axes[2]*dt*.8;}
     if(isolated&&xrInspectCenter){const offset=xrInspectCenter.clone().multiplyScalar(modelRoot.scale.x).applyEuler(modelRoot.rotation);modelRoot.position.copy(new THREE.Vector3(0,1.4,-.8).sub(offset));}
@@ -458,7 +520,7 @@ function resume3DView(){
   resize();applyAppearance();renderCard();syncStagePrompt();syncViewerControls();prevTime=0;
   if(initialPresentationPending&&!initialPresentationFramed){if(isolated&&!quiz&&!physio)focusOrgan();else frameAtlasHome();}
   if(initialPresentationFramed)initialPresentationPending=false;
-  renderer.setAnimationLoop?.(renderFrame);return true;
+  if(!anatomyLabOpen)renderer.setAnimationLoop?.(renderFrame);return true;
 }
 async function setViewerMode(mode){
   if(xrActive)return;
@@ -478,7 +540,7 @@ async function init({force3D=false}={}){
   $('#loading').hidden=false;$('#load-status').textContent='Загружаем анатомию…';syncViewerControls();
   loadingTimer=setTimeout(()=>{if(epoch===viewerEpoch&&viewerLoad==='loading')activateFallback('3D не успел загрузиться');},15000);
   try{
-    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,stencil:true,powerPreference:'high-performance'});
     renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=studioLightProfile.exposure;
     try{const gl=renderer.getContext?.();graphicsMaxSize=Math.min(renderer.capabilities?.maxTextureSize||8192,gl?.getParameter(gl.MAX_RENDERBUFFER_SIZE)||8192);}catch{graphicsMaxSize=4096;}
     renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType('local-floor');$('#viewport').append(renderer.domElement);
@@ -526,6 +588,7 @@ function updateXRHover(){let button=-1;for(const controller of controllers){if(!
 // Scene tools expose only visual state. No scores, student records or geometry edits.
 function sceneBlocked(){
   if(xrActive)return 'vr';
+  if(anatomyLabOpen)return 'lab';
   if(quiz||lesson||physio)return 'practice';
   if(viewerLoad==='loading')return 'loading';
   if(viewerLoad==='unavailable'||!loaded||!renderer)return 'unavailable';
@@ -533,7 +596,7 @@ function sceneBlocked(){
   return null;
 }
 function sceneReason(blocked=sceneBlocked()){
-  return {vr:'Настройка сцены доступна после выхода из VR.',practice:'Завершите текущее задание, чтобы настроить сцену.',loading:'3D-модель загружается. Настройки станут доступны после загрузки.',image:'Переключитесь в 3D, чтобы менять состав сцены.',unavailable:'Для настройки сцены нужен работающий 3D-просмотр.'}[blocked]||'';
+  return {lab:'Закройте 3D-лабораторию, чтобы вернуться к настройке атласа.',vr:'Настройка сцены доступна после выхода из VR.',practice:'Завершите текущее задание, чтобы настроить сцену.',loading:'3D-модель загружается. Настройки станут доступны после загрузки.',image:'Переключитесь в 3D, чтобы менять состав сцены.',unavailable:'Для настройки сцены нужен работающий 3D-просмотр.'}[blocked]||'';
 }
 function visibleSceneIds(){
   const filter=$('#system').value,focus=focusedIds();
@@ -541,11 +604,11 @@ function visibleSceneIds(){
 }
 function sceneSnapshot(){
   if(sceneBlocked())return null;
-  return normalizeScene({v:1,selected,hidden:[...hiddenOrgans],system:$('#system').value,isolated,context:contextMode,pair:comparison3D?[...comparison3D.ids]:null,skeleton:showSkeleton,labels:showLabels,contextOpacity,camera:{theta:view.turn?.to??view.theta,phi:view.turn?.toPhi??view.phi,radius:view.toRadius,target:view.toTarget.toArray()}});
+  return normalizeScene({v:1,section:getSectionSnapshot(),selected,hidden:[...hiddenOrgans],system:$('#system').value,isolated,context:contextMode,pair:comparison3D?[...comparison3D.ids]:null,skeleton:showSkeleton,labels:showLabels,contextOpacity,camera:{theta:view.turn?.to??view.theta,phi:view.turn?.toPhi??view.phi,radius:view.toRadius,target:view.toTarget.toArray()}});
 }
 function publishSceneState(){
   const blocked=sceneBlocked();
-  notifyLearning('scene-state',{available:!blocked,blocked,activity:blocked==='practice'||blocked==='vr',busy:['practice','vr','loading'].includes(blocked),reason:sceneReason(blocked),selected,visible:visibleSceneIds(),hidden:[...hiddenOrgans],isolated,pair:comparison3D?[...comparison3D.ids]:null,context:contextMode,contextOpacity,skeleton:showSkeleton,labels:showLabels,snapshot:sceneSnapshot()});
+  notifyLearning('scene-state',{available:!blocked,blocked,activity:['practice','vr','lab'].includes(blocked),busy:['practice','vr','lab','loading'].includes(blocked),reason:sceneReason(blocked),selected,visible:visibleSceneIds(),hidden:[...hiddenOrgans],isolated,pair:comparison3D?[...comparison3D.ids]:null,context:contextMode,contextOpacity,skeleton:showSkeleton,labels:showLabels,snapshot:sceneSnapshot()});
 }
 function scheduleSceneState(){
   if(sceneStateQueued)return;
@@ -576,7 +639,7 @@ function restoreSceneSnapshot(input){
   stopDemo();clearStudyModes();reviewedQuiz=null;autoRotate=false;
   selected=next.selected;$('#system').value=next.system;$('#search').value='';
   for(const id of next.hidden)hiddenOrgans.add(id);
-  isolated=next.isolated;contextMode=next.context;contextOpacity=next.contextOpacity;showSkeleton=next.skeleton;showLabels=next.labels;
+  isolated=next.isolated;contextMode=next.context;contextOpacity=next.contextOpacity;showSkeleton=next.skeleton;showLabels=next.labels;restoreSectionSnapshot(next.section);
   comparison3D=next.pair?{ids:[...next.pair],fitRadius:Math.max(3.7,next.camera.radius),fitAspect:camera?.aspect||1,fitAutomatic:false}:null;
   document.body.classList.toggle('in-comparison3d',!!comparison3D);
   view.turn=null;view.theta=next.camera.theta;view.phi=next.camera.phi;view.radius=view.toRadius=next.camera.radius;
@@ -724,7 +787,7 @@ function updateFallback(){
   $('#fallback-caption').textContent=`${o?o.name:'Общий вид'} · исходный рендер. Без вращения.`;
 }
 function showImageView(reason,failed){
-  fallbackMode=true;autoRotate=false;clearTimeout(loadingTimer);
+  fallbackMode=true;autoRotate=false;updateSectionView();clearTimeout(loadingTimer);
   if(viewerLoad==='loading')loadingTimer=setTimeout(()=>{if(viewerLoad==='loading')activateFallback('3D не успел загрузиться');},15000);
   try{renderer?.setAnimationLoop?.(null);if(renderer?.domElement)renderer.domElement.hidden=true;}catch{}
   document.body.classList.add('fallback-mode');document.body.classList.toggle('image-choice',!failed);setSceneOnly(false);
@@ -747,7 +810,7 @@ function activateFallback(reason){
 function resetExperience(){
   stopDemo();$('#modal').close();clearStudyModes();reviewedQuiz=null;quiz=null;
   document.body.classList.remove('in-practice','spatial-practice','quiz-finished');
-  selected='heart';isolated=false;contextMode=false;autoRotate=false;showLabels=false;showSkeleton=true;
+  selected='heart';isolated=false;contextMode=false;autoRotate=false;showLabels=false;showSkeleton=true;sectionEnabled=false;sectionConfig={...defaultSectionConfig};
   $('#search').value='';$('#system').value='all';setSceneOnly(false);toggleCatalog(false);setNav('atlas');home();renderList();renderCard();syncStagePrompt();updateXRPanel();
   $('#catalog-toggle').focus({preventScroll:true});toast('Начальный вид восстановлен. Сохранённый прогресс не удалён.');
 }

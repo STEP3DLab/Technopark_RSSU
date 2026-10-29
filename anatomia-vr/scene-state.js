@@ -1,4 +1,5 @@
 import {organs, systemNames} from './data.js';
+import {normalizeSectionSnapshot} from './section-state.js';
 
 // A scene contains display choices only. Learner records and saved view names are never
 // included in its shared URL, and importing a view cannot create new anatomy.
@@ -54,6 +55,8 @@ export function normalizeScene(value) {
     if (!finite(camera.theta) || !bounded(camera.phi, .1, Math.PI - .1) || !bounded(camera.radius, .18, 25)) return null;
     if (!Array.isArray(camera.target) || camera.target.length !== 3) return null;
     if (!bounded(camera.target[0], -5, 5) || !bounded(camera.target[1], -2, 5) || !bounded(camera.target[2], -5, 5)) return null;
+    const section = own(value, 'section') ? normalizeSectionSnapshot(value.section) : undefined;
+    if (section === null) return null;
     const theta = ((camera.theta + Math.PI) % tau + tau) % tau - Math.PI;
     // The canonical order makes equivalent hidden sets produce the same link.
     const hidden = organIds.filter(id => value.hidden.includes(id));
@@ -62,6 +65,7 @@ export function normalizeScene(value) {
       isolated:value.isolated, context:value.context, pair,
       skeleton:value.skeleton, labels:value.labels,
       contextOpacity:rounded(value.contextOpacity, .03, .3),
+      ...(section ? {section} : {}),
       camera:{
         theta:rounded(theta, -Math.PI, Math.PI),
         phi:rounded(camera.phi, .1, Math.PI - .1),
@@ -113,7 +117,7 @@ export function sceneFromURL(base) {
     const url = safeURL(base);
     if (!url) return null;
     const params = url.searchParams, scenes = params.getAll('scene');
-    if (scenes.length !== 1 || ['organ','compare','lesson','practice','mode','demo','view'].some(key => params.has(key))) return null;
+    if (scenes.length !== 1 || ['organ','compare','lesson','practice','mode','demo','view','lab','part'].some(key => params.has(key))) return null;
     return decode(scenes[0]);
   } catch { return null; }
 }

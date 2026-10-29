@@ -6,6 +6,8 @@ import * as data from '../data.js';
 import * as experience from '../experience.js';
 import * as sceneState from '../scene-state.js';
 import * as renderProfile from '../render-profile.js';
+import * as sectionState from '../section-state.js';
+import {createSectionRenderer} from '../section-renderer.js';
 
 // Execute the production state/event functions with small DOM stand-ins.
 // These tests do not render WebGL or claim to verify a physical VR headset.
@@ -55,7 +57,7 @@ function harness() {
   });
   const storage = new Map();
   const context = vm.createContext({
-    THREE, ...data, ...experience, ...sceneState, ...renderProfile, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
+    THREE, ...data, ...experience, ...sceneState, ...renderProfile, ...sectionState, createSectionRenderer, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
     CustomEvent: class {constructor(type,options={}) {this.type=type;this.detail=options.detail;}},
     location: {search: ''},
     localStorage: {getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v)},
@@ -926,6 +928,79 @@ test('Demo keyboard navigation is bounded and reports its five steps without int
   run('assert.equal(demoStep,4);');
   press('Home');run("assert.equal(demoStep,0);assert.equal($('#demo-progress').value,1);");
   press('Escape');run("assert.equal(demoStep,-1);assert.equal($('#demo-bar').hidden,true);");
+});
+
+test('Real section commands clip the selected source geometry and preserve a manually framed camera',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';
+    view.toRadius=2.3;view.toTarget.set(.2,1.1,.1);view.turn=null;view.theta=.6;view.phi=1.2;sceneFit=null;
+    const before=JSON.stringify(sceneSnapshot().camera);
+    handleSectionCommand({action:'enable',value:true});
+    handleSectionCommand({action:'config',patch:{axis:'sagittal',position:.6,mode:'slab',thickness:.2}});
+    assert.equal(sectionEnabled,true);assert.equal(sectionView.active,true);assert.equal(organMeshes.get('heart')[0].material.clippingPlanes.length,2);
+    assert.equal(organMeshes.get('brain')[0].material.clippingPlanes,null);assert.equal(JSON.stringify(sceneSnapshot().camera),before);
+    const beforeInvalid=JSON.stringify(getSectionSnapshot());handleSectionCommand({action:'config',patch:{position:NaN}});handleSectionCommand({action:'enable',value:'yes'});
+    assert.equal(JSON.stringify(getSectionSnapshot()),beforeInvalid);
+    handleSectionCommand({action:'reset'});assert.equal(sectionEnabled,false);assert.equal(organMeshes.get('heart')[0].material.clippingPlanes,null);
+  `);
+});
+
+test('Starting a spatial exercise removes cutting before fitting all sixteen original structures',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';
+    handleSectionCommand({action:'enable',value:true});handleSectionCommand({action:'config',patch:{scope:'visible'}});
+    startQuiz('find',['brain','heart']);
+    assert.equal(sectionEnabled,false);assert.equal(sectionView.active,false);
+    assert.ok(meshes.every(mesh=>!mesh.material.clippingPlanes));assert.equal(visibleSceneIds().length,16);
+    handleSectionCommand({action:'enable',value:true});assert.equal(sectionEnabled,false);
+  `);
+});
+
+test('An explicit image mode pauses a cut and returning to 3D restores its unchanged configuration',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};renderer.setAnimationLoop=()=>{};
+    handleSectionCommand({action:'enable',value:true});handleSectionCommand({action:'config',patch:{axis:'coronal',flipped:true}});
+    const originalSection=JSON.stringify(getSectionSnapshot());showImageView('Image',false);
+    assert.equal(sectionView.active,false);assert.equal(sectionEnabled,true);assert.ok(meshes.every(mesh=>!mesh.material.clippingPlanes));
+    handleSectionCommand({action:'config',patch:{position:.2}});assert.equal(JSON.stringify(getSectionSnapshot()),originalSection);
+    resume3DView();assert.equal(sectionView.active,true);assert.equal(JSON.stringify(getSectionSnapshot()),originalSection);
+  `);
+});
+
+test('The organ cut action reveals, isolates and frames the chosen organ before asking the panel to open',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';$('#system').value='digest';selected='brain';hiddenOrgans.add('brain');
+    openOrganSection();assert.equal(selected,'brain');assert.equal(isolated,true);assert.equal(hiddenOrgans.has('brain'),false);
+    assert.equal($('#system').value,'all');assert.equal(sectionEnabled,true);assert.equal(sectionConfig.scope,'selected');
+    const open=document.events.filter(event=>event.type==='anatomia:open-section').at(-1);assert.equal(open.detail.selected,'brain');
+    assert.deepEqual(Array.from(visibleSceneIds()),['brain']);assert.equal(sceneFit.kind,'focus');
+  `);
+});
+
+test('The independent anatomy laboratory pauses the atlas loop and cannot resume a fallback renderer',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};
+    const loops=[];renderer.setAnimationLoop=fn=>loops.push(fn);
+    handleSectionCommand({action:'enable',value:true});
+    notifyLearning('lab-visibility',{open:true});assert.equal(anatomyLabOpen,true);assert.equal(loops.at(-1),null);assert.equal(sceneBlocked(),'lab');
+    assert.equal(sectionView.active,false);handleSectionCommand({action:'config',patch:{position:.3}});assert.equal(sectionConfig.position,.5);
+    notifyLearning('lab-visibility',{open:false});assert.equal(loops.at(-1),renderFrame);assert.equal(sectionView.active,true);
+    notifyLearning('lab-visibility',{open:true});showImageView('Image',false);const count=loops.length;
+    notifyLearning('lab-visibility',{open:false});assert.equal(loops.length,count);assert.equal(sectionView.active,false);
+  `);
+});
+
+test('Saved cuts restore together with their camera and legacy saved scenes restore whole surfaces',({run})=>{
+  run(`
+    scene=new THREE.Scene();scene.add(modelRoot);viewerLoad='ready';
+    handleSectionCommand({action:'enable',value:true});handleSectionCommand({action:'config',patch:{axis:'coronal',mode:'slab',position:.7,thickness:.12,guide:false}});
+    view.turn=null;view.toRadius=1.9;view.toTarget.set(.2,.3,.1);const saved=sceneSnapshot();
+    handleSectionCommand({action:'reset'});assert.equal(restoreSceneSnapshot(saved),true);
+    assert.equal(sectionEnabled,true);assert.equal(sectionConfig.axis,'coronal');assert.equal(sectionConfig.mode,'slab');assert.equal(sectionConfig.position,.7);
+    assert.equal(JSON.stringify(sceneSnapshot().camera),JSON.stringify(saved.camera));assert.equal(organMeshes.get(selected)[0].material.clippingPlanes.length,2);
+    const legacy={...saved};delete legacy.section;assert.equal(restoreSceneSnapshot(legacy),true);assert.equal(sectionEnabled,false);assert.ok(meshes.every(mesh=>!mesh.material.clippingPlanes));
+    const malformed={...saved,section:{enabled:true,config:{...saved.section.config,position:Infinity}}};assert.equal(restoreSceneSnapshot(malformed),false);assert.equal(sectionEnabled,false);
+  `);
 });
 
 console.log(JSON.stringify({

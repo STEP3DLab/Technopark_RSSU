@@ -1,0 +1,311 @@
+/* Detailed anatomical models. All controls remain ordinary, accessible HTML. */
+#anatomy-lab{
+  --lab-ink:#183c4c;--lab-muted:#607983;--lab-border:#d9e5e9;--lab-teal:#087f83;--lab-purple:#796394;
+  --lab-stage:#102e3a;--lab-section-height:78px;
+  position:fixed;inset:0;z-index:1000;margin:0;padding:0;border:0;border-radius:0;
+  width:100vw;max-width:none;height:100dvh;max-height:none;background:#f6f9fa;color:var(--lab-ink);
+  font-family:var(--sans,'Helvetica Neue',Arial,sans-serif);font-size:14px;line-height:1.5;
+  overflow:hidden;overscroll-behavior:contain;box-shadow:none;
+}
+#anatomy-lab::backdrop{background:#071c27db;backdrop-filter:blur(8px)}
+#anatomy-lab:not([open]),#anatomy-lab [hidden]{display:none!important}
+#anatomy-lab *,#anatomy-lab *::before,#anatomy-lab *::after{box-sizing:border-box}
+#anatomy-lab :is(h1,h2,h3,h4,p){margin:0;font-family:inherit}
+#anatomy-lab :is(button,input,select,output){font:inherit}
+#anatomy-lab button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#anatomy-lab button:disabled{opacity:.45;cursor:default}
+#anatomy-lab :is(button,input,summary,select):focus-visible{outline:3px solid #4486cf;outline-offset:3px}
+#anatomy-lab svg{width:20px;height:20px;flex-shrink:0}
+#anatomy-lab .lab-shell{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0;min-width:0}
+#anatomy-lab .lab-header{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:80px;padding:15px 26px;border-bottom:1px solid #d4e2e6;background:#fff}
+#anatomy-lab .lab-header>div:first-child{min-width:0}
+#anatomy-lab .lab-header h2{font-size:22px;font-weight:600;letter-spacing:-.65px;line-height:1.2;color:#194458}
+#anatomy-lab .lab-header p,#anatomy-lab .lab-breadcrumb{font-size:10px;line-height:1.5;letter-spacing:1.2px;font-weight:600;color:#0d8587;margin-bottom:4px;text-transform:uppercase}
+#anatomy-lab .lab-brand{display:flex;align-items:center;gap:18px;min-width:0}
+#anatomy-lab .lab-brand>img,#anatomy-lab .lab-logo{display:block;width:108px;max-width:24vw;max-height:44px;height:auto;object-fit:contain;flex-shrink:0}
+#anatomy-lab .lab-brand>div{min-width:0}
+#anatomy-lab .lab-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#anatomy-lab .lab-btn,#anatomy-lab .lab-icon-button,#anatomy-lab .lab-header-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:10px 14px;color:#31586a;background:#fff;border:1px solid #bfd2dc;border-radius:11px;font-size:12px;line-height:1.45;text-decoration:none;white-space:normal}
+#anatomy-lab .lab-icon-button{width:44px;min-width:44px;padding:10px}
+#anatomy-lab .lab-btn:hover:not(:disabled),#anatomy-lab .lab-icon-button:hover:not(:disabled),#anatomy-lab .lab-header-actions button:hover:not(:disabled){background:#edf7f5;border-color:#74aeaf}
+#anatomy-lab .lab-btn.is-active,#anatomy-lab .lab-btn[aria-pressed=true]{background:#e4f3ef;color:#086e72;border-color:#70aca8;font-weight:600}
+#anatomy-lab .lab-btn.lab-primary{background:#087f83;border-color:#087f83;color:#fff;font-weight:600}
+#anatomy-lab .lab-btn.lab-primary:hover:not(:disabled){background:#066c72}
+#anatomy-lab .lab-workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;min-height:0;min-width:0}
+#anatomy-lab .lab-stage{
+  position:relative;isolation:isolate;min-width:0;min-height:0;overflow:hidden;
+  background:radial-gradient(ellipse at 49% 44%,#225e64 0%,#17434d 37%,#102e3a 72%);color:#ebf7f7;
+}
+#anatomy-lab .lab-stage::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:-1;background-image:linear-gradient(#97d7d507 1px,transparent 1px),linear-gradient(90deg,#97d7d507 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,#0008,transparent 80%)}
+#anatomy-lab .lab-canvas-wrap{position:absolute;inset:0;z-index:0;min-width:0;min-height:0;touch-action:none}
+#anatomy-lab .lab-canvas-wrap canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+#anatomy-lab .lab-canvas-wrap:focus-visible{outline:3px solid #a8d9ed;outline-offset:-5px}
+#anatomy-lab .lab-view-controls{position:absolute;top:20px;left:22px;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:7px;max-width:calc(100% - 44px)}
+#anatomy-lab .lab-view-controls .lab-btn,#anatomy-lab .lab-view-controls .lab-icon-button,#anatomy-lab .lab-view-controls button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:9px 12px;border:1px solid #8bb8bf4d;border-radius:11px;background:#0c2938bb;color:#dceff2;font-size:12px;line-height:1.4;backdrop-filter:blur(12px)}
+#anatomy-lab .lab-view-controls .lab-icon-button{width:44px;padding:10px}
+#anatomy-lab .lab-view-controls button:hover:not(:disabled){background:#27535f;border-color:#91c7cc}
+#anatomy-lab .lab-view-controls :is([aria-pressed=true],.is-active){background:#d8f2ed;color:#10535e;border-color:#b4dad4}
+#anatomy-lab .lab-status{position:absolute;top:77px;left:25px;z-index:2;max-width:min(72%,420px);pointer-events:none;color:#adcbd2;font-size:11px;line-height:1.6;text-shadow:0 1px 3px #102e3a}
+#anatomy-lab .lab-status:empty{display:none}
+#anatomy-lab .lab-status b{color:#e0f2f4;font-weight:600}
+#anatomy-lab .lab-orientation{position:absolute;right:23px;bottom:calc(var(--lab-section-height) + 30px);z-index:2;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:7px;max-width:calc(100% - 46px);color:#a5c7cf;font-size:10px;line-height:1.5;letter-spacing:.2px;pointer-events:none;text-shadow:0 1px 3px #0e2b39}
+#anatomy-lab .lab-orientation>span{padding:5px 9px;border:1px solid #9bc9d226;border-radius:7px;background:#0e2c38b3}
+#anatomy-lab .lab-loading{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:40px 28px;color:#d4eaed;background:radial-gradient(ellipse at center,#1a4c56f5,#102e3afb);text-align:center}
+#anatomy-lab .lab-loading h3,#anatomy-lab .lab-loading b{font-size:21px;font-weight:550;letter-spacing:-.4px;color:#f0fbfa}
+#anatomy-lab .lab-loading p{max-width:360px;font-size:13px;line-height:1.7;color:#aacad1}
+#anatomy-lab .lab-loading progress{width:min(240px,100%);height:5px;border:0;border-radius:8px;overflow:hidden;accent-color:#83d4c6;background:#54808a55}
+#anatomy-lab .lab-loading progress::-webkit-progress-bar{background:#54808a55;border-radius:8px}
+#anatomy-lab .lab-loading progress::-webkit-progress-value{background:#83d4c6;border-radius:8px;transition:width .15s linear}
+#anatomy-lab .lab-loading progress::-moz-progress-bar{background:#83d4c6;border-radius:8px}
+#anatomy-lab .lab-loading .lab-btn{background:#edf9f6;border-color:#9fcfca;color:#0c626b;margin-top:4px}
+#anatomy-lab .lab-spinner{width:34px;height:34px;border:2px solid #8fcfc333;border-top-color:#9bdfd1;border-radius:50%;animation:lab-spin 1s linear infinite}
+@keyframes lab-spin{to{transform:rotate(1turn)}}
+#anatomy-lab .lab-sidebar{position:relative;display:flex;flex-direction:column;gap:16px;min-width:0;min-height:0;padding:22px 20px 17px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#a7c3ca #f3f7f8;border-left:1px solid #d4e2e6;background:#fff;color:var(--lab-ink)}
+#anatomy-lab .lab-organ-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border:1px solid #d8e5e8;border-radius:13px;background:#f1f6f7}
+#anatomy-lab .lab-organ-switch button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:44px;padding:10px 7px;border:1px solid transparent;border-radius:9px;background:transparent;color:#617c88;font-size:13px;line-height:1.4;font-weight:500}
+#anatomy-lab .lab-organ-switch button:is(.is-active,[aria-pressed=true], [aria-selected=true]){background:#fff;border-color:#a9ccce;color:#066f74;font-weight:650;box-shadow:0 2px 5px #1744520b}
+#anatomy-lab .lab-organ-switch button:hover:not(:disabled){color:#086f74;background:#eaf5f1}
+#anatomy-lab .lab-sidebar-title h2{font-size:27px;font-weight:550;line-height:1.18;letter-spacing:-.8px;color:#1c4458}
+#anatomy-lab .lab-sidebar-title p,#anatomy-lab .lab-sidebar-title .lab-kicker{color:#73828d;font-size:11px;line-height:1.6;margin-top:5px}
+#anatomy-lab .lab-sidebar-title small{display:block;margin-top:4px;font-size:12px;line-height:1.6;color:#857290;font-family:Georgia,serif;font-style:italic}
+#anatomy-lab .lab-kicker{display:block;font-size:10px;line-height:1.5;letter-spacing:1px;font-weight:600;color:#188187;text-transform:uppercase}
+#anatomy-lab .lab-pill{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:4px 7px;border:1px solid #cce2e1;border-radius:6px;color:#26797c;background:#edf7f4;font-size:10px;font-weight:600;line-height:1.4;white-space:nowrap}
+#anatomy-lab .lab-selected-card{padding:14px;border:1px solid #cbdde3;border-radius:13px;background:linear-gradient(120deg,#eef8f4,#f4f4fa);box-shadow:inset 3px 0 0 #4e9e99;min-width:0}
+#anatomy-lab .lab-selected-card h3,#anatomy-lab .lab-selected-card strong{display:block;font-size:17px;font-weight:550;letter-spacing:-.35px;line-height:1.35;color:#2a4c5e;overflow-wrap:anywhere}
+#anatomy-lab .lab-selected-card .lab-kicker{font-size:9px;margin-bottom:6px;color:#2b8888}
+#anatomy-lab .lab-selected-card p{font-size:12px;line-height:1.7;color:#566e7e;margin-top:7px;overflow-wrap:anywhere}
+#anatomy-lab .lab-selected-card small{display:block;font-size:11px;line-height:1.6;color:#80718d;margin-top:5px;overflow-wrap:anywhere}
+#anatomy-lab .lab-selected-card .lab-btn{font-size:11px;padding:9px 10px;margin-top:11px;max-width:100%;background:#fff}
+#anatomy-lab .lab-selected-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+#anatomy-lab .lab-parts-search{position:sticky;top:-22px;z-index:3;padding:8px 0 4px;background:#fff;box-shadow:0 -8px 0 0 #fff,0 7px 12px #ffffffd9}
+#anatomy-lab .lab-parts-search label{display:block;font-size:11px;font-weight:600;color:#375e70;line-height:1.5;margin-bottom:7px}
+#anatomy-lab .lab-parts-search input{display:block;width:100%;min-width:0;min-height:46px;padding:12px 13px;color:#244a5b;border:1px solid #bdcfd9;border-radius:11px;background:#f9fbfc;font-size:13px;line-height:1.5;box-shadow:none}
+#anatomy-lab .lab-parts-search input::placeholder{color:#8a9ba5;opacity:1}
+#anatomy-lab .lab-search-field{position:relative}
+#anatomy-lab .lab-search-field input{padding-right:45px}
+#anatomy-lab .lab-search-field button{position:absolute;right:1px;top:1px;width:44px;min-height:44px;padding:11px;border:0;border-radius:10px;background:transparent;color:#658391}
+#anatomy-lab .lab-parts-search p{font-size:10px;color:#78909b;line-height:1.5;margin-top:5px}
+#anatomy-lab .lab-layer-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:-5px}
+#anatomy-lab .lab-layer-toolbar button{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto;min-height:44px;min-width:0;padding:9px 8px;border:1px solid #d4e2e6;border-radius:9px;background:#f8fafb;color:#4a6e7f;font-size:11px;line-height:1.5}
+#anatomy-lab .lab-layer-toolbar button:hover:not(:disabled){border-color:#8bb7b7;background:#eef7f4;color:#126d74}
+#anatomy-lab .lab-layer-toolbar button:is(.is-active,[aria-pressed=true]){border-color:#81b3b1;background:#e5f3ef;color:#086d72}
+#anatomy-lab .lab-groups{min-width:0;margin-top:-5px}
+#anatomy-lab .lab-group{border-bottom:1px solid #dce7eb;margin:0;padding:0;min-width:0}
+#anatomy-lab .lab-group>summary{display:flex;align-items:center;gap:8px;min-height:50px;padding:13px 1px;list-style:none;cursor:pointer;color:#345b6b;font-size:12px;line-height:1.5;font-weight:650;overflow-wrap:anywhere}
+#anatomy-lab .lab-group>summary::-webkit-details-marker{display:none}
+#anatomy-lab .lab-group>summary::after{content:'';width:7px;height:7px;flex:none;border-right:1.5px solid #73929e;border-bottom:1.5px solid #73929e;transform:rotate(-45deg);margin:0 4px 0 auto;transition:transform .15s ease}
+#anatomy-lab .lab-group[open]>summary::after{transform:rotate(45deg)}
+#anatomy-lab .lab-group>summary span,#anatomy-lab .lab-group>summary small{font-size:10px;line-height:1.5;color:#7b939e;font-weight:400}
+#anatomy-lab .lab-parts{display:flex;flex-direction:column;gap:4px;padding:0 0 11px;min-width:0}
+#anatomy-lab .lab-part-row{display:flex;align-items:center;gap:3px;min-width:0;min-height:49px;padding:2px 3px 2px 8px;border:1px solid transparent;border-radius:9px;background:#f6f9fa}
+#anatomy-lab .lab-part-row:is(.is-active,.is-selected){background:#eaf5f1;border-color:#a4c9c6;box-shadow:inset 3px 0 0 #358e89}
+#anatomy-lab .lab-part-row:has([aria-pressed=true]){background:#eaf5f1;border-color:#a4c9c6;box-shadow:inset 3px 0 0 #358e89}
+#anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select){display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;flex:1 1 auto;min-width:0;min-height:44px;padding:7px 8px;border:0;border-radius:7px;background:transparent;text-align:left;color:#355d70;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+#anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select):hover:not(:disabled){background:#e5f0ee;color:#116c70}
+#anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select) small,#anatomy-lab .lab-part-meta{font-size:10px;line-height:1.5;color:#8a7995;font-weight:400;overflow-wrap:anywhere}
+#anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select) b,#anatomy-lab .lab-part-label{font-weight:550;color:inherit;overflow-wrap:anywhere}
+#anatomy-lab input.lab-part-visibility,#anatomy-lab .lab-part-visibility input{appearance:auto;accent-color:#16868a;width:18px;height:18px;min-width:18px;margin:4px;flex:0 0 18px;cursor:pointer}
+#anatomy-lab label.lab-part-visibility,#anatomy-lab .lab-visibility-toggle{display:flex;align-items:center;justify-content:center;width:44px;min-width:44px;min-height:44px;cursor:pointer;flex:0 0 44px}
+#anatomy-lab input.lab-part-visibility:disabled,#anatomy-lab .lab-part-visibility input:disabled{cursor:default;opacity:.4}
+#anatomy-lab .lab-part-row.is-hidden{background:#fafbfc}
+#anatomy-lab .lab-part-row.is-hidden button[data-lab-part]{color:#899ca6}
+#anatomy-lab .lab-part-swatch{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid #29465820;background:var(--part-color,#b79cb5);flex:none}
+#anatomy-lab .lab-empty{border:1px dashed #c5d8df;border-radius:11px;padding:20px 12px;text-align:center;color:#65818e;font-size:12px;line-height:1.6;background:#f9fcfc}
+#anatomy-lab .lab-empty b{display:block;font-weight:600;color:#3a6374;margin-bottom:5px}
+#anatomy-lab .lab-notes{margin-top:auto;padding-top:14px;border-top:1px solid #dbe6ea;color:#718794;font-size:10px;line-height:1.75;overflow-wrap:anywhere}
+#anatomy-lab .lab-notes p+p{margin-top:7px}
+#anatomy-lab .lab-notes a{color:#326f88;text-underline-offset:3px}
+#anatomy-lab .lab-notes small{font-size:inherit;line-height:inherit}
+#anatomy-lab .lab-source-notes{margin-top:5px;border-top:1px solid #e1e9ed;padding-top:5px}
+#anatomy-lab .lab-source-notes>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:10px 0;cursor:pointer;list-style:none;color:#527688;font-size:11px;font-weight:500;line-height:1.5}
+#anatomy-lab .lab-source-notes>summary::-webkit-details-marker{display:none}
+#anatomy-lab .lab-source-notes>summary::after{content:'+';font-size:16px;font-weight:400;color:#7c95a2}
+#anatomy-lab .lab-source-notes[open]>summary::after{content:'−'}
+#anatomy-lab .lab-source-notes p,#anatomy-lab .lab-source-notes li{font-size:10px;line-height:1.7;color:#738994;overflow-wrap:anywhere;margin:0 0 7px}
+#anatomy-lab .lab-source-notes ul{padding-left:16px;margin:0}
+#anatomy-lab .lab-source-notes a{color:#466f85;text-underline-offset:3px;overflow-wrap:anywhere}
+#anatomy-lab .lab-source-notes table{width:100%;border-collapse:collapse;font-size:10px;line-height:1.7}
+#anatomy-lab .lab-source-notes td{padding:3px 0;overflow-wrap:anywhere;vertical-align:top}
+
+#anatomy-lab .lab-sectionbar{position:absolute;left:22px;right:22px;bottom:18px;z-index:3;min-width:0;padding:13px 16px;border:1px solid #a8d0d340;border-radius:15px;background:#f7fbfaf2;color:#244f61;box-shadow:0 10px 35px #061b2b28;backdrop-filter:blur(18px)}
+#anatomy-lab .lab-cut-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px}
+#anatomy-lab .lab-cut-head h3,#anatomy-lab .lab-cut-head b{font-size:13px;font-weight:650;line-height:1.5;color:#2b5267}
+#anatomy-lab .lab-cut-head p,#anatomy-lab .lab-cut-head small{font-size:10px;line-height:1.5;color:#69808b}
+#anatomy-lab .lab-cut-head label{display:flex;align-items:center;gap:9px;min-height:44px;font-size:12px;font-weight:550;line-height:1.4;color:#3d6072;cursor:pointer}
+#anatomy-lab .lab-cut-head input[type=checkbox]{width:18px;height:18px;accent-color:#087f83;flex:none;cursor:pointer}
+#anatomy-lab .lab-cut-settings{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px 15px;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid #cedfe3}
+#anatomy-lab .lab-cut-settings :is(.lab-cut-modes,.lab-cut-axes,.lab-cut-options,[role=group]){display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap}
+#anatomy-lab .lab-cut-settings button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:44px;padding:8px 10px;border:1px solid #c3d4de;border-radius:9px;background:#fff;color:#486577;font-size:11px;line-height:1.4;flex:1 1 auto}
+#anatomy-lab .lab-cut-settings button:hover:not(:disabled){background:#edf6f3;border-color:#84b4b1}
+#anatomy-lab .lab-cut-settings button:is(.is-active,[aria-pressed=true]){background:#e8e5f2;border-color:#a795be;color:#71558d;font-weight:600}
+#anatomy-lab .lab-cut-settings label:not(.lab-cut-option){display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;color:#4b6878;font-size:11px;line-height:1.5}
+#anatomy-lab .lab-cut-settings output{font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;color:#75608e}
+#anatomy-lab .lab-cut-settings input[type=range]{width:100%;min-width:0;height:44px;padding:0;margin:1px 0 0;accent-color:#796394;background:transparent;border:0;cursor:pointer}
+#anatomy-lab .lab-cut-range{min-width:0}
+#anatomy-lab .lab-cut-settings .lab-cut-secondary{display:flex;align-items:center;gap:7px;flex-wrap:wrap;grid-column:1/-1}
+#anatomy-lab .lab-cut-secondary button{flex:0 1 auto;min-height:44px;font-size:10px;padding:7px 9px;background:transparent}
+#anatomy-lab .lab-cut-secondary label,#anatomy-lab .lab-cut-option{display:flex;align-items:center;gap:7px;min-height:44px;font-size:11px;line-height:1.5;color:#5d7482;cursor:pointer}
+#anatomy-lab .lab-cut-secondary input[type=checkbox]{width:17px;height:17px;accent-color:#087f83}
+#anatomy-lab .lab-cut-note{font-size:10px;line-height:1.6;color:#77838f;grid-column:1/-1}
+#anatomy-lab.lab-cut-on,#anatomy-lab .lab-stage.lab-cut-on{--lab-section-height:220px}
+#anatomy-lab.lab-loading-model .lab-sectionbar{opacity:.6;pointer-events:none}
+@media(min-width:1500px){
+  #anatomy-lab .lab-workspace{grid-template-columns:minmax(0,1fr) 382px}
+  #anatomy-lab .lab-sidebar{padding:25px 25px 20px}
+  #anatomy-lab .lab-header{padding-left:30px;padding-right:30px}
+  #anatomy-lab .lab-sectionbar{left:30px;right:30px;bottom:22px;padding:15px 20px}
+  #anatomy-lab .lab-view-controls{left:30px;top:24px}
+}
+@media(max-width:1100px) and (min-width:701px){
+  #anatomy-lab .lab-workspace{grid-template-columns:minmax(0,1fr) 300px}
+  #anatomy-lab .lab-sidebar{padding:18px 15px;gap:13px}
+  #anatomy-lab .lab-header{padding:13px 20px;min-height:76px}
+  #anatomy-lab .lab-header h2{font-size:21px}
+  #anatomy-lab .lab-sectionbar{left:15px;right:15px;bottom:15px;padding:12px}
+  #anatomy-lab .lab-view-controls{left:16px;top:17px;max-width:calc(100% - 32px);gap:5px}
+  #anatomy-lab .lab-view-controls button{padding:9px;font-size:11px}
+  #anatomy-lab .lab-status{left:18px;font-size:10px;top:74px}
+  #anatomy-lab .lab-cut-settings{gap:9px;grid-template-columns:minmax(0,1fr)}
+  #anatomy-lab .lab-cut-settings .lab-cut-secondary{grid-column:auto}
+  #anatomy-lab .lab-cut-settings button{font-size:10px;padding:8px 7px;min-height:44px}
+  #anatomy-lab.lab-cut-on,#anatomy-lab .lab-stage.lab-cut-on{--lab-section-height:290px}
+}
+@media(max-width:900px) and (min-width:701px){
+  #anatomy-lab .lab-workspace{grid-template-columns:minmax(0,1fr) 270px}
+  #anatomy-lab .lab-sidebar{padding:16px 13px}
+  #anatomy-lab .lab-sidebar-title h2{font-size:25px}
+  #anatomy-lab .lab-brand>img{width:82px}
+  #anatomy-lab .lab-view-controls{right:14px;max-width:none;gap:5px}
+  #anatomy-lab .lab-view-controls button{min-height:44px;min-width:44px;font-size:10px;padding:8px 7px}
+  #anatomy-lab .lab-status{top:116px;max-width:calc(100% - 36px)}
+  #anatomy-lab .lab-cut-head{gap:7px}
+  #anatomy-lab .lab-cut-head h3{font-size:12px}
+  #anatomy-lab .lab-cut-head label{font-size:11px;gap:6px}
+}
+@media(max-width:700px){
+  #anatomy-lab{height:100dvh;width:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  #anatomy-lab .lab-shell{height:auto;min-height:100%;display:flex;flex-direction:column}
+  #anatomy-lab .lab-header{position:sticky;top:0;z-index:6;min-height:72px;padding:12px 13px;gap:9px;flex:none}
+  #anatomy-lab .lab-header h2{font-size:18px;letter-spacing:-.5px;line-height:1.25;overflow-wrap:anywhere}
+  #anatomy-lab .lab-header p,#anatomy-lab .lab-breadcrumb{font-size:8px;letter-spacing:.8px;margin-bottom:3px}
+  #anatomy-lab .lab-brand{gap:10px}
+  #anatomy-lab .lab-brand>img,#anatomy-lab .lab-logo{width:62px;max-width:19vw;max-height:34px}
+  #anatomy-lab .lab-header-actions{gap:5px}
+  #anatomy-lab .lab-header-actions .lab-btn,#anatomy-lab .lab-header-actions button{min-width:44px;min-height:44px;padding:9px;font-size:11px}
+  #anatomy-lab .lab-header-actions .lab-optional{display:none}
+  #anatomy-lab .lab-workspace{display:flex;flex-direction:column;min-height:0;flex:1 0 auto}
+  #anatomy-lab .lab-stage{height:max(55dvh,400px);min-height:400px;flex:none;width:100%;overflow:hidden}
+  #anatomy-lab .lab-sidebar{display:flex;min-height:0;overflow:visible;padding:20px 16px max(22px,env(safe-area-inset-bottom));border-left:0;border-top:1px solid #d4e2e6;gap:15px;flex:1 0 auto}
+  #anatomy-lab .lab-organ-switch{max-width:100%}
+  #anatomy-lab .lab-organ-switch button{min-height:46px;font-size:13px}
+  #anatomy-lab .lab-sidebar-title h2{font-size:28px}
+  #anatomy-lab .lab-view-controls{top:12px;left:12px;right:12px;max-width:none;gap:5px}
+  #anatomy-lab .lab-view-controls button{min-height:44px;min-width:44px;padding:9px 10px;font-size:11px}
+  #anatomy-lab .lab-status{top:112px;left:15px;max-width:calc(100% - 30px);font-size:10px;line-height:1.5}
+  #anatomy-lab .lab-orientation{right:14px;bottom:calc(var(--lab-section-height) + 22px);max-width:calc(100% - 28px);font-size:9px;gap:4px}
+  #anatomy-lab .lab-orientation>span{padding:3px 6px}
+  #anatomy-lab .lab-sectionbar{left:10px;right:10px;bottom:10px;padding:10px 12px;border-radius:13px}
+  #anatomy-lab .lab-cut-head{gap:8px;min-height:36px}
+  #anatomy-lab .lab-cut-head h3,#anatomy-lab .lab-cut-head b{font-size:12px}
+  #anatomy-lab .lab-cut-head label{font-size:11px;gap:7px;min-height:44px}
+  #anatomy-lab .lab-cut-head p,#anatomy-lab .lab-cut-head small{font-size:9px}
+  #anatomy-lab .lab-cut-settings{grid-template-columns:minmax(0,1fr);gap:8px;padding-top:9px;margin-top:6px;max-height:250px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  #anatomy-lab .lab-cut-settings button{min-height:44px;font-size:11px;padding:9px 8px}
+  #anatomy-lab .lab-cut-settings input[type=range]{height:44px;margin:0}
+  #anatomy-lab .lab-cut-settings label:not(.lab-cut-option){font-size:11px}
+  #anatomy-lab .lab-cut-settings .lab-cut-secondary{grid-column:auto;gap:5px}
+  #anatomy-lab .lab-cut-secondary button,#anatomy-lab .lab-cut-secondary label{min-height:44px}
+  #anatomy-lab .lab-parts-search{position:static;top:auto;padding:3px 0;box-shadow:none}
+  #anatomy-lab .lab-parts-search input{font-size:16px;min-height:48px}
+  #anatomy-lab .lab-part-row{min-height:53px}
+  #anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select){font-size:13px;min-height:48px}
+  #anatomy-lab .lab-part-row :is(button[data-lab-part],button.lab-part-select) small{font-size:11px}
+  #anatomy-lab label.lab-part-visibility,#anatomy-lab .lab-visibility-toggle{width:44px;min-width:44px;flex-basis:44px;min-height:48px}
+  #anatomy-lab .lab-notes{font-size:11px;line-height:1.75}
+  #anatomy-lab.lab-cut-on .lab-stage,#anatomy-lab .lab-stage.lab-cut-on{min-height:580px;height:max(72dvh,580px);--lab-section-height:320px}
+}
+@media(max-width:380px){
+  #anatomy-lab .lab-header{padding:10px;gap:7px}
+  #anatomy-lab .lab-header h2{font-size:16px;letter-spacing:-.35px}
+  #anatomy-lab .lab-brand>img,#anatomy-lab .lab-logo{width:48px;max-width:15vw}
+  #anatomy-lab .lab-brand{gap:7px}
+  #anatomy-lab .lab-header-actions .lab-btn{font-size:10px;padding:8px}
+  #anatomy-lab .lab-view-controls button{padding:9px 8px;font-size:10px}
+  #anatomy-lab .lab-sidebar{padding-left:13px;padding-right:13px}
+  #anatomy-lab .lab-cut-head label{font-size:10px}
+}
+@media(max-height:650px) and (min-width:701px){
+  #anatomy-lab .lab-header{min-height:65px;padding-top:10px;padding-bottom:10px}
+  #anatomy-lab .lab-header h2{font-size:20px}
+  #anatomy-lab .lab-view-controls{top:12px}
+  #anatomy-lab .lab-sectionbar{bottom:10px;padding-top:8px;padding-bottom:8px}
+  #anatomy-lab .lab-cut-settings{max-height:180px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  #anatomy-lab .lab-sidebar{padding-top:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  #anatomy-lab *,#anatomy-lab *::before,#anatomy-lab *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+@media(forced-colors:active){
+  #anatomy-lab,#anatomy-lab .lab-header,#anatomy-lab .lab-sidebar,#anatomy-lab .lab-sectionbar,#anatomy-lab .lab-loading{background:Canvas;color:CanvasText;border-color:CanvasText}
+  #anatomy-lab .lab-stage{background:Canvas;color:CanvasText}
+  #anatomy-lab .lab-stage::before{display:none}
+  #anatomy-lab :is(.lab-btn,.lab-icon-button,.lab-view-controls button,.lab-organ-switch button,.lab-layer-toolbar button,.lab-cut-settings button){border:1px solid ButtonText;background:ButtonFace;color:ButtonText}
+  #anatomy-lab .lab-part-row,#anatomy-lab .lab-selected-card,#anatomy-lab .lab-pill{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none}
+  #anatomy-lab .lab-part-row:is(.is-active,.is-selected),#anatomy-lab .lab-part-row:has([aria-pressed=true]){outline:2px solid Highlight}
+  #anatomy-lab [aria-pressed=true],#anatomy-lab .lab-organ-switch .is-active{outline:2px solid Highlight}
+  #anatomy-lab .lab-parts-search{background:Canvas;box-shadow:none}
+  #anatomy-lab .lab-orientation,#anatomy-lab .lab-status{color:CanvasText;text-shadow:none}
+}
+/* Source-backed layer tools and the compact stage controls. */
+body.anatomy-lab-open{overflow:hidden}
+#anatomy-lab .lab-quality-label{display:inline-flex;align-items:center;min-width:0;max-width:100%;min-height:44px}
+#anatomy-lab .lab-quality-label select{min-height:44px;width:142px;min-width:0;max-width:100%;padding:9px 8px 9px 11px;color:#dceff2;background:#0c2938e8;border:1px solid #8bb8bf4d;border-radius:11px;font-size:11px;line-height:1.5;cursor:pointer}
+#anatomy-lab .lab-quality-label select:hover:not(:disabled){background:#27535f;border-color:#91c7cc}
+#anatomy-lab .lab-quality-label select:disabled{opacity:.45;cursor:default}
+#anatomy-lab .lab-quality-label option{background:#173f4c;color:#e4f4f5}
+#anatomy-lab .lab-range-steps{display:flex;align-items:center;gap:6px;min-width:0}
+#anatomy-lab .lab-range-steps .lab-btn{flex:0 0 44px;width:44px;min-width:44px;min-height:44px;padding:6px;font-size:18px;line-height:1}
+#anatomy-lab .lab-range-steps span{margin-left:4px;font-size:10px;line-height:1.5;color:#6a7d8a;overflow-wrap:anywhere}
+#anatomy-lab .lab-group>summary>span:first-child{display:flex;align-items:center;gap:5px;color:#345b6b;font-size:12px;line-height:1.5;font-weight:650;min-width:0;flex:1}
+#anatomy-lab .lab-group>summary>span:last-child{font-size:10px;font-variant-numeric:tabular-nums;line-height:1.5;color:#79919d;font-weight:400;white-space:nowrap;flex:none}
+#anatomy-lab .lab-group>summary::after{margin-left:0}
+#anatomy-lab .lab-group-tools{display:flex;align-items:center;gap:6px;justify-content:space-between;flex-wrap:wrap;padding-bottom:6px}
+#anatomy-lab .lab-group-tools label{display:flex;align-items:center;gap:7px;min-height:44px;color:#5c7987;font-size:11px;line-height:1.5;cursor:pointer}
+#anatomy-lab .lab-group-tools input[type=checkbox]{appearance:auto;width:18px;height:18px;min-width:18px;flex:none;margin:0;accent-color:#16868a;cursor:pointer}
+#anatomy-lab .lab-group-tools .lab-btn{min-height:44px;flex:0 1 auto;padding:9px 8px;font-size:10px;background:#f7fafb;border-color:#d1dfe4}
+#anatomy-lab .lab-group-description{font-size:11px;line-height:1.7;color:#718691;margin:0 0 10px;overflow-wrap:anywhere}
+#anatomy-lab .lab-context-switch{display:flex;align-items:center;gap:8px;min-height:44px;font-size:11px;line-height:1.5;color:#5a7583;cursor:pointer;margin-top:7px}
+#anatomy-lab .lab-context-switch input[type=checkbox]{appearance:auto;width:18px;height:18px;min-width:18px;flex:none;margin:0;accent-color:#16868a;cursor:pointer}
+#anatomy-lab .lab-message{font-size:12px;line-height:1.6;color:#306d79;padding:11px 12px;border:1px solid #c6e1df;border-radius:10px;background:#eef8f4;overflow-wrap:anywhere}
+#anatomy-lab .lab-message:empty{display:none}
+#anatomy-lab #lab-share-url{width:100%;min-width:0;min-height:46px;padding:11px;color:#375f78;font-size:12px;line-height:1.5;border:1px solid #9bbeca;border-radius:10px;background:#f4f9fc}
+#anatomy-lab .lab-loading .lab-btn{min-height:44px}
+#anatomy-lab .lab-cut-note{flex:1 1 100%}
+#organ-card .section-card-launch,#organ-card .lab-card-launch{display:grid;grid-template-columns:20px minmax(0,1fr);align-items:center;gap:2px 8px;width:100%;min-height:60px;margin:10px 0 0;padding:12px 13px;text-align:left;border:1px solid #b8d5d7;border-radius:12px;background:#edf7f4;color:#146d73;font:600 12px/1.5 var(--sans,'Helvetica Neue',Arial,sans-serif);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+#organ-card .section-card-launch>svg,#organ-card .lab-card-launch>svg{grid-column:1;grid-row:1/3;width:18px;height:18px;align-self:center;opacity:.9}
+#organ-card .section-card-launch>span,#organ-card .lab-card-launch>span{grid-column:2;font-size:10px;font-weight:400;line-height:1.5;color:#58818b}
+#organ-card .section-card-launch:hover:not(:disabled){background:#dff0eb;border-color:#6aa8a7}
+#organ-card .lab-card-launch{background:linear-gradient(120deg,#087f83,#126b7e);border-color:#087f83;color:#fff;box-shadow:0 4px 12px #087f8312}
+#organ-card .lab-card-launch>span{color:#cae9e7}
+#organ-card .lab-card-launch:hover:not(:disabled){background:#086d76;border-color:#086d76}
+#organ-card .section-card-launch:focus-visible,#organ-card .lab-card-launch:focus-visible{outline:3px solid #04558a;outline-offset:3px}
+#organ-card .section-card-launch:disabled,#organ-card .lab-card-launch:disabled{opacity:.45;cursor:default}
+@media(max-width:700px){
+  #anatomy-lab .lab-quality-label select{width:136px;font-size:12px;min-height:44px}
+  #anatomy-lab .lab-range-steps .lab-btn{min-width:44px;width:44px;flex-basis:44px}
+  #anatomy-lab .lab-group-tools{gap:5px}
+  #anatomy-lab .lab-group-tools label{font-size:12px}
+  #anatomy-lab .lab-group-tools .lab-btn{font-size:11px}
+  #anatomy-lab .lab-group-description,#anatomy-lab .lab-context-switch{font-size:12px}
+  #anatomy-lab #lab-share-url{font-size:16px}
+  #organ-card .section-card-launch,#organ-card .lab-card-launch{font-size:13px;min-height:62px}
+  #organ-card .section-card-launch>span,#organ-card .lab-card-launch>span{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){#organ-card .section-card-launch,#organ-card .lab-card-launch{transition:none}}
+@media(forced-colors:active){
+  #anatomy-lab .lab-quality-label select,#anatomy-lab .lab-quality-label option{color:ButtonText;background:ButtonFace;border-color:ButtonText}
+  #anatomy-lab .lab-message,#anatomy-lab #lab-share-url{color:CanvasText;background:Canvas;border-color:CanvasText}
+  #organ-card .section-card-launch,#organ-card .lab-card-launch{background:ButtonFace;color:ButtonText;border:1px solid ButtonText;box-shadow:none}
+  #organ-card .section-card-launch>span,#organ-card .lab-card-launch>span{color:ButtonText}
+}
+#anatomy-lab .lab-cut-range:has(+ #lab-thickness-control[hidden]){grid-column:1/-1}
