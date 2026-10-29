@@ -1,0 +1,113 @@
+/* Comparison and distinction practice share the college's light, teal palette. */
+#anatomia-workbench{width:min(1120px,calc(100% - 36px));max-width:none;max-height:calc(100dvh - 36px);padding:0;border:1px solid #bad5df;border-radius:24px;overflow:auto;overscroll-behavior:contain;color:#16324f;background:#fff;box-shadow:0 28px 100px #16324f33}
+#anatomia-workbench:not([open]){display:none!important}
+#anatomia-workbench::backdrop{background:#16324f91;backdrop-filter:blur(7px)}
+#anatomia-workbench *{box-sizing:border-box}
+#anatomia-workbench :is(button,select,input,a){font:inherit}
+#anatomia-workbench button{min-height:44px;border:1px solid #b9d1dc;border-radius:11px;padding:11px 16px;background:#fff;color:#16324f;line-height:1.45;text-align:left;cursor:pointer}
+#anatomia-workbench button:hover:not(:disabled){background:#eef8f8;border-color:#087f83}
+#anatomia-workbench button:disabled{cursor:default}
+#anatomia-workbench :is(button,a,select,input,summary):focus-visible{outline:3px solid #04558a;outline-offset:3px}
+#anatomia-workbench :is(h2,h3,h4){font-family:var(--sans);font-weight:600;letter-spacing:-.6px;color:#16324f;line-height:1.2}
+#anatomia-workbench h2{font-size:32px;margin:10px 0 0}
+#anatomia-workbench h3{font-size:25px;margin:0}
+#anatomia-workbench h4{font-size:16px;margin:0}
+#anatomia-workbench p{color:#496375;font-size:14px;line-height:1.6}
+#anatomia-workbench a{color:#04558a;text-underline-offset:3px}
+#anatomia-workbench svg{width:21px;height:21px;flex-shrink:0}
+.wb-header{padding:28px 32px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;border-bottom:1px solid #d2e3e7;background:linear-gradient(112deg,#effaf8,#f3f4fd)}
+.wb-eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;color:#087f83}
+#anatomia-workbench .wb-close{width:44px;display:grid;place-items:center;flex-shrink:0;padding:10px;background:#fff}
+.wb-tabs{display:flex;gap:8px;padding:18px 32px 0;flex-wrap:wrap}
+#anatomia-workbench .wb-tabs button{display:flex;align-items:center;gap:10px;border-color:transparent;background:#f5f9fa;font-size:13px}
+#anatomia-workbench [aria-pressed=true]{border-color:#087f83;background:#e1f2f2;color:#04558a}
+#anatomia-workbench .wb-tabs [aria-pressed=true]{border-color:#087f83;background:#e1f2f2;color:#04558a;font-weight:600}
+.wb-compare{padding:0 32px 26px}
+.wb-compare-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:18px 0}
+.wb-compare-intro p{margin:0;max-width:510px}
+#anatomia-workbench .wb-share{display:flex;align-items:center;justify-content:center;gap:9px;font-size:12px;white-space:nowrap;color:#04558a}
+.wb-presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:20px}
+#anatomia-workbench .wb-presets button{padding:12px 14px}
+.wb-presets b,.wb-presets small{display:block}
+.wb-presets b{font-size:13px;font-weight:600}
+.wb-presets small{font-size:10px;color:#496375;margin-top:4px}
+.wb-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
+.wb-organ-card{min-width:0;border:1px solid #c4dce2;border-radius:19px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.wb-select-label{padding:17px 20px;display:flex;align-items:center;gap:14px;font-size:11px;color:#496375;white-space:nowrap;border-bottom:1px solid #dce9ed;background:#f7fafb}
+.wb-select-label select{min-height:44px;min-width:0;width:100%;border:1px solid #b9d1dc;border-radius:9px;padding:9px 30px 9px 12px;color:#16324f;background:#fff;font-size:13px!important}
+.wb-organ-visual{height:245px;position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#fdfefe,#edf6f5 75%)}
+.wb-organ-visual img{height:100%;width:100%;object-fit:contain;display:block}
+.wb-organ-system{position:absolute;bottom:12px;left:18px;right:18px;width:fit-content;max-width:calc(100% - 36px);padding:6px 10px;border:1px solid #cce1e4;background:#fffffff0;color:#496375;border-radius:20px;font-size:10px;line-height:1.4}
+.wb-organ-copy{padding:22px;flex:1;display:flex;flex-direction:column}
+.wb-organ-heading{min-height:60px}
+.wb-organ-heading>span{display:block;font-family:Georgia,serif;font-style:italic;font-size:15px;color:#6853a3;margin-top:7px}
+#anatomia-workbench .wb-organ-brief{font-size:15px;font-weight:500;color:#087f83;margin:12px 0 16px}
+.wb-organ-copy dl{margin:0;display:grid;gap:5px}
+.wb-organ-copy dt{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#496375;font-weight:700;margin-top:14px}
+.wb-organ-copy dd{margin:0;font-size:13px;color:#16324f;line-height:1.65}
+.wb-landmark{margin:18px 0 0;border-top:1px solid #dce7ec;padding:14px 0}
+.wb-landmark summary{font-size:11px;line-height:1.6;color:#04558a;cursor:pointer}
+#anatomia-workbench .wb-landmark p{font-size:12px;margin:9px 0 3px}
+.wb-organ-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
+.wb-organ-actions>a{font-size:11px}
+#anatomia-workbench .wb-primary{background:#087f83;border-color:#087f83;color:#fff;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:13px}
+#anatomia-workbench .wb-primary:hover:not(:disabled){background:#066a70;color:#fff}
+#anatomia-workbench .wb-image-note{font-size:11px;margin:14px 2px;color:#496375}
+.wb-image-missing{max-width:250px;text-align:center;padding:20px}
+.wb-compare-next{display:flex;justify-content:space-between;gap:18px;align-items:center;border-top:1px solid #d2e2e9;padding-top:20px;margin-top:20px;font-size:13px;color:#496375}
+.wb-compare-next button{display:flex;gap:9px;align-items:center;flex-shrink:0;font-size:12px!important;color:#04558a!important}
+.wb-share-result{padding:18px;border:1px solid #a6cfd4;background:#f0f9f8;border-radius:12px;margin:16px 0}
+.wb-share-result[hidden]{display:none}
+.wb-share-result label{font-size:12px;font-weight:600;display:block;margin-bottom:10px}
+.wb-share-result>div{display:flex;gap:8px}
+.wb-share-result input{width:100%;min-width:0;padding:10px 12px;border:1px solid #b9d1dc;border-radius:9px;font-size:12px!important;color:#496375;background:#fff}
+#anatomia-workbench .wb-share-result p{font-size:11px;margin:8px 0 0}
+.wb-quiz{max-width:800px;margin:auto;padding:30px 34px}
+.wb-history{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 14px;margin:0 0 20px;border:1px solid #d2e2e9;border-radius:10px;font-size:11px;line-height:1.6;color:#496375;background:#f7fafb}
+.wb-history b{color:#087f83}
+.wb-quiz-meta{display:flex;align-items:center;justify-content:space-between;color:#087f83;font-size:10px;letter-spacing:1px;font-weight:700}
+.wb-quiz-meta b{font-size:24px;letter-spacing:-.5px;color:#16324f}
+.wb-quiz-meta small{font-size:14px;font-weight:400;color:#496375}
+.wb-progress{height:5px;background:#deecef;border-radius:5px;margin:14px 0 30px;overflow:hidden}
+.wb-progress i{height:100%;display:block;background:#087f83}
+#anatomia-workbench .wb-quiz h3{font-size:29px;line-height:1.35;max-width:640px}
+#anatomia-workbench .wb-quiz-instruction{font-size:12px;margin:13px 0 24px}
+.wb-answers{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+#anatomia-workbench .wb-answers button{padding:20px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;min-height:170px;background:#f7fafb;position:relative}
+.wb-option-number{display:grid;place-items:center;width:29px;height:29px;border:1px solid #c5dce1;border-radius:9px;color:#496375;font-size:12px;background:#fff}
+.wb-answers b{font-size:17px;line-height:1.5;font-weight:500}
+.wb-answer-label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;margin-top:auto}
+#anatomia-workbench .wb-answer-label svg{width:15px;height:15px}
+#anatomia-workbench .wb-answers .is-correct{border-color:#448667;background:#e8f6ed;color:#195538}
+#anatomia-workbench .wb-answers .is-wrong{border-color:#ab674b;background:#fff1e9;color:#823d25}
+.wb-feedback{padding:18px 22px;margin-top:20px;border:1px solid #d9bca9;border-radius:13px;background:#fff8f1;color:#823d25}
+.wb-feedback.is-correct{background:#eff9f3;border-color:#9bc5ad;color:#195538}
+.wb-feedback>b{font-size:14px}
+#anatomia-workbench .wb-feedback p{margin:8px 0 10px;font-size:14px;color:#16324f}
+.wb-feedback>a{font-size:11px}
+#anatomia-workbench .wb-next{margin-top:18px;min-height:48px}
+#anatomia-workbench .wb-key-hint{font-size:11px;margin:16px 0;color:#496375}
+#anatomia-workbench .wb-pause-note{font-size:11px;margin:22px 0 0;color:#496375;line-height:1.7}
+.wb-result{padding:34px;max-width:780px;margin:auto;text-align:center}
+.wb-result-score{margin:0 auto 22px;width:124px;height:124px;border-radius:50%;background:#e4f4ef;border:1px solid #abcfbf;display:flex;align-items:center;justify-content:center;gap:8px;color:#195538}
+.wb-result-score b{font-size:53px;font-weight:500;line-height:1}
+.wb-result-score>span{align-self:center;font-size:14px}
+#anatomia-workbench .wb-result h3{margin:12px 0;font-size:28px}
+.wb-best{font-size:12px;color:#496375;padding:12px 0}
+.wb-best>b{color:#087f83}
+.wb-result-actions{display:flex;gap:12px;justify-content:center;margin:16px 0 26px;flex-wrap:wrap}
+.wb-review-list{padding:20px;border:1px solid #d2e2e9;border-radius:14px;text-align:left}
+.wb-review-list>h4{margin-bottom:14px!important}
+.wb-review-list>button{width:100%;margin-top:8px;display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:13px!important}
+.wb-review{margin-top:22px;text-align:left;border-top:1px solid #d2e2e9;padding-top:16px}
+.wb-review>summary{font-size:13px;color:#04558a;cursor:pointer;padding:7px 0}
+.wb-review article{padding:20px 0;border-bottom:1px solid #dce7eb}
+.wb-review article>span{font-size:10px;color:#087f83;display:block;margin-bottom:7px;font-weight:600}
+#anatomia-workbench .wb-review article h4{font-size:15px;line-height:1.5;letter-spacing:0}
+#anatomia-workbench .wb-review article p{font-size:12px}
+.wb-review article>a{font-size:11px}
+.wb-footer{padding:18px 32px;background:#f6fafb;border-top:1px solid #d2e2e9;font-size:10px;line-height:1.6;color:#496375;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:760px){#anatomia-workbench{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:18px}.wb-header{padding:23px 22px 20px}.wb-tabs{padding:16px 22px 0}.wb-compare{padding:0 22px 24px}.wb-compare-intro{align-items:flex-start;gap:12px}.wb-presets{grid-template-columns:repeat(2,minmax(0,1fr))}.wb-compare-grid{gap:12px}.wb-organ-visual{height:205px}.wb-organ-copy{padding:18px}.wb-select-label{padding:12px;display:block}.wb-select-label select{display:block;margin-top:6px}.wb-organ-system{left:12px;right:12px;max-width:calc(100% - 24px);font-size:9px}.wb-quiz{padding:26px}.wb-footer{padding:18px 22px}#anatomia-workbench .wb-organ-heading h3{font-size:21px}.wb-organ-heading{min-height:78px}.wb-organ-actions .wb-primary{width:100%}}
+@media(max-width:560px){#anatomia-workbench h2{font-size:27px}.wb-header{padding:21px 18px;gap:12px}.wb-eyebrow{font-size:9px;letter-spacing:1px}.wb-tabs{padding:14px 18px 0;display:grid;grid-template-columns:1fr 1fr;gap:7px}#anatomia-workbench .wb-tabs button{padding:10px;font-size:11px;gap:7px;align-items:flex-start}#anatomia-workbench .wb-tabs svg{width:18px;height:18px}.wb-compare{padding:0 18px 22px}.wb-compare-intro{flex-direction:column;gap:10px}.wb-compare-intro p{font-size:13px!important}.wb-compare-intro .wb-share{align-self:flex-start}.wb-compare-grid{grid-template-columns:1fr}.wb-organ-visual{height:245px}.wb-select-label{display:flex;padding:12px 16px}.wb-select-label select{margin:0}.wb-organ-heading{min-height:0}.wb-organ-copy{padding:20px}.wb-organ-actions .wb-primary{width:auto}.wb-compare-next{flex-direction:column;align-items:flex-start;gap:12px}.wb-presets{gap:7px}#anatomia-workbench .wb-presets button{padding:11px}.wb-presets b{font-size:12px}.wb-presets small{font-size:9px}.wb-quiz{padding:25px 18px}#anatomia-workbench .wb-quiz h3{font-size:24px}.wb-answers{grid-template-columns:1fr;gap:10px}#anatomia-workbench .wb-answers button{min-height:96px;padding:17px;display:grid;grid-template-columns:30px 1fr;align-content:center;align-items:center;gap:10px}.wb-answers b{font-size:16px}.wb-answer-label{grid-column:2}.wb-progress{margin-bottom:24px}.wb-feedback{padding:17px}.wb-result{padding:28px 20px}#anatomia-workbench .wb-result h3{font-size:25px}.wb-result-actions{flex-direction:column}.wb-result-actions>button{justify-content:center;text-align:center!important}.wb-review-list{padding:16px}.wb-share-result>div{flex-wrap:wrap}.wb-share-result input{min-height:44px}.wb-share-result button{width:100%;text-align:center!important}.wb-footer{padding:16px 18px;gap:7px}.wb-footer span{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){#anatomia-workbench *,#anatomia-workbench *::before,#anatomia-workbench *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){#anatomia-workbench button,#anatomia-workbench select,.wb-organ-card,.wb-result-score{border:1px solid ButtonText}.wb-progress{border:1px solid CanvasText}.wb-progress i{background:Highlight}.wb-organ-system{background:Canvas;color:CanvasText}}

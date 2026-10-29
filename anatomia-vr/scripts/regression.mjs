@@ -314,6 +314,24 @@ try {
   process.exitCode = 1;
 }
 
+test('System filters synchronize the visible fallback organ and catalog count', ({run, node}) => {
+  run("activateFallback('Test');applySystem('urinary');");
+  assert.equal(node('#system').value,'urinary');
+  assert.equal(node('#scene-heading').textContent,'Правая почка');
+  assert.equal(node('#organ-results-status').textContent,'Показано 3 из 16');
+  run("assert.equal(selected,'kidneyR');assert.equal(isolated,false);");
+  node('#search').value='ren sinister';run('renderList()');
+  assert.equal(node('#organ-results-status').textContent,'Показано 1 из 16');
+  assert.ok(node('#organ-list').innerHTML.includes('kidneyL.webp'));
+  assert.ok(!node('#organ-list').innerHTML.includes('kidneyR.webp'));
+});
+
+test('Search treats ё/е alike and organ links exclude unrelated parameters', ({run, node}) => {
+  node('#search').value='ЛЕГКОЕ';run('renderList()');
+  assert.equal(node('#organ-results-status').textContent,'Показано 2 из 16');
+  run("location.href='https://example.test/anatomia/?token=private&lesson=heart#results';assert.equal(organURL('brain'),'https://example.test/anatomia/?organ=brain');");
+});
+
 console.log(JSON.stringify({
   status: process.exitCode ? 'failed' : 'passed',
   passed: results.filter(r => r.status === 'passed').length,
@@ -321,3 +339,4 @@ console.log(JSON.stringify({
   scope: 'Production state and event functions in Node; no visual or headset verification',
   results
 }, null, 2));
+

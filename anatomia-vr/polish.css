@@ -1,0 +1,328 @@
+/* ANATOMIA 1.6: clearer controls, a visual catalog, and a compact study rail.
+   Load after the existing atlas, laboratory, and learning-centre styles. */
+:root {
+  --surface-soft: #f1f8f9;
+  --surface-border: #c8dde4;
+  --focus-ring: #04558a;
+  --rail-left: 30px;
+}
+
+body { -webkit-font-smoothing: antialiased; }
+button, a, input, select, summary { touch-action: manipulation; }
+button, input, select { max-width: 100%; }
+button:focus-visible, a:focus-visible, input:focus-visible,
+select:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+.topbar { gap: 16px; }
+.topbar nav { flex-shrink: 0; }
+.topbar .nav, .learning-launch { min-height: 40px; font-size: 13px; }
+.brand small { font-size: 9px; letter-spacing: .25px; }
+.demo-start, .vr-btn { min-height: 42px; font-size: 13px; }
+.header-actions { gap: 8px; }
+.stage-caption { left: var(--rail-left); max-width: 310px; }
+.stage-caption .eyebrow { font-size: 10px; letter-spacing: 1.1px; }
+.stage-caption h1 { font-size: 30px; line-height: 1.2; letter-spacing: -.8px; }
+.stage-caption p { font-size: 13px; }
+.catalog-toggle, .fallback-mode .catalog-toggle {
+  left: var(--rail-left); top: 140px; min-height: 44px;
+  padding: 10px 15px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 12px #16324f05;
+}
+.catalog-toggle small { font-size: 11px; }
+
+/* Useful filters remain beside the model, outside its centre. */
+.system-dock {
+  position: absolute; top: 198px; left: var(--rail-left);
+  width: 260px; max-width: calc(100% - 60px);
+  display: flex; flex-wrap: wrap; align-content: flex-start;
+  gap: 7px; z-index: 4;
+}
+.system-dock > :is(span, p, label) {
+  flex: 0 0 100%; margin: 0 0 4px; color: #496375;
+  font-size: 10px; font-weight: 600; letter-spacing: 1px;
+}
+.system-dock button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 36px; padding: 8px 11px; border-radius: 10px;
+  border-color: #c6dce2; background: #ffffffdb; color: #345365;
+  font-size: 12px; line-height: 1.3; font-weight: 500;
+  backdrop-filter: blur(12px);
+}
+.system-dock button svg { width: 16px; height: 16px; }
+.system-dock button small { font-size: 10px; opacity: .8; font-variant-numeric: tabular-nums; }
+.system-dock button[aria-pressed="true"] {
+  border-color: #087f83; color: #fff; background: #087f83;
+  box-shadow: 0 3px 9px #087f8315;
+}
+.system-dock button[aria-pressed="true"]:hover { background: #066a70; color: #fff; }
+.system-dock button:hover:not(:disabled):not([aria-pressed="true"]) { background: #fff; }
+
+/* These are real study actions; the scene remains the visual focus. */
+.atlas-shortcuts {
+  position: absolute; left: var(--rail-left); bottom: 80px;
+  width: 250px; max-width: calc(100% - 60px);
+  display: grid; gap: 8px; z-index: 4;
+}
+.atlas-shortcuts button {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 12px 14px; min-height: 46px; text-align: left;
+  color: #04558a; background: #fffffff0; border-color: #bdd6df;
+  font-size: 13px; font-weight: 600; box-shadow: 0 4px 15px #16324f06;
+}
+.atlas-shortcuts svg { width: 19px; height: 19px; color: #087f83; }
+.atlas-shortcuts button > span { min-width: 0; }
+.atlas-shortcuts small { display: block; color: #496375; font-size: 11px; font-weight: 400; margin-top: 4px; }
+.fallback-mode .atlas-shortcuts { bottom: 145px; }
+.only-scene :is(.system-dock, .atlas-shortcuts),
+.in-practice :is(.system-dock, .atlas-shortcuts),
+.in-lesson :is(.system-dock, .atlas-shortcuts),
+.in-physio :is(.system-dock, .atlas-shortcuts) { display: none; }
+.stage:has(.catalog-toggle[aria-expanded="true"]) .system-dock { visibility: hidden; }
+
+/* The visual organ catalog is large enough for Russian and Latin names. */
+.library, .fallback-mode .library {
+  left: var(--rail-left); top: 198px; width: 310px;
+  max-height: calc(100% - 236px); min-height: 0; padding: 17px;
+  border-color: #bfd7df; border-radius: 18px; background: #fffffff9;
+  box-shadow: 0 14px 40px #16324f18; overscroll-behavior: contain; overflow: auto;
+}
+.fallback-mode .library { max-height: calc(100% - 236px); }
+.section-head h2 { font-size: 22px; }
+.section-head .icon-button { width: 38px; height: 38px; flex-shrink: 0; }
+.search { min-height: 46px; padding: 7px 12px; background: #f7fbfc; }
+.search input { min-height: 30px; font-size: 14px; }
+.filter-row select { min-height: 43px; font-size: 13px; padding: 9px 10px; }
+.organ-results-status { color: #496375; font-size: 12px; line-height: 1.4; margin: 2px 2px 10px; }
+.organ-list { flex: 1 1 auto; min-height: 72px; padding: 3px; margin: 0 -3px; scrollbar-color: #9dbdc8 transparent; overscroll-behavior: contain; }
+.organ-item { gap: 11px; padding: 8px; min-height: 66px; border-radius: 12px; margin-bottom: 3px; }
+.organ-thumb {
+  flex: 0 0 46px; display: block; width: 46px; height: 50px;
+  object-fit: contain; border: 1px solid #dbe9ed; border-radius: 9px;
+  padding: 3px; background: #eff7f8;
+}
+.organ-item:has(.organ-thumb) .dot { display: none; }
+.organ-item .name { min-width: 0; font-size: 13px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.organ-item small, .organ-item.active small {
+  display: block; font: italic 12px/1.35 Georgia, serif;
+  color: #596d80; margin-top: 3px; overflow-wrap: anywhere;
+}
+.organ-item.active { border-color: #84bcc5; background: #e6f3f4; box-shadow: inset 3px 0 0 #087f83; }
+.organ-item.active small { color: #6853a3; }
+.organ-item .idx { font-size: 10px; min-width: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+.library .text-button { font-size: 12px; min-height: 42px; }
+
+/* Short organ facts gain hierarchy without replacing the full sourced card. */
+.detail {
+  width: 326px; padding: 22px; bottom: 100px;
+  max-height: calc(100% - 128px); border-radius: 22px;
+  box-shadow: 0 16px 42px #16324f12; scrollbar-color: #a9c9d3 transparent;
+  overscroll-behavior: contain;
+}
+.fallback-mode .detail { bottom: 138px; max-height: calc(100% - 164px); }
+.detail h2 { font-size: 30px; line-height: 1.15; font-weight: 500; letter-spacing: -.7px; }
+.card-kicker { letter-spacing: 1px; font-size: 10px; margin-bottom: 12px; }
+.card-pager { gap: 5px; }
+.card-pager button { width: 34px; height: 36px; font-size: 21px; background: #f8fbfc; }
+.card-pager .number { white-space: nowrap; font-size: 10px; letter-spacing: .4px; }
+.latin { margin: 8px 0 12px; font-size: 17px; }
+.organ-system-tag {
+  display: inline-block; max-width: 100%; font-size: 10px; line-height: 1.45;
+  color: #06767b; background: #e8f5f4; border: 1px solid #c8e4e1;
+  padding: 4px 8px; border-radius: 6px; margin-bottom: 12px;
+  font-weight: 600; letter-spacing: .15px; overflow-wrap: anywhere;
+}
+.brief { font-size: 14px; line-height: 1.55; margin-bottom: 14px; }
+.organ-location-preview { margin: 0 0 16px; font-size: 12px; line-height: 1.55; color: #496375; }
+.organ-location-preview > :is(b, span) { font-weight: 600; color: #345365; }
+.detail .primary, .detail .secondary { min-height: 46px; font-size: 13px; }
+.detail .card-actions { grid-template-columns: minmax(0,1fr) 46px; }
+.detail .card-actions .icon-button { width: 46px; height: 46px; }
+.fallback-mode .detail .card-actions { grid-template-columns: minmax(0,1fr); }
+.card-links { flex-wrap: wrap; gap: 3px 10px; margin-top: 10px; }
+.card-links .text-button { min-height: 40px; font-size: 12px; }
+.teach-card-launch { min-height: 54px; padding: 12px; font-size: 13px; border-radius: 12px; }
+.teach-card-launch span { font-size: 11px; line-height: 1.5; }
+.card-study-tools { flex-wrap: wrap; gap: 4px 12px; margin-top: 16px; padding-top: 10px; }
+.card-study-tools button { min-height: 40px; font-size: 12px; }
+.organ-share { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 0; border: 0; font-size: 12px; color: #04558a; }
+.organ-share svg { width: 16px; height: 16px; }
+.organ-share-status { font-size: 12px; line-height: 1.5; color: #496375; margin-top: 3px; overflow-wrap: anywhere; }
+.organ-share-status:empty { display: none; }
+.detail .context-button { min-height: 40px; font-size: 12px; }
+.fallback-status { font-size: 12px; }
+.fallback-status button { min-height: 40px; font-size: 12px; }
+.fallback-view p { font-size: 11px; }
+.education-label { font-size: 10px; }
+
+/* Readable utility text in the existing learning modes. */
+.learn-organ b { font-size: 14px; }
+.learn-organ small { font-size: 12px; }
+.learn-labs small, .learn-route-list small, .learn-action small,
+.learn-section-head > span { font-size: 12px; }
+#learning-hub .learn-filters button { font-size: 12px; min-height: 40px; }
+#learning-hub .learn-search input { font-size: 16px; }
+.lesson-tile b { font-size: 14px; line-height: 1.4; }
+.lesson-tile small { font-size: 12px; line-height: 1.45; }
+.exercise small { font-size: 12px; }
+.source-link { font-size: 13px; line-height: 1.5; }
+.answer { min-height: 48px; font-size: 13px; }
+#teaching-lab :is(.teach-layer-note, .teach-schematic-note, .teach-quiz-hint) { font-size: 12px; }
+
+/* A grid image's intrinsic size must not crop anatomy inside a fixed panel. */
+.wb-organ-visual { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); }
+.wb-organ-visual img { min-width: 0; min-height: 0; width: 100%; height: 100%; object-fit: contain; }
+#anatomia-workbench .wb-header { position: sticky; top: 0; z-index: 5; box-shadow: 0 5px 14px #16324f08; }
+
+@media (min-width: 1550px) {
+  :root { --rail-left: 40px; }
+  .detail { right: 40px; width: 350px; padding: 26px; }
+  .stage-caption h1 { font-size: 34px; }
+}
+@media (min-width: 701px) and (max-width: 1100px) {
+  :root { --rail-left: 22px; }
+  .topbar { padding: 0 18px; gap: 8px; }
+  .brand-logo { width: 150px; }
+  .topbar .nav { padding: 10px 12px; }
+  .learning-launch { padding: 10px 12px; }
+  .header-actions { gap: 5px; }
+  .demo-start { padding: 10px; }
+  .vr-btn { padding: 10px; }
+  .stage-caption { max-width: 246px; }
+  .stage-caption h1, .fallback-mode .stage-caption h1 { font-size: 25px; }
+  .system-dock { width: 220px; }
+  .system-dock button { font-size: 11px; padding: 8px 9px; }
+  .atlas-shortcuts { width: 210px; }
+  .atlas-shortcuts button { font-size: 12px; padding: 11px; }
+  .detail { right: 18px; width: 284px; padding: 19px; }
+  .detail h2 { font-size: 27px; }
+  .organ-system-tag { font-size: 10px; }
+  .library, .fallback-mode .library { width: 294px; }
+}
+@media (min-width: 701px) and (max-width: 900px) {
+  .system-dock { width: 172px; max-height: 180px; overflow-y: auto; padding: 3px; margin-left: -3px; scrollbar-width: thin; scrollbar-color: #a9c9d3 transparent; }
+  .system-dock button { font-size: 11px; gap: 4px; padding: 8px; }
+  .atlas-shortcuts { width: 176px; }
+  .atlas-shortcuts button { font-size: 11px; gap: 7px; }
+  .atlas-shortcuts small { display: none; }
+  .detail { width: 264px; padding: 17px; }
+  .detail h2 { font-size: 26px; }
+  .stage-caption { max-width: 240px; }
+}
+@media (min-width: 701px) and (max-height: 700px) {
+  .system-dock { top: 192px; gap: 5px; max-height: 100px; overflow-y: auto; scrollbar-width: thin; }
+  .system-dock button { min-height: 32px; padding-top: 6px; padding-bottom: 6px; }
+  .atlas-shortcuts { bottom: 73px; gap: 5px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .atlas-shortcuts button { min-height: 42px; padding: 9px 12px; }
+  .atlas-shortcuts small { display: none; }
+  .fallback-mode .atlas-shortcuts { bottom: 137px; }
+  .detail, .fallback-mode .detail { max-height: calc(100% - 154px); }
+}
+
+@media (max-width: 700px) {
+  :root { --rail-left: 16px; }
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; min-height: 112px; height: auto; padding: 12px 16px 10px; gap: 10px; }
+  .brand { order: 0; min-width: 0; }
+  .brand-logo { width: 155px; }
+  .header-actions { order: 1; margin-left: auto; gap: 7px; }
+  .topbar nav { order: 2; display: flex; width: 100%; min-width: 0; flex-shrink: 1; }
+  .topbar nav > button { flex: 1 1 auto; min-width: 0; min-height: 41px; padding: 9px 8px; font-size: 12px; }
+  .demo-start { min-height: 40px; font-size: 12px; padding: 8px 12px; }
+  .vr-btn { min-height: 40px; width: 42px; padding: 8px; justify-content: center; }
+  .stage { height: clamp(470px,calc(100dvh - 270px),700px); }
+  .stage-caption { top: 19px; max-width: calc(100% - 76px); }
+  .stage-caption .eyebrow { font-size: 9px; letter-spacing: 1px; }
+  .stage-caption h1 { font-size: 25px; }
+  .stage-caption p { font-size: 12px; }
+  .catalog-toggle { top: 110px; left: 16px; min-height: 40px; font-size: 12px; padding: 9px 12px; }
+  .catalog-toggle small { display: inline; margin-left: 2px; }
+  .system-dock {
+    top: 159px; left: 16px; right: 16px; width: auto; max-width: none;
+    display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto;
+    padding: 3px 3px 7px; margin-left: -3px; margin-right: -3px;
+    scrollbar-width: thin; scrollbar-color: #a9c9d3 transparent;
+  }
+  .system-dock > :is(span, p, label) { display: none; }
+  .system-dock button { flex: 0 0 auto; min-height: 40px; white-space: nowrap; font-size: 12px; }
+  .atlas-shortcuts {
+    left: 16px; right: 16px; bottom: 93px; width: auto; max-width: none;
+    grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px;
+  }
+  .atlas-shortcuts button { min-height: 44px; padding: 9px 10px; gap: 7px; font-size: 12px; border-radius: 10px; line-height: 1.35; }
+  .atlas-shortcuts button svg { width: 17px; height: 17px; }
+  .atlas-shortcuts small { display: none; }
+  .stage-tools { bottom: 29px; max-width: calc(100% - 28px); }
+  .stage-tools button { width: 39px; height: 40px; }
+  .education-label { bottom: 8px; left: 16px; max-width: calc(100% - 32px); font-size: 9px; line-height: 1.4; }
+  .library, .fallback-mode .library {
+    position: absolute; top: 157px; left: 12px; right: 12px;
+    width: auto; max-width: 380px; max-height: min(580px,calc(100dvh - 190px));
+    min-height: 0; padding: 16px;
+  }
+  .library .organ-list { max-height: none; min-height: 74px; }
+  .search input, .filter-row select { font-size: 16px; }
+  .organ-item { min-height: 69px; }
+  .organ-item .name { font-size: 14px; }
+  .organ-item small, .organ-item.active small { font-size: 12px; }
+  .detail, .fallback-mode .detail, .in-practice .detail,
+  .fallback-mode.in-practice .detail, .in-physio .detail,
+  .fallback-mode.in-physio .detail {
+    position: relative; right: auto; bottom: auto; width: auto; max-height: none;
+    margin: 4px 12px 18px; padding: 20px; border-radius: 20px;
+  }
+  .detail h2 { font-size: 29px; }
+  .card-kicker { font-size: 10px; }
+  .card-pager button, .fallback-mode .card-pager button { width: 40px; height: 42px; }
+  .brief { font-size: 14px; }
+  .organ-system-tag { font-size: 11px; }
+  .organ-location-preview { font-size: 13px; }
+  .card-links .text-button, .card-study-tools button, .organ-share { min-height: 44px; font-size: 13px; }
+  .teach-card-launch { min-height: 56px; font-size: 14px; }
+  .teach-card-launch span { font-size: 12px; }
+  .card-study-tools { margin-top: 14px; }
+  .fallback-mode .stage { display: flex; flex-direction: column; height: auto; min-height: 0; padding: 20px 16px 12px; }
+  .fallback-mode .stage-caption { order: 0; position: relative; inset: auto; max-width: none; margin-bottom: 12px; }
+  .fallback-mode .catalog-toggle { order: 1; position: relative; inset: auto; align-self: flex-start; margin: 0 0 8px; }
+  .fallback-mode .system-dock { order: 2; position: relative; inset: auto; width: calc(100% + 6px); margin: 0 -3px 7px; }
+  .fallback-mode .fallback-view, .fallback-mode.in-practice .fallback-view,
+  .fallback-mode.in-physio .fallback-view { order: 3; position: relative; inset: auto; width: 100%; height: 310px; margin: 0 0 12px; }
+  .fallback-mode .atlas-shortcuts { order: 4; position: relative; inset: auto; width: 100%; margin-bottom: 12px; }
+  .fallback-mode .fallback-status { order: 5; position: relative; inset: auto; margin: 0 0 10px; padding: 10px; font-size: 11px; }
+  .fallback-mode .fallback-status button { font-size: 11px; min-height: 40px; }
+  .fallback-mode .education-label { order: 6; position: relative; inset: auto; max-width: 100%; margin: 0; font-size: 10px; }
+  .fallback-view p { font-size: 11px; }
+  .fallback-mode.in-practice .fallback-view, .fallback-mode.in-physio .fallback-view { height: 240px; }
+  .only-scene .stage { min-height: 460px; height: calc(100dvh - 112px); }
+  .spatial-practice:not(.quiz-finished) .stage { height: calc(100dvh - 112px); }
+  .demo-active .library { top: 157px; }
+  .lesson-tile b { font-size: 12px; }
+  .lesson-tile small { font-size: 11px; }
+  .exercise small { font-size: 12px; }
+  .learn-organ b { font-size: 13px; }
+  .learn-organ small { font-size: 12px; }
+  #learning-hub .learn-action small, .learn-labs small { font-size: 11px; }
+  .wb-presets small, .wb-organ-system { font-size: 11px; line-height: 1.45; }
+  .wb-organ-copy dt { font-size: 11px; }
+  dialog { max-height: calc(100dvh - 24px); }
+  .workspace { padding-bottom: env(safe-area-inset-bottom); }
+}
+@media (max-width: 360px) {
+  .topbar { padding-left: 12px; padding-right: 12px; }
+  .brand-logo { width: 132px; }
+  .header-actions { gap: 5px; }
+  .demo-start { padding: 8px 10px; font-size: 11px; }
+  .topbar nav > button { font-size: 11px; padding-left: 6px; padding-right: 6px; }
+  .detail { padding: 18px; }
+  .atlas-shortcuts button { font-size: 11px; gap: 5px; }
+  .stage-tools button { width: 36px; }
+  .lesson-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none!important; transition: none!important; scroll-behavior: auto!important; }
+}
+@media (forced-colors: active) {
+  .system-dock button[aria-pressed="true"], .organ-item.active { outline: 2px solid Highlight; outline-offset: -2px; }
+  .system-dock button, .atlas-shortcuts button, .organ-system-tag { border: 1px solid CanvasText; }
+  .organ-thumb { forced-color-adjust: none; }
+}
