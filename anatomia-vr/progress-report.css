@@ -1,0 +1,173 @@
+/* MEDSI learning report: independent measures, a readable print sheet. */
+#anatomia-progress-report{width:min(1120px,calc(100% - 36px));max-width:none;max-height:calc(100dvh - 36px);padding:0;border:1px solid #b8d7dc;border-radius:24px;background:#fff;color:#16324f;overflow:auto;overscroll-behavior:contain;box-shadow:0 28px 100px #16324f33;font-family:var(--sans,Arial,sans-serif)}
+#anatomia-progress-report:not([open]){display:none!important}
+#anatomia-progress-report::backdrop{background:#16324f91;backdrop-filter:blur(7px)}
+#anatomia-progress-report *{box-sizing:border-box}
+#anatomia-progress-report :is(button,a){font:inherit}
+#anatomia-progress-report button{min-height:44px;padding:10px 15px;border:1px solid #adcdd5;border-radius:10px;background:#fff;color:#075f6a;cursor:pointer;line-height:1.45;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+#anatomia-progress-report button:hover{border-color:#087f83;background:#eff8f7}
+#anatomia-progress-report :is(button,a,summary):focus-visible{outline:3px solid #04558a;outline-offset:3px}
+#anatomia-progress-report :is(h2,h3,h4){font-family:var(--sans,Arial,sans-serif);font-weight:600;line-height:1.25;color:#16324f;letter-spacing:-.5px}
+#anatomia-progress-report svg{width:19px;height:19px;flex-shrink:0}
+.pr-head{position:sticky;top:0;z-index:4;padding:28px 32px 25px;display:flex;gap:24px;justify-content:space-between;align-items:flex-start;background:linear-gradient(115deg,#effaf8,#f4f4fd);border-bottom:1px solid #d0e4e6}
+.pr-brand{display:block;width:140px;height:auto;margin-bottom:20px}
+.pr-eyebrow{font-size:10px;line-height:1.5;font-weight:700;letter-spacing:1.1px;color:#08767a;display:block}
+#anatomia-progress-report h2{font-size:34px;margin:8px 0 10px}
+.pr-head p{font-size:13px;color:#496375;margin:0;line-height:1.6}
+#anatomia-progress-report .pr-close{width:44px;height:44px;min-width:44px;padding:10px;background:#fff}
+.pr-toolbar{padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #d5e6e8}
+.pr-toolbar>p{font-size:11px;line-height:1.6;color:#496375;margin:0}
+.pr-toolbar>p>span{display:block;font-size:10px;color:#637886;margin-top:3px}
+.pr-toolbar>div{display:flex;flex-wrap:wrap;gap:8px}
+.pr-body{padding:28px 32px 25px}
+.pr-notice{padding:16px 19px;border:1px solid #dcc8a4;background:#fff9ef;border-radius:13px;margin-bottom:22px;font-size:12px;line-height:1.6;color:#684f2c}
+.pr-notice b{font-size:13px}
+.pr-notice p{margin:6px 0 0}
+.pr-overview{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px}
+.pr-overview-card{border:1px solid #c9dfe3;border-radius:17px;padding:23px;background:#f7fbfa;min-width:0}
+#anatomia-progress-report .pr-overview-card h3{font-size:46px;margin:13px 0 0;color:#08767a;font-weight:500}
+.pr-overview-card h3 small{font-size:22px;font-weight:400;color:#637886}
+.pr-overview-card>p:not(.pr-caption){font-size:13px;color:#496375;margin:4px 0 18px}
+.pr-viewed-meter{height:5px;background:#d7e8e8;border-radius:6px;overflow:hidden;margin:22px 0 14px}
+.pr-viewed-meter span{height:100%;display:block;background:#087f83;border-radius:6px}
+#anatomia-progress-report .pr-caption{font-size:11px;line-height:1.75;color:#526b7c;margin:14px 0}
+.pr-text-link{font-size:12px;color:#04558a;text-decoration:underline;text-underline-offset:3px}
+#anatomia-progress-report .pr-assessment h3{font-size:21px;margin:14px 0 18px;color:#16324f}
+.pr-assessment dl{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pr-assessment dl>div{border-left:1px solid #c7dde3;padding-left:13px;display:flex;flex-direction:column}
+.pr-assessment dt{font-size:11px;color:#496375;order:2;line-height:1.5}
+.pr-assessment dd{font-size:27px;color:#16324f;margin:0 0 5px;line-height:1.2}
+.pr-repeat-list{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 14px}
+#anatomia-progress-report .pr-organ-link{min-height:36px;padding:5px 9px;font-size:11px;border-color:#d0e1e6;color:#04558a;line-height:1.5;background:#fff;text-align:left;display:inline-flex;align-items:flex-start;flex-direction:column;gap:1px}
+.pr-organ-link small{font:italic 11px Georgia,serif;color:#687183;display:block;line-height:1.45}
+.pr-results{margin-top:33px}
+.pr-section-heading{display:flex;justify-content:space-between;gap:25px;align-items:flex-end;margin-bottom:18px}
+#anatomia-progress-report .pr-section-heading h3{font-size:23px;margin:7px 0 0}
+.pr-section-heading>p{font-size:11px;line-height:1.7;color:#526b7c;max-width:310px;margin:0}
+.pr-results-list{border:1px solid #c9dfe3;border-radius:17px;overflow:hidden}
+.pr-attempt{display:grid;grid-template-columns:minmax(0,1fr) 145px auto;gap:14px 25px;padding:23px 24px;background:#fff;border-bottom:1px solid #d7e5e9;align-items:center}
+.pr-attempt:last-child{border-bottom:0}
+#anatomia-progress-report .pr-attempt-heading h4{font-size:17px;margin:0 0 5px}
+.pr-attempt-heading p{font-size:11px;color:#526b7c;margin:0 0 10px;line-height:1.5}
+.pr-scope{display:inline-block;border:1px solid #d2e0e9;border-radius:6px;padding:4px 7px;background:#f5f8fb;color:#496375;font-size:10px;line-height:1.5}
+.pr-scope-review{background:#f4f1fb;border-color:#d8cfe9;color:#665085}
+.pr-attempt-score{display:flex;flex-direction:column;gap:4px}
+.pr-attempt-score strong{font-size:31px;line-height:1.3;color:#16324f;font-weight:500;white-space:nowrap}
+.pr-attempt-score strong small{font-size:17px;color:#607584;font-weight:400}
+.pr-attempt-score>span{font-size:10px;line-height:1.65;color:#526b7c}
+.pr-attempt-score .pr-no-attempt{font-size:11px;max-width:150px}
+.pr-attempt-next{justify-self:end}
+.pr-attempt-next button{white-space:nowrap}
+.pr-attempt-meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px 18px;color:#607584;font-size:10px;line-height:1.6;border-top:1px solid #e5eef0;padding-top:10px}
+.pr-mistakes{grid-column:1/-1;font-size:11px;line-height:1.6;color:#496375}
+.pr-mistakes summary{cursor:pointer;color:#075f6a;width:fit-content;min-height:30px;padding:5px 0;font-weight:500}
+.pr-mistakes ul{list-style:none;margin:7px 0 0;padding:0;display:grid;gap:7px}
+.pr-mistakes li{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#f6f9fa;border-radius:8px;padding:10px 12px;margin:0}
+.pr-mistakes li>span{flex:1;min-width:180px;color:#16324f}
+.pr-mistakes li small{font-size:10px;color:#685183}
+#anatomia-progress-report .pr-mistakes li button{min-height:34px;padding:5px 9px;font-size:10px;background:#fff}
+.pr-systems{margin-top:35px;scroll-margin-top:20px}
+.pr-systems table{width:100%;border-collapse:collapse;border:1px solid #c9dfe3;table-layout:fixed}
+.pr-systems th,.pr-systems td{padding:14px;border-bottom:1px solid #d7e5e9;vertical-align:top;text-align:left;font-weight:400}
+.pr-systems thead th{background:#f2f8f8;font-size:10px;font-weight:600;line-height:1.5;color:#496375}
+.pr-systems thead th:first-child{width:29%}
+.pr-systems thead th:nth-child(2){width:15%}
+.pr-systems tbody th{font-size:12px;color:#16324f;line-height:1.65}
+.pr-systems td:nth-child(2){font-size:12px;color:#496375;white-space:nowrap}
+.pr-systems td:last-child{display:flex;gap:6px;flex-wrap:wrap;min-height:65px}
+.pr-empty{font-size:11px;color:#647d8c;line-height:1.7;padding:5px 0}
+.pr-foot{margin-top:25px;border-top:1px solid #d7e5e9;padding-top:17px}
+.pr-foot p{margin:0 0 7px;font-size:10px;line-height:1.7;color:#607584}
+.pr-foot p:first-child{font-size:11px;color:#496375}
+#progress-report-status{min-height:18px;color:#075f6a}
+@media(max-width:760px){
+  #anatomia-progress-report{width:calc(100% - 16px);max-height:calc(100dvh - 16px);border-radius:18px}
+  .pr-head{padding:23px 20px 21px;gap:12px}
+  .pr-brand{width:126px;margin-bottom:16px}
+  #anatomia-progress-report h2{font-size:28px}
+  .pr-toolbar{padding:15px 20px;align-items:flex-start;flex-direction:column;gap:13px}
+  .pr-toolbar>div{width:100%}
+  .pr-toolbar>div button{flex:1}
+  .pr-body{padding:22px 19px}
+  .pr-overview{grid-template-columns:1fr;gap:12px}
+  .pr-overview-card{padding:20px}
+  .pr-section-heading{align-items:flex-start;flex-direction:column;gap:10px}
+  .pr-section-heading>p{max-width:none}
+  #anatomia-progress-report .pr-section-heading h3{font-size:21px}
+  .pr-attempt{padding:20px 18px;grid-template-columns:minmax(0,1fr) 90px;gap:15px}
+  .pr-attempt-next{grid-column:1/-1;justify-self:stretch}
+  .pr-attempt-next button{width:100%}
+  .pr-attempt-score strong{font-size:29px}
+  .pr-attempt-meta{font-size:10px;gap:7px}
+  .pr-attempt-score .pr-no-attempt{font-size:10px}
+  .pr-mistakes li>span{min-width:100%;font-size:11px}
+  .pr-systems table,.pr-systems tbody{display:block;width:100%}
+  .pr-systems table{border:0}
+  .pr-systems thead{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+  .pr-systems tr{display:grid;grid-template-columns:minmax(0,1fr) 52px;border:1px solid #c9dfe3;border-bottom:0}
+  .pr-systems tr:last-child{border-bottom:1px solid #c9dfe3}
+  .pr-systems tbody th,.pr-systems td{border:0;padding:12px 13px}
+  .pr-systems td:nth-child(2){padding-left:0;white-space:nowrap;text-align:right}
+  .pr-systems td:last-child{grid-column:1/-1;padding-top:0;min-height:0}
+}
+@media print{
+  @page{size:A4 portrait;margin:13mm}
+  body.anatomia-report-printing{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;color:#000!important}
+  body.anatomia-report-printing>*:not(#anatomia-progress-report){display:none!important}
+  body.anatomia-report-printing #anatomia-progress-report{display:block!important;position:static!important;inset:auto!important;width:100%!important;max-width:none!important;max-height:none!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important;color:#172d40!important;font-size:10pt!important}
+  #anatomia-progress-report::backdrop{display:none!important}
+  #anatomia-progress-report .pr-no-print,#anatomia-progress-report .pr-text-link{display:none!important}
+  #anatomia-progress-report .pr-head{position:static!important;padding:0 0 5mm;background:#fff;border-bottom:1px solid #77969e;break-inside:avoid}
+  #anatomia-progress-report .pr-brand{width:32mm;margin-bottom:3mm}
+  #anatomia-progress-report h2{font-size:23pt;margin:2mm 0}
+  #anatomia-progress-report .pr-head p{font-size:9pt}
+  #anatomia-progress-report .pr-eyebrow{font-size:7pt}
+  #anatomia-progress-report .pr-toolbar{padding:3mm 0;border-bottom:1px solid #c8d7db}
+  #anatomia-progress-report .pr-toolbar p{font-size:8pt}
+  #anatomia-progress-report .pr-toolbar p>span{font-size:7pt}
+  #anatomia-progress-report .pr-body{padding:4mm 0 0}
+  #anatomia-progress-report .pr-overview{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+  #anatomia-progress-report .pr-overview-card{padding:4mm;border-radius:0;background:#fff;break-inside:avoid}
+  #anatomia-progress-report .pr-overview-card h3{font-size:25pt;margin:2mm 0 0}
+  #anatomia-progress-report .pr-assessment h3{font-size:13pt;margin:2mm 0 3mm}
+  #anatomia-progress-report .pr-assessment dt{font-size:8pt}
+  #anatomia-progress-report .pr-assessment dd{font-size:18pt}
+  #anatomia-progress-report .pr-overview-card>p:not(.pr-caption){font-size:8pt;margin:1mm 0 3mm}
+  #anatomia-progress-report .pr-viewed-meter{display:none}
+  #anatomia-progress-report .pr-caption{font-size:7.5pt;margin:2mm 0;line-height:1.55}
+  #anatomia-progress-report .pr-section-heading{display:block;margin-bottom:3mm;break-after:avoid}
+  #anatomia-progress-report .pr-section-heading h3{font-size:14pt;margin:2mm 0}
+  #anatomia-progress-report .pr-section-heading>p{font-size:8pt;max-width:none}
+  #anatomia-progress-report .pr-results,#anatomia-progress-report .pr-systems{margin-top:6mm}
+  #anatomia-progress-report .pr-results-list{border-radius:0;overflow:visible}
+  #anatomia-progress-report .pr-attempt{padding:3mm 4mm;grid-template-columns:1fr 30mm;gap:2mm;break-inside:avoid;background:#fff}
+  #anatomia-progress-report .pr-attempt-heading h4{font-size:11pt;margin:0 0 1mm}
+  #anatomia-progress-report .pr-attempt-heading p{font-size:8pt;margin:0 0 1mm}
+  #anatomia-progress-report .pr-scope{font-size:7pt;padding:1mm 2mm;background:#fff}
+  #anatomia-progress-report .pr-attempt-score strong{font-size:21pt}
+  #anatomia-progress-report .pr-attempt-score strong small{font-size:12pt}
+  #anatomia-progress-report .pr-attempt-score>span{font-size:7pt}
+  #anatomia-progress-report .pr-attempt-meta{font-size:7pt;padding-top:2mm;line-height:1.5}
+  #anatomia-progress-report .pr-mistakes{font-size:8pt}
+  #anatomia-progress-report .pr-mistakes summary{padding:0;min-height:0;list-style:none}
+  #anatomia-progress-report .pr-mistakes ul{margin:2mm 0 0;gap:1mm}
+  #anatomia-progress-report .pr-mistakes li{padding:1mm 0;background:#fff;display:block}
+  #anatomia-progress-report .pr-mistakes li>span{font-size:8pt;min-width:0}
+  #anatomia-progress-report .pr-mistakes li small{font-size:7pt;margin-left:2mm}
+  #anatomia-progress-report .pr-mistakes summary::marker{content:''}
+  #anatomia-progress-report .pr-systems table{display:table;border:1px solid #c9dfe3;table-layout:fixed}
+  #anatomia-progress-report .pr-systems thead{display:table-header-group;position:static;width:auto;height:auto;clip-path:none;overflow:visible}
+  #anatomia-progress-report .pr-systems tbody{display:table-row-group}
+  #anatomia-progress-report .pr-systems tr{display:table-row;border:0;break-inside:avoid}
+  #anatomia-progress-report .pr-systems :is(th,td){display:table-cell!important;padding:2mm 3mm;border-bottom:1px solid #d7e5e9;font-size:8pt!important;line-height:1.4;text-align:left!important}
+  #anatomia-progress-report .pr-systems thead th:first-child{width:31%}
+  #anatomia-progress-report .pr-systems thead th:nth-child(2){width:14%}
+  #anatomia-progress-report .pr-systems td:last-child{min-height:0}
+  #anatomia-progress-report .pr-organ-link{display:inline-block;font-size:8pt;min-height:0;border:0;padding:0;margin:0 2mm 1mm 0;background:#fff;color:#172d40}
+  #anatomia-progress-report .pr-organ-link small{font-size:7pt;display:block}
+  #anatomia-progress-report .pr-empty{font-size:7.5pt;padding:0}
+  #anatomia-progress-report .pr-notice{font-size:8pt;background:#fff;padding:3mm;border-radius:0;break-inside:avoid}
+  #anatomia-progress-report .pr-notice b{font-size:9pt}
+  #anatomia-progress-report .pr-foot{margin-top:4mm;padding-top:3mm;break-inside:avoid}
+  #anatomia-progress-report .pr-foot p{font-size:7pt;line-height:1.5}
+}

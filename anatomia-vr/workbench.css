@@ -25,6 +25,13 @@
 .wb-compare{padding:0 32px 26px}
 .wb-compare-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:18px 0}
 .wb-compare-intro p{margin:0;max-width:510px}
+.wb-3d-launch{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 24px;padding:20px;margin:0 0 20px;border:1px solid #aacfd4;border-radius:16px;background:linear-gradient(115deg,#edf8f5,#f2f5fc)}
+.wb-3d-launch>div>b{display:block;margin-top:7px;font-size:17px;line-height:1.45;font-weight:600}
+#anatomia-workbench .wb-3d-launch p{margin:6px 0 0;font-size:12px;max-width:600px}
+.wb-3d-launch>button{max-width:100%;white-space:normal}
+#wb-3d-status{grid-column:1/-1}
+#wb-3d-status:empty{display:none}
+@media(max-width:760px){.wb-3d-launch{grid-template-columns:minmax(0,1fr);padding:17px}.wb-3d-launch>button{justify-self:start}}
 #anatomia-workbench .wb-share{display:flex;align-items:center;justify-content:center;gap:9px;font-size:12px;white-space:nowrap;color:#04558a}
 .wb-presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:20px}
 #anatomia-workbench .wb-presets button{padding:12px 14px}

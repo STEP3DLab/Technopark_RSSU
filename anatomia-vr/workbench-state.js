@@ -52,7 +52,7 @@ export function validateAttempt(value, tasks) {
   const full = answers.length === tasks.length && tasks.every(t => seen.has(t.id));
   return {
     answers, correct, total: answers.length,
-    scope: full ? 'all' : 'review',
+    scope: value.scope === 'review' ? 'review' : full ? 'all' : 'review',
     completedAt: typeof value.completedAt === 'string' && Number.isFinite(Date.parse(value.completedAt)) ? value.completedAt : null
   };
 }
@@ -69,6 +69,7 @@ export function createWorkbenchState(storage, organIds, tasks) {
       state.pair = validPair(saved.pair, organIds) || fallbackPair;
       state.best = Number.isInteger(saved.best) && saved.best >= 0 && saved.best <= tasks.length ? saved.best : null;
       state.last = validateAttempt(saved.last, tasks);
+      if (saved.last != null && !state.last) corrupt = true;
     }
   } catch (error) {
     if (error instanceof SyntaxError) corrupt = true;
@@ -104,7 +105,7 @@ export function createContrastSession(tasks, selectedIds, random = Math.random) 
   return {
     get() {
       const id = ids[Math.min(index, ids.length - 1)];
-      return {ids: [...ids], index, total: ids.length, id, order: [...orders[id]], answered: answers.length > index, answers: answers.map(a => ({...a})), finished};
+      return {ids: [...ids], scope: Array.isArray(selectedIds) ? 'review' : 'all', index, total: ids.length, id, order: [...orders[id]], answered: answers.length > index, answers: answers.map(a => ({...a})), finished};
     },
     answer(choice) {
       const task = tasks.find(t => t.id === ids[index]);
@@ -120,7 +121,7 @@ export function createContrastSession(tasks, selectedIds, random = Math.random) 
     },
     result(now = new Date().toISOString()) {
       if (!finished) return null;
-      return validateAttempt({answers, correct: answers.filter(a => a.correct).length, total: ids.length, completedAt: now}, tasks);
+      return validateAttempt({answers, correct: answers.filter(a => a.correct).length, total: ids.length, scope: Array.isArray(selectedIds) ? 'review' : 'all', completedAt: now}, tasks);
     }
   };
 }

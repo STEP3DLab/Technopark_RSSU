@@ -1,4 +1,4 @@
-/* ANATOMIA 1.6: clearer controls, a visual catalog, and a compact study rail.
+/* ANATOMIA 1.7: clearer controls, a visual catalog, and a compact study rail.
    Load after the existing atlas, laboratory, and learning-centre styles. */
 :root {
   --surface-soft: #f1f8f9;
@@ -325,4 +325,164 @@ select:focus-visible, summary:focus-visible {
   .system-dock button[aria-pressed="true"], .organ-item.active { outline: 2px solid Highlight; outline-offset: -2px; }
   .system-dock button, .atlas-shortcuts button, .organ-system-tag { border: 1px solid CanvasText; }
   .organ-thumb { forced-color-adjust: none; }
+}
+
+/* Viewing mode is independent from the current organ or learning activity. */
+.viewer-controls {
+  position: absolute; top: 26px; right: 28px; z-index: 7;
+  display: flex; align-items: center; gap: 8px; max-width: calc(100% - 32px);
+}
+.viewer-mode {
+  display: flex; align-items: center; gap: 2px; padding: 3px;
+  border: 1px solid #bdd6df; border-radius: 13px; background: #fffffff5;
+  box-shadow: 0 5px 18px #16324f08;
+}
+.viewer-mode button {
+  min-height: 36px; padding: 8px 13px; border: 0; border-radius: 9px;
+  color: #496375; background: transparent; font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+}
+.viewer-mode button[aria-pressed="true"] { color: #fff; background: #087f83; }
+.viewer-mode button[aria-pressed="true"]:hover:not(:disabled) { color: #fff; background: #066a70; }
+.viewer-mode button:not([aria-pressed="true"]):hover:not(:disabled) { color: #04558a; background: #edf6f8; }
+.viewer-mode button:disabled { opacity: .55; }
+.viewer-controls .icon-button {
+  width: 44px; height: 44px; flex: 0 0 44px;
+  background: #fffffff5; border-color: #bdd6df; color: #04558a; border-radius: 12px;
+  box-shadow: 0 5px 18px #16324f08;
+}
+.viewer-controls .icon-button[aria-pressed="true"] { background: #e6f3f4; border-color: #087f83; }
+.viewer-angle-control { position: absolute; right: 84px; top: 84px; z-index: 5; }
+.viewer-angle-control select {
+  min-height: 40px; width: 138px; max-width: 100%; padding: 8px 10px;
+  border: 1px solid #bdd6df; border-radius: 10px; background: #fffffff0;
+  color: #345365; font-size: 13px; cursor: pointer;
+}
+.scene-only { top: 84px; right: 28px; width: 44px; height: 40px; }
+.stage-tools { z-index: 7; }
+.stage-tools :is(#zoom-in,#zoom-out) { font-size: 23px; font-weight: 400; line-height: 1; }
+.stage-tools button:disabled { opacity: .38; cursor: default; }
+.fallback-mode .viewer-angle-control { display: none; }
+.fallback-mode .stage-tools { display: flex!important; bottom: 118px; }
+.fallback-mode .stage-tools :is(#front,#skeleton,#labels-toggle,#rotate,.tool-separator) { display: none; }
+.fallback-view { bottom: 188px; overflow: hidden; }
+.fallback-view img { pointer-events: auto; user-select: none; -webkit-user-drag: none; transform-origin: center; touch-action: pan-y; }
+.fallback-view img:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: -4px; border-radius: 12px; }
+.fallback-view p { position: relative; z-index: 1; padding: 4px 8px; border-radius: 6px; background: #edf6f8ed; }
+.image-zoomed .fallback-view img { cursor: grab; touch-action: none; }
+.image-zoomed .fallback-view img:active { cursor: grabbing; }
+.image-choice .fallback-view { bottom: 112px; }
+.image-choice .stage-tools { bottom: 38px; }
+.image-choice .detail { bottom: 100px; max-height: calc(100% - 128px); }
+.image-choice .atlas-shortcuts { bottom: 80px; }
+.image-choice .library { max-height: calc(100% - 236px); }
+.viewer-theatre, .viewer-native-fullscreen { overflow: hidden; }
+:is(.viewer-theatre,.viewer-native-fullscreen) .workspace {
+  position: fixed; inset: 0; z-index: 50; height: 100dvh; min-height: 0;
+  overflow: auto; overscroll-behavior: contain; background: #edf6f8;
+  padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+}
+:is(.viewer-theatre,.viewer-native-fullscreen) .stage { min-height: 100%; }
+
+@media (min-width: 701px) and (max-width: 1100px) {
+  .viewer-controls { right: 18px; }
+  .viewer-angle-control { right: 74px; }
+  .scene-only { right: 18px; }
+  .fallback-view { left: 190px; right: 306px; }
+  .fallback-mode.in-physio .fallback-view { bottom: 188px; }
+  .image-choice.in-physio .fallback-view { bottom: 112px; }
+}
+@media (min-width: 701px) and (max-width: 900px) {
+  .fallback-view { left: 172px; right: 282px; }
+}
+@media (max-width: 700px) {
+  .viewer-controls { top: 110px; right: 16px; gap: 6px; }
+  .viewer-mode { padding: 2px; border-radius: 11px; }
+  .viewer-mode button { min-height: 34px; padding: 7px 9px; font-size: 12px; border-radius: 8px; }
+  .viewer-controls .icon-button { width: 40px; height: 40px; flex-basis: 40px; border-radius: 10px; }
+  .viewer-controls .icon-button svg { width: 19px; height: 19px; }
+  .scene-only { top: 17px; right: 17px; width: 38px; height: 38px; }
+  .viewer-angle-control { top: auto; right: auto; bottom: 85px; left: 50%; transform: translateX(-50%); }
+  .viewer-angle-control select { min-height: 40px; width: 140px; font-size: 16px; padding-top: 6px; padding-bottom: 6px; }
+  body:not(.fallback-mode) .atlas-shortcuts { display: none; }
+  :is(.only-scene,.in-practice,.in-lesson,.in-physio) .viewer-controls { top: 17px; }
+  :is(.in-lesson,.spatial-practice) .stage-caption { top: 72px; }
+  .only-scene .scene-only { top: 65px; }
+  .in-lesson .scene-only { top: 65px; }
+  .fallback-mode .stage {
+    display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0;
+    align-items: start; min-height: 0; height: auto;
+  }
+  .fallback-mode .stage-caption { grid-column: 1/-1; grid-row: 1; }
+  .fallback-mode .catalog-toggle { grid-column: 1; grid-row: 2; justify-self: start; }
+  .fallback-mode .viewer-controls {
+    position: relative; inset: auto; transform: none; max-width: none;
+    grid-column: 2; grid-row: 2; justify-self: end; margin-bottom: 8px;
+  }
+  .fallback-mode .system-dock { grid-column: 1/-1; grid-row: 3; }
+  .fallback-mode .fallback-view { inset: auto; grid-column: 1/-1; grid-row: 4; }
+  .fallback-mode .stage-tools {
+    position: relative; inset: auto; transform: none; grid-column: 1/-1; grid-row: 5;
+    justify-self: center; margin: 0 0 12px; max-width: 100%;
+  }
+  .fallback-mode .stage-tools button { width: 44px; height: 42px; }
+  .fallback-mode .atlas-shortcuts { inset: auto; grid-column: 1/-1; grid-row: 6; }
+  .fallback-mode .fallback-status { grid-column: 1/-1; grid-row: 7; }
+  .fallback-mode .education-label { grid-column: 1/-1; grid-row: 8; }
+  .fallback-mode .detail, .image-choice .detail { bottom: auto; max-height: none; }
+  .fallback-mode .library { max-height: min(580px,calc(100dvh - 190px)); }
+  .fallback-view p { font-size: 11px; }
+  :is(.viewer-theatre,.viewer-native-fullscreen) .stage { height: 100dvh; min-height: 540px; }
+  :is(.viewer-theatre,.viewer-native-fullscreen).in-practice:not(.spatial-practice) .stage,
+  :is(.viewer-theatre,.viewer-native-fullscreen).in-physio .stage { height: 350px; min-height: 350px; }
+  :is(.viewer-theatre,.viewer-native-fullscreen).fallback-mode .stage { height: auto; min-height: 0; }
+}
+@media (max-width: 360px) {
+  .viewer-mode button { padding-left: 7px; padding-right: 7px; font-size: 11px; }
+  .viewer-controls { gap: 5px; }
+  .catalog-toggle { padding-left: 10px; padding-right: 10px; }
+  .catalog-toggle svg, .catalog-toggle small { display: none; }
+}
+@media (forced-colors: active) {
+  .viewer-mode button[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+  .viewer-controls, .viewer-angle-control select { border-color: CanvasText; }
+}
+
+/* Local scene edits remain beside the organ they affect. */
+.structure-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0 4px; }
+.structure-tools button {
+  min-width: 0; min-height: 42px; padding: 9px 8px; font-size: 12px; line-height: 1.4;
+  color: #345365; background: #f3f8fa; border-color: #c6dce2;
+}
+.structure-tools button:only-child { grid-column: 1/-1; }
+.structure-tools button b { margin-left: 3px; color: #087f83; font-variant-numeric: tabular-nums; }
+.organ-item .organ-hidden-label { margin-top: 4px; color: #6a5a85; font: 500 11px var(--sans); }
+.organ-item:has(.organ-hidden-label) .organ-thumb { opacity: .4; }
+.in-comparison3d :is(.catalog-toggle,.system-dock,.atlas-shortcuts) { display: none; }
+.in-comparison3d .detail { max-height: calc(100% - 145px); }
+.in-comparison3d .detail h2 { font-size: 26px; }
+.comparison3d-organs { display: grid; gap: 9px; margin-top: 18px; }
+.comparison3d-organs button {
+  display: block; width: 100%; padding: 12px 14px; min-height: 80px;
+  border: 1px solid #c6dce2; border-left: 4px solid var(--organ); border-radius: 12px;
+  text-align: left; color: #16324f; background: #f5fafb;
+}
+.comparison3d-organs b { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; }
+.comparison3d-organs small { display: block; margin-top: 4px; color: #6853a3; font: italic 15px Georgia,serif; }
+.comparison3d-organs span { display: block; margin-top: 9px; color: #04558a; font-size: 11px; }
+.comparison3d-note { margin: 14px 0 10px; color: #496375; font-size: 12px; line-height: 1.55; }
+.comparison3d-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.comparison3d-actions button { min-width: 0; }
+@media (max-width: 700px) {
+  .structure-tools button { min-height: 44px; font-size: 13px; }
+  .in-comparison3d .viewer-controls { top: 17px; }
+  .in-comparison3d .stage-caption { top: 72px; }
+  .in-comparison3d .stage-caption h1 { font-size: 22px; }
+  .in-comparison3d .scene-only { top: 65px; }
+  .in-comparison3d .detail { max-height: none; }
+  .comparison3d-organs { grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .comparison3d-organs button { min-width: 0; padding: 11px; }
+  .comparison3d-organs b { font-size: 13px; overflow-wrap: anywhere; }
+  .comparison3d-organs small { font-size: 13px; overflow-wrap: anywhere; }
+  .comparison3d-organs span { font-size: 11px; }
 }

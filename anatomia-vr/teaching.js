@@ -1,16 +1,19 @@
 import { teachingModules } from './teaching-content.js';
 import { teachingActivities } from './teaching-activities.js';
+import { normalizeTeachingAttempt } from './teaching-state.js';
 const $ = (s, root=document) => root.querySelector(s);
 const aliases={heart:'heart',lungR:'lungs',lungL:'lungs',airway:'lungs',kidneyR:'kidneys',kidneyL:'kidneys',bladder:'kidneys'};
 const storageKey='anatomia-teaching-v1';
-let saved={best:0};try{const v=JSON.parse(localStorage.getItem(storageKey)||'{}');if(Number.isFinite(v.best)&&v.best>=0&&v.best<=900)saved.best=v.best;if(v.lastAttempt&&Number.isInteger(v.lastAttempt.total)&&v.lastAttempt.total>0&&v.lastAttempt.total<=9&&Number.isInteger(v.lastAttempt.correct)&&v.lastAttempt.correct>=0&&v.lastAttempt.correct<=v.lastAttempt.total)saved.lastAttempt={total:v.lastAttempt.total,correct:v.lastAttempt.correct};}catch{}
+let saved={best:0},persistent=true,savedCorrupt=false;try{const v=JSON.parse(localStorage.getItem(storageKey)||'{}');if(!v||typeof v!=='object'||Array.isArray(v))throw new SyntaxError('Invalid saved record');if(Number.isFinite(v.best)&&v.best>=0&&v.best<=900)saved.best=v.best;const attempt=normalizeTeachingAttempt(v.lastAttempt);if(attempt)saved.lastAttempt=attempt;else if(v.lastAttempt!=null)savedCorrupt=true;}catch(error){if(error instanceof SyntaxError)savedCorrupt=true;else persistent=false;}
 const state={organ:'heart',disease:false,paused:matchMedia('(prefers-reduced-motion: reduce)').matches,teacher:false,tab:'explore',spot:0,questions:[],index:0,answers:[],score:0,finished:false,scope:'heart',projector:false,guideStep:0,order:[2,0,1],orderChecked:false,guideReveal:false,curtain:false,activityIndex:0,activityOrder:[0,1,2],activityAnswer:null,activityHint:false,caseAnswer:null,caseOrder:[0,1,2],layers:{shell:true,flow:true,labels:true}};
 const dialog=document.createElement('dialog');dialog.id='teaching-lab';dialog.setAttribute('aria-labelledby','teach-title');document.body.append(dialog);
 let opener=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const moduleFor=()=>teachingModules[state.organ];
 function shuffle(items){const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
-function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved))}catch{}if(typeof CustomEvent!=='undefined')document.dispatchEvent(new CustomEvent('anatomia:lab-progress',{detail:saved}));}
+function publishProgress(){if(typeof CustomEvent!=='undefined')document.dispatchEvent(new CustomEvent('anatomia:lab-progress',{detail:{...saved,persistent,corrupt:savedCorrupt}}));}
+function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved));persistent=true;savedCorrupt=false;}catch{persistent=false;}publishProgress();}
+document.addEventListener('anatomia:request-progress',publishProgress);
 function sourceList(m){return m.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join('');}
 function flowLine(path,cls=''){return `<path class="teach-flow ${cls}" d="${path}" fill="none" stroke-width="5" stroke-linecap="round"/>`;}
 function schematic({disease=state.disease,prefix='single',labels=true}={}){const label=moduleFor().name;let content='';
@@ -52,7 +55,7 @@ function launchProjector(){state.projector=true;state.guideReveal=false;state.cu
 function focusContent(){const el=$('#teach-body',dialog)||dialog;el.setAttribute('tabindex','-1');el.focus({preventScroll:true});dialog.scrollTop=0;}
 function focusFeedback(selector){const el=$(selector,dialog);if(!el)return;el.setAttribute('tabindex','-1');el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',behavior:'instant'});}
 function answer(index,revealed=false){if(state.finished||state.answers[state.index]!==undefined)return;const q=state.questions[state.index];if(!q)return;if(revealed)state.answers[state.index]='revealed';else{const opt=q.options[index];if(!opt)return;opt.chosen=true;state.answers[state.index]=opt.correct;if(opt.correct)state.score+=100;}render();$('.teach-next',dialog)?.focus({preventScroll:true});}
-export function openTeaching(organ='heart'){opener=document.activeElement;state.organ=aliases[organ]||organ in teachingModules&&organ||'heart';state.tab='explore';state.spot=0;state.disease=false;state.questions=[];state.answers=[];state.index=0;state.score=0;state.finished=false;state.projector=false;resetActivity();render();if(!dialog.open)dialog.showModal();$('.teach-close',dialog).focus({preventScroll:true});}
+export function openTeaching(organ='heart'){opener=document.activeElement;document.querySelectorAll('dialog[open]').forEach(d=>{if(d!==dialog)d.close();});state.organ=aliases[organ]||organ in teachingModules&&organ||'heart';state.tab='explore';state.spot=0;state.disease=false;state.questions=[];state.answers=[];state.index=0;state.score=0;state.finished=false;state.projector=false;resetActivity();render();if(!dialog.open)dialog.showModal();$('.teach-close',dialog).focus({preventScroll:true});}
 document.addEventListener('click',e=>{const trigger=e.target.closest('[data-teaching]');if(trigger)openTeaching(trigger.dataset.teaching||'heart');});
 dialog.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const organ=b.dataset.organLesson,tab=b.dataset.tabLesson,mode=b.dataset.state,action=b.dataset.action;
 if(b.dataset.layer){const key=b.dataset.layer;if(key in state.layers){state.layers[key]=!state.layers[key];render();$(`[data-layer="${key}"]`,dialog).focus();}}
@@ -86,7 +89,7 @@ else if(action==='quiz-organ')startQuiz(state.organ);
 else if(action==='quiz-all')startQuiz('all');
 else if(action==='reveal')answer(0,true);
 else if(action==='restart-quiz'){if(state.scope==='mistakes'){state.questions=state.questions.map(q=>({...q,options:shuffle(q.options.map(o=>({text:o.text,correct:o.correct})))}));state.index=0;state.answers=[];state.score=0;state.finished=false;render();focusContent();}else startQuiz(state.scope==='all'?'all':state.organ);}
-else if(action==='next'){if(state.answers[state.index]===undefined)return;if(state.index===state.questions.length-1){state.finished=true;saved.lastAttempt={total:state.questions.length,correct:state.answers.filter(a=>a===true).length};if(state.scope==='all')saved.best=Math.max(saved.best,state.score);persist();}else state.index++;render();focusContent();}
+else if(action==='next'){if(state.answers[state.index]===undefined)return;if(state.index===state.questions.length-1){state.finished=true;saved.lastAttempt=normalizeTeachingAttempt({total:state.questions.length,correct:state.answers.filter(a=>a===true).length,scope:state.scope==='all'?'all':state.scope==='mistakes'?'review':'organ',organ:state.scope==='all'?null:state.organ,completedAt:new Date().toISOString(),answers:state.questions.map((q,i)=>({id:q.id,correct:state.answers[i]===true,revealed:state.answers[i]==='revealed'}))});if(state.scope==='all')saved.best=Math.max(saved.best,state.score);persist();}else state.index++;render();focusContent();}
 else if(action==='clear-score'){saved.best=0;persist();render();}
 });
 dialog.addEventListener('change',e=>{if(e.target.id==='teach-teacher'){state.teacher=e.target.checked;render();$('#teach-teacher',dialog).focus();}});
@@ -97,4 +100,13 @@ const requested=new URLSearchParams(location.search).get('lesson');if(requested&
 // Shortcuts only belong to the open teaching dialog, never the atlas.
 dialog.addEventListener('keydown',e=>{if(!dialog.open||!state.projector||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const action=e.key==='ArrowRight'?'guide-next':e.key==='ArrowLeft'?'guide-prev':e.key==='Home'?'guide-reset':e.code==='KeyB'?'curtain':null;if(action){e.preventDefault();$(`[data-action="${action}"]`,dialog)?.click();}});
 
-document.addEventListener('anatomia:teaching',e=>{const {organ,view,teacher}=e.detail||{};openTeaching(organ);state.teacher=teacher===true;if(view==='lesson')launchProjector();else{render();focusContent();}});
+function repeatSavedMistakes(){
+ const missed=saved.lastAttempt?.answers?.filter(a=>!a.correct).map(a=>a.id);
+ if(!missed?.length)return false;
+ state.questions=Object.entries(teachingModules).flatMap(([organ,m])=>m.questions.filter(q=>missed.includes(q.id)).map(q=>({...q,organ,options:shuffle(q.options.map((text,i)=>({text,correct:i===q.correct})))})));
+ if(!state.questions.length)return false;
+ state.scope='mistakes';state.index=0;state.answers=[];state.score=0;state.finished=false;state.tab='quiz';render();focusContent();return true;
+}
+ document.addEventListener('anatomia:teaching',e=>{const {organ,view,teacher,action}=e.detail||{};openTeaching(organ);state.teacher=teacher===true;if(action==='quiz-all')startQuiz('all');else if(action==='mistakes'&&repeatSavedMistakes())return;else if(view==='lesson')launchProjector();else{render();focusContent();}});
+
+

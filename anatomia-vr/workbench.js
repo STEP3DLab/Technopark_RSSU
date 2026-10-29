@@ -1,13 +1,15 @@
 import {organs, sources, systemNames} from './data.js';
 import {briefs, icon} from './experience.js';
 import {contrastPairs as contrastTasks} from './contrast-content.js';
-import {createWorkbenchState, createContrastSession, comparisonFromURL, comparisonURL} from './workbench-state.js';
+import {createWorkbenchState, createContrastSession, comparisonFromURL, comparisonURL, validPair} from './workbench-state.js';
 
 const ids = organs.map(o => o.id), byId = id => organs.find(o => o.id === id);
 const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 let storage;
 try { storage = localStorage; } catch { storage = {getItem(){throw new Error('Storage unavailable');}, setItem(){throw new Error('Storage unavailable');}}; }
 const store = createWorkbenchState(storage, ids, contrastTasks);
+const publishProgress = () => document.dispatchEvent(new CustomEvent('anatomia:workbench-progress', {detail:store.get()}));
+document.addEventListener('anatomia:request-progress', publishProgress);
 const panel = document.createElement('dialog');
 panel.id = 'anatomia-workbench';
 panel.setAttribute('aria-labelledby', 'workbench-title');
@@ -42,7 +44,7 @@ function compareCard(id, index) {
 }
 function compare() {
   const current = presets.find(p => p.ids.every((id,i) => pair[i] === id));
-  return `<section class="wb-compare"><div class="wb-compare-intro"><p>Два органа рядом: сопоставьте форму, расположение и функцию.</p><button class="wb-share" data-wb="share">${icon('link')}Ссылка на сравнение</button></div><div class="wb-presets" role="group" aria-label="Готовые сравнения">${presets.map((p,index) => `<button data-wb-preset="${index}" aria-pressed="${p === current}"><b>${esc(p.label)}</b><small>${esc(p.hint)}</small></button>`).join('')}</div><div class="wb-compare-grid">${pair.map(compareCard).join('')}</div><p class="wb-image-note">Статичные виды исходных моделей · изображения масштабированы независимо: размеры органов по ним не сравнивают.</p><div class="wb-share-result" id="wb-share-result" hidden><label for="wb-share-url">Ссылка открывает эту пару органов</label><div><input id="wb-share-url" readonly value="${esc(comparisonURL(location.href, pair, ids) || '')}" aria-describedby="wb-share-status"><button data-wb="copy-link">Копировать</button></div><p id="wb-share-status" role="status"></p></div><div class="wb-compare-next"><span>Форму рассмотрели. А функции различаете?</span><button data-wb-mode="contrast">8 коротких заданий ${icon('arrow')}</button></div></section>`;
+  return `<section class="wb-compare"><div class="wb-compare-intro"><p>Два органа рядом: сопоставьте форму, расположение и функцию.</p><button class="wb-share" data-wb="share">${icon('link')}Ссылка на сравнение</button></div><div class="wb-3d-launch"><div><span class="wb-eyebrow">ОБЩАЯ 3D-СЦЕНА</span><b>${pair.map(id => esc(byId(id).name)).join(' + ')}</b><p>Рассмотрите пару со всех сторон. Исходные взаимное положение и масштаб модели сохраняются.</p></div><button class="wb-primary" data-wb="compare3d" aria-describedby="wb-3d-status">${icon('layers')}Открыть пару в 3D ${icon('arrow')}</button><p id="wb-3d-status" role="status"></p></div><div class="wb-presets" role="group" aria-label="Готовые сравнения">${presets.map((p,index) => `<button data-wb-preset="${index}" aria-pressed="${p === current}"><b>${esc(p.label)}</b><small>${esc(p.hint)}</small></button>`).join('')}</div><div class="wb-compare-grid">${pair.map(compareCard).join('')}</div><p class="wb-image-note">Статичные виды исходных моделей · изображения масштабированы независимо: размеры органов по ним не сравнивают.</p><div class="wb-share-result" id="wb-share-result" hidden><label for="wb-share-url">Ссылка открывает эту пару органов</label><div><input id="wb-share-url" readonly value="${esc(comparisonURL(location.href, pair, ids) || '')}" aria-describedby="wb-share-status"><button data-wb="copy-link">Копировать</button></div><p id="wb-share-status" role="status"></p></div><div class="wb-compare-next"><span>Форму рассмотрели. А функции различаете?</span><button data-wb-mode="contrast">8 коротких заданий ${icon('arrow')}</button></div></section>`;
 }
 function quiz() {
   if (!session) session = createContrastSession(contrastTasks);
@@ -50,11 +52,11 @@ function quiz() {
   if (s.finished) return result();
   const task = contrastTasks.find(t => t.id === s.id), response = s.answered ? s.answers[s.index] : null, saved = store.get();
   const history = s.index === 0 && !s.answered && saved.last ? `<div class="wb-history"><span>Последняя ${saved.last.scope === 'review' ? 'проверка ошибок' : 'полная попытка'}: <b>${saved.last.correct} / ${saved.last.total}</b></span>${saved.best !== null ? `<span>Лучший полный: <b>${saved.best} / ${contrastTasks.length}</b></span>` : ''}</div>` : '';
-  return `<section class="wb-quiz">${history}<div class="wb-quiz-meta"><span>${s.total === contrastTasks.length ? '8 РАЗЛИЧИЙ' : 'ПОВТОР ОШИБОК'}</span><b>${s.index + 1}<small> / ${s.total}</small></b></div><div class="wb-progress" role="progressbar" aria-label="Ответы в текущей попытке" aria-valuenow="${s.answers.length}" aria-valuemin="0" aria-valuemax="${s.total}"><i style="width:${s.answers.length / s.total * 100}%"></i></div><h3 id="workbench-question" tabindex="-1">${esc(task.prompt)}</h3><p class="wb-quiz-instruction">Выберите один ответ. Объяснение откроется после выбора.</p><div class="wb-answers">${s.order.map((choice,index) => `<button data-wb-choice="${choice}" ${s.answered ? 'disabled' : ''} class="${response ? choice === task.answer ? 'is-correct' : choice === response.choice ? 'is-wrong' : '' : ''}"><span class="wb-option-number" aria-hidden="true">${index + 1}</span><b>${esc(task.options[choice])}</b>${response && choice === task.answer ? `<span class="wb-answer-label">${icon('check')}Верный ответ</span>` : response && choice === response.choice ? '<span class="wb-answer-label">Ваш ответ</span>' : ''}</button>`).join('')}</div>${response ? `<div id="wb-feedback" class="wb-feedback ${response.correct ? 'is-correct' : ''}" tabindex="-1" role="status"><b>${response.correct ? 'Верно.' : 'Разберём различие.'}</b><p>${esc(task.why)}</p><a href="${esc(task.source)}" target="_blank" rel="noopener">Проверить по учебному источнику ↗</a></div><button class="wb-primary wb-next" data-wb="next">${s.index === s.total - 1 ? 'Посмотреть результат' : 'Следующий вопрос'} ${icon('arrow')}</button>` : '<p class="wb-key-hint">На клавиатуре: 1 или 2 · без ограничения времени</p>'}<p class="wb-pause-note">Закройте окно — попытка останется до перезагрузки страницы. Сохраняется только завершённый результат.</p></section>`;
+  return `<section class="wb-quiz">${history}<div class="wb-quiz-meta"><span>${s.scope === 'all' ? '8 РАЗЛИЧИЙ' : 'ПОВТОР ОШИБОК'}</span><b>${s.index + 1}<small> / ${s.total}</small></b></div><div class="wb-progress" role="progressbar" aria-label="Ответы в текущей попытке" aria-valuenow="${s.answers.length}" aria-valuemin="0" aria-valuemax="${s.total}"><i style="width:${s.answers.length / s.total * 100}%"></i></div><h3 id="workbench-question" tabindex="-1">${esc(task.prompt)}</h3><p class="wb-quiz-instruction">Выберите один ответ. Объяснение откроется после выбора.</p><div class="wb-answers">${s.order.map((choice,index) => `<button data-wb-choice="${choice}" ${s.answered ? 'disabled' : ''} class="${response ? choice === task.answer ? 'is-correct' : choice === response.choice ? 'is-wrong' : '' : ''}"><span class="wb-option-number" aria-hidden="true">${index + 1}</span><b>${esc(task.options[choice])}</b>${response && choice === task.answer ? `<span class="wb-answer-label">${icon('check')}Верный ответ</span>` : response && choice === response.choice ? '<span class="wb-answer-label">Ваш ответ</span>' : ''}</button>`).join('')}</div>${response ? `<div id="wb-feedback" class="wb-feedback ${response.correct ? 'is-correct' : ''}" tabindex="-1" role="status"><b>${response.correct ? 'Верно.' : 'Разберём различие.'}</b><p>${esc(task.why)}</p><a href="${esc(task.source)}" target="_blank" rel="noopener">Проверить по учебному источнику ↗</a></div><button class="wb-primary wb-next" data-wb="next">${s.index === s.total - 1 ? 'Посмотреть результат' : 'Следующий вопрос'} ${icon('arrow')}</button>` : '<p class="wb-key-hint">На клавиатуре: 1 или 2 · без ограничения времени</p>'}<p class="wb-pause-note">Закройте окно — попытка останется до перезагрузки страницы. Сохраняется только завершённый результат.</p></section>`;
 }
 function result() {
   const s = session.get(), correct = s.answers.filter(a => a.correct).length, mistakes = s.answers.filter(a => !a.correct), saved = store.get();
-  return `<section class="wb-result"><div class="wb-result-score" aria-label="Правильных ответов: ${correct} из ${s.total}"><b>${correct}</b><span>из ${s.total}</span></div><span class="wb-eyebrow">${s.total === contrastTasks.length ? 'ПОЛНАЯ ПОПЫТКА' : 'ПОВТОР ОШИБОК'}</span><h3 id="workbench-result" tabindex="-1">${mistakes.length ? 'Теперь различия понятнее.' : 'Все различия найдены.'}</h3><p>${mistakes.length ? 'Вернитесь к сложным вопросам или рассмотрите связанные органы в атласе.' : 'Перенесите знание на модель: найдите органы и объясните их функции своими словами.'}</p>${saved.best !== null ? `<div class="wb-best">Лучший полный проход: <b>${saved.best} / ${contrastTasks.length}</b></div>` : ''}<div class="wb-result-actions">${mistakes.length ? '<button class="wb-primary" data-wb="repeat">Повторить ошибки</button>' : '<button class="wb-primary" data-wb-mode="compare">Сравнить органы</button>'}<button data-wb="restart">Все ${contrastTasks.length} ещё раз</button></div>${mistakes.length ? `<div class="wb-review-list"><h4>Разобрать на модели</h4>${[...new Set(mistakes.map(a => contrastTasks.find(t => t.id === a.id).organId))].map(id => `<button data-wb-open-organ="${id}"><span>${esc(byId(id).name)}</span>${icon('arrow')}</button>`).join('')}</div>` : ''}<details class="wb-review"><summary>Разбор всех ответов</summary>${s.answers.map(a => {const t = contrastTasks.find(t => t.id === a.id);return `<article><span>${a.correct ? '✓ Верно' : '↻ Повторить'}</span><h4>${esc(t.prompt)}</h4><p><b>${esc(t.options[t.answer])}.</b> ${esc(t.why)}</p><a href="${esc(t.source)}" target="_blank" rel="noopener">Учебный источник ↗</a></article>`;}).join('')}</details><p class="wb-pause-note">Самопроверка для обучения. Результат не является оценкой квалификации.</p></section>`;
+  return `<section class="wb-result"><div class="wb-result-score" aria-label="Правильных ответов: ${correct} из ${s.total}"><b>${correct}</b><span>из ${s.total}</span></div><span class="wb-eyebrow">${s.scope === 'all' ? 'ПОЛНАЯ ПОПЫТКА' : 'ПОВТОР ОШИБОК'}</span><h3 id="workbench-result" tabindex="-1">${mistakes.length ? 'Теперь различия понятнее.' : 'Все различия найдены.'}</h3><p>${mistakes.length ? 'Вернитесь к сложным вопросам или рассмотрите связанные органы в атласе.' : 'Перенесите знание на модель: найдите органы и объясните их функции своими словами.'}</p>${saved.best !== null ? `<div class="wb-best">Лучший полный проход: <b>${saved.best} / ${contrastTasks.length}</b></div>` : ''}<div class="wb-result-actions">${mistakes.length ? '<button class="wb-primary" data-wb="repeat">Повторить ошибки</button>' : '<button class="wb-primary" data-wb-mode="compare">Сравнить органы</button>'}<button data-wb="restart">Все ${contrastTasks.length} ещё раз</button></div>${mistakes.length ? `<div class="wb-review-list"><h4>Разобрать на модели</h4>${[...new Set(mistakes.map(a => contrastTasks.find(t => t.id === a.id).organId))].map(id => `<button data-wb-open-organ="${id}"><span>${esc(byId(id).name)}</span>${icon('arrow')}</button>`).join('')}</div>` : ''}<details class="wb-review"><summary>Разбор всех ответов</summary>${s.answers.map(a => {const t = contrastTasks.find(t => t.id === a.id);return `<article><span>${a.correct ? '✓ Верно' : '↻ Повторить'}</span><h4>${esc(t.prompt)}</h4><p><b>${esc(t.options[t.answer])}.</b> ${esc(t.why)}</p><a href="${esc(t.source)}" target="_blank" rel="noopener">Учебный источник ↗</a></article>`;}).join('')}</details><p class="wb-pause-note">Самопроверка для обучения. Результат не является оценкой квалификации.</p></section>`;
 }
 function render() {
   panel.innerHTML = header() + (mode === 'compare' ? compare() : quiz()) + `<footer class="wb-footer"><span>${localNote()}</span><span>Колледж МЕДСИ · Учебный проект</span></footer>`;
@@ -81,7 +83,7 @@ function close(restore = true) {
   panel.close();
   if (!restore) return;
   const visible = element => element?.isConnected && !element.disabled && !element.closest('[hidden],dialog:not([open])') && element.getClientRects().length > 0;
-  const parentLaunch = openerDialog === 'modal' ? document.querySelector('.nav[data-tab="practice"]')
+  const parentLaunch = ['modal','practice-hub'].includes(openerDialog) ? document.querySelector('.nav[data-tab="practice"]')
     : openerDialog === 'learning-hub' || openerDialog === 'teaching-lab' ? document.querySelector('#learning-launch') : null;
   const fallback = [...document.querySelectorAll('[data-workbench="compare"],[data-workbench="contrast"],#learning-launch,#catalog-toggle')].find(visible);
   const target = visible(opener) && opener !== document.body ? opener : visible(parentLaunch) ? parentLaunch : fallback;
@@ -121,11 +123,15 @@ panel.addEventListener('click', event => {
   }
   const action = button.dataset.wb;
   if (action === 'close') close();
+  else if (action === 'compare3d') {
+    $('#wb-3d-status').textContent = 'Подготовка 3D-сцены…';
+    document.dispatchEvent(new CustomEvent('anatomia:navigate', {detail:{action:'compare3d',ids:[...pair]}}));
+  }
   else if (action === 'share') { $('#wb-share-result').hidden = false; $('#wb-share-url').focus(); copyLink(); }
   else if (action === 'copy-link') copyLink();
   else if (action === 'next') {
     if (!session?.next()) return;
-    if (session.get().finished) store.record(session.result());
+    if (session.get().finished) { store.record(session.result()); publishProgress(); }
     render(); focus(session.get().finished ? '#workbench-result' : '#workbench-question');
   } else if (action === 'restart' || action === 'repeat') {
     const missed = action === 'repeat' ? session?.get().answers.filter(a => !a.correct).map(a => a.id) : undefined;
@@ -155,7 +161,30 @@ document.addEventListener('click', event => {
   if (!['compare','contrast'].includes(trigger.dataset.workbench)) return;
   event.preventDefault(); open(trigger.dataset.workbench);
 });
-document.addEventListener('anatomia:workbench', event => open(event.detail?.mode));
+document.addEventListener('anatomia:workbench', event => {
+  const {mode:nextMode, action, ids:requestedPair} = event.detail || {};
+  const validRequestedPair = validPair(requestedPair, ids);
+  if (nextMode === 'compare' && validRequestedPair) { pair = validRequestedPair; store.setPair(pair); }
+  if (nextMode === 'contrast' && action === 'mistakes') {
+    const last = store.get().last;
+    const missed = last?.answers.filter(a => !a.correct).map(a => a.id);
+    if (missed?.length) session = createContrastSession(contrastTasks, missed);
+  } else if (nextMode === 'contrast' && action === 'restart') session = createContrastSession(contrastTasks);
+  open(nextMode);
+});
+document.addEventListener('anatomia:comparison3d-state', event => {
+  const {status, ids:openedPair, message} = event.detail || {};
+  if (!validPair(openedPair, ids)) return;
+  const matchesOpenComparison = panel.open && mode === 'compare' && openedPair.every((id,index) => id === pair[index]);
+  if (!matchesOpenComparison) return;
+  if (status === 'ready') {
+    if (panel.open) close(false);
+    document.querySelector('#viewport')?.focus({preventScroll:true});
+  } else if (status === 'unavailable' && panel.open && mode === 'compare') {
+    const note = $('#wb-3d-status');
+    if (note) note.textContent = typeof message === 'string' && message ? message : '3D сейчас недоступно. Вы можете продолжить сравнение по изображениям и описаниям.';
+  }
+});
 
 // Resolve a shared comparison only when it names two supported, distinct structures.
 const sharedPair = comparisonFromURL(location.href, ids);

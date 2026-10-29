@@ -1,0 +1,34 @@
+name: ANATOMIA study checks
+
+on:
+  push:
+    paths:
+      - 'anatomia-vr/**'
+      - '.github/workflows/anatomia-study.yml'
+  pull_request:
+    paths:
+      - 'anatomia-vr/**'
+      - '.github/workflows/anatomia-study.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anatomy-and-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: anatomia-vr
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify models, previews and study scenarios
+        run: npm run check
+      - name: Rebuild the self-contained laboratory
+        run: npm run build:offline
+      - name: Verify the published offline laboratory matches its sources
+        run: git diff --exit-code -- ANATOMIA-lesson-offline.html

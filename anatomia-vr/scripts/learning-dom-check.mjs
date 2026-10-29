@@ -4,6 +4,7 @@ import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:asser
 import * as THREE from '../vendor/three.module.min.js';
 import * as data from '../data.js';import * as experience from '../experience.js';
 import * as learningState from '../learning-state.js';
+import {normalizeTeachingAttempt} from '../teaching-state.js';
 import {teachingModules} from '../teaching-content.js';import {teachingActivities} from '../teaching-activities.js';
 const {Window}=await import(process.env.HAPPY_DOM_MODULE||'happy-dom');
 const root=new URL('../',import.meta.url),read=f=>fs.readFileSync(new URL(f,root),'utf8');
@@ -14,10 +15,10 @@ async function harness({denied=false,raw=null}={}){
  if(raw)for(const [key,value]of Object.entries(raw))window.localStorage.setItem(key,value);
  const storage=denied?{getItem(){throw Error('denied')},setItem(){throw Error('denied')}}:window.localStorage;
  const common={document,window,location:window.location,localStorage:storage,navigator:{clipboard:{writeText:()=>Promise.reject(Error('denied'))}},CustomEvent:window.CustomEvent,URL,URLSearchParams,console,Blob,matchMedia:()=>({matches:false}),setTimeout:()=>1,clearTimeout(){}};
- const app=vm.createContext({...common,THREE,...data,...experience});
+ const app=vm.createContext({...common,THREE,...data,...experience,openPracticeHub(){}});
  vm.runInContext(read('app.js').replace(/^import .*$/gm,'').replaceAll('import.meta.url',JSON.stringify('https://example.org/anatomia-vr/app.js')).replace('renderList();renderCard();init();','renderList();renderCard();'),app);
  vm.runInContext("activateFallback('Test without WebGL')",app);
- const teaching=vm.createContext({...common,teachingModules,teachingActivities});vm.runInContext(read('teaching.js').replace(/^import .*$/gm,'').replace('export function','function'),teaching);
+ const teaching=vm.createContext({...common,teachingModules,teachingActivities,normalizeTeachingAttempt});vm.runInContext(read('teaching.js').replace(/^import .*$/gm,'').replace('export function','function'),teaching);
  const learn=vm.createContext({...common,...data,...experience,...learningState});vm.runInContext(read('learning.js').replace(/^import .*$/gm,''),learn);
  const $=s=>document.querySelector(s),click=s=>{assert.ok($(s),s);$(s).click();};
  const open=()=>{$('#learning-launch').focus();click('#learning-launch');assert.equal($('#learning-hub').open,true);};
@@ -47,3 +48,4 @@ await test('Visual route Next and physiology retain visible keyboard destination
  results.push({name:'Generated offline HTML runs all three labs, compare and projector without imports or storage',status:'passed'});await offline.happyDOM.close();
 }
 console.log(JSON.stringify({status:'passed',passed:results.length,scope:'Production modules against real parsed DOM; no layout/WebGL/device simulation',results},null,2));
+

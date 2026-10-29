@@ -156,3 +156,24 @@ test('shuffle does not mutate source arrays or lose entries', () => {
   assert.deepEqual(input,[0,1,2,3]);
   assert.deepEqual([...result].sort(),input);
 });
+
+test('repeating all eight mistakes remains a review and cannot replace the full-attempt best', () => {
+  const store = createWorkbenchState(memory(), ids, tasks);
+  assert.equal(store.record(complete(undefined, false)), true);
+  assert.equal(store.get().best, 0);
+  const repeat = complete(tasks.map(t => t.id));
+  assert.equal(repeat.scope, 'review');
+  assert.equal(repeat.correct, 8);
+  assert.equal(store.record(repeat), true);
+  assert.equal(store.get().last.scope, 'review');
+  assert.equal(store.get().best, 0);
+  const reloaded = createWorkbenchState(memory({[workbenchKey]:JSON.stringify(store.get())}), ids, tasks);
+  assert.equal(reloaded.get().last.scope, 'review');
+  assert.equal(reloaded.get().best, 0);
+});
+
+test('malformed stored answers remain visibly corrupt after a live snapshot request', () => {
+  const store = createWorkbenchState(memory({[workbenchKey]:JSON.stringify({last:{total:8,correct:8,answers:'damaged'}})}), ids, tasks);
+  assert.equal(store.get().last,null);
+  assert.equal(store.get().corrupt,true);
+});
