@@ -4,6 +4,7 @@ import {organs,sources,systemNames,findTasks,cases} from './data.js';
 import {briefs,lessons,icon} from './experience.js';
 import {openPracticeHub} from './practice-hub.js';
 import {normalizeScene,scenePresets} from './scene-state.js';
+import {normalizeGraphicsQuality,resolveGraphicsProfile,surfaceProfile,studioLightProfile,selectionProfile,safeSceneFrame,fittedSceneRadius} from './render-profile.js';
 const $=s=>document.querySelector(s), byId=id=>organs.find(o=>o.id===id);
 const rootURL=new URL('.',import.meta.url), q=new URLSearchParams(location.search);
 let scene,renderer,camera,modelRoot,anatomy,skeleton,raycaster,selected='heart',isolated=false,showSkeleton=true,showLabels=false,autoRotate=false,loaded=false,quiz=null,reviewedQuiz=null,hovered=null;
@@ -13,6 +14,8 @@ let contextOpacity=.075,sceneFit=null,sceneZoomLimit=3.7,sceneStateQueued=false;
 let fallbackMode=false,loadingTimer,demoStep=-1;
 let viewerLoad='idle',viewerEpoch=0,viewerImagePreference=false,viewerResizeObserver=null,orbitAbort=null,skeletonLoad='idle',vrSupported=null;
 let initialSceneApplied=false,initialDemoHandled=false,imageScale=1,imageOffset={x:0,y:0},theatreMode=false;
+let graphicsQuality='auto',graphicsPersistent=true,graphicsResolution=null,graphicsMaxSize=8192,cameraFrameState=null,initialPresentationFramed=false,initialPresentationPending=false;
+try{graphicsQuality=normalizeGraphicsQuality(localStorage.getItem('anatomia-graphics-v1'))||'auto';}catch{graphicsPersistent=false;}
 const demoSteps=[{title:'От целого к детали',hint:'Выберите орган на модели или в каталоге. Русское название, латынь и функция — рядом.'},{title:'Сравните лёгкие',hint:'Справа три доли, слева две. В 3D маршрут помогает рассмотреть форму.'},{title:'Найдите скрытое',hint:'Поджелудочная железа расположена позади желудка. В 3D сравните ракурсы.'},{title:'Один объём — два режима',hint:'Сравните 100 × 50 и 50 × 100. Одинаковый МОК не означает одинаковое состояние сердца.'},{title:'Проверьте понимание',hint:'Два вопроса, обратная связь и разбор. Это самопроверка, не клиническая оценка.'}];
 const meshes=[], organMeshes=new Map(), centers=new Map(), labelNodes=new Map(), controllers=[],xrButtons=[];
 let progressPersistent=true;
@@ -74,16 +77,97 @@ function select(id,focus=false,remember=true){
   if(!byId(id))return;if(quiz){if(quiz.type==='find'&&!quiz.answered&&!quiz.finished)answerFind(id);return}
   if(lesson||physio||comparison3D)clearStudyModes();hiddenOrgans.delete(id);selected=id;if(fallbackMode&&focus)isolated=true;const filter=$('#system');if(filter.value!=='all'&&byId(id).system!==filter.value)filter.value='all';
   if(xrActive&&isolated)xrFocusOrgan();if(!progress.viewed.includes(id)){progress.viewed.push(id);save()}if(remember)notifyLearning('visit',{id});
-  renderList();renderCard();applyAppearance();if(fallbackMode)syncStagePrompt();if(focus)focusOrgan();updateXRPanel();
+  renderList();renderCard();applyAppearance();if(fallbackMode)syncStagePrompt();if(focus){toggleCatalog(false);focusOrgan();}updateXRPanel();
   if(focus){toggleCatalog(false);if(fallbackMode&&matchMedia('(max-width:700px)').matches)$('#detail').scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'})}
 }
 
+function createOrganMaterial(id){
+  const profile=surfaceProfile(id);
+  return new THREE.MeshStandardMaterial({color:byId(id).color,roughness:profile.roughness,metalness:profile.metalness,side:THREE.DoubleSide});
+}
+function createStudioLights(){
+  const profile=studioLightProfile;
+  scene.add(new THREE.HemisphereLight(profile.hemisphere.sky,profile.hemisphere.ground,profile.hemisphere.intensity));
+  for(const name of ['key','fill','rim']){
+    const spec=profile[name],light=new THREE.DirectionalLight(spec.color,spec.intensity);
+    light.position.fromArray(spec.position);light.target.position.set(0,1.1,0);scene.add(light,light.target);
+  }
+}
+function graphicsAvailability(){
+  if(xrActive)return {available:false,reason:'В VR разрешением управляет шлем. Профиль экрана сохранён.'};
+  if(viewerLoad==='loading')return {available:false,reason:'3D-модель загружается. Профиль станет доступен после подготовки сцены.'};
+  if(!loaded||!renderer)return {available:false,reason:'3D сейчас недоступен. Изображения и учебные задания доступны.'};
+  if(fallbackMode)return {available:false,reason:'Открыто изображение. Перейдите в 3D, чтобы изменить качество.'};
+  return {available:true,reason:{auto:'Разрешение подбирается по размеру экрана.',high:'Повышенное разрешение изображения.',eco:'Сниженная нагрузка на графический модуль.'}[graphicsQuality]};
+}
+function publishGraphicsState(){
+  const state=graphicsAvailability();
+  notifyLearning('graphics-state',{...state,quality:graphicsQuality,effectiveDPR:state.available?(graphicsResolution?.effectiveDPR??null):null,resolution:state.available&&graphicsResolution?{width:graphicsResolution.width,height:graphicsResolution.height}:null,persistent:graphicsPersistent});
+}
+function applyGraphicsResolution(width=$('#viewport').clientWidth,height=$('#viewport').clientHeight){
+  if(!renderer||xrActive||fallbackMode||!width||!height)return false;
+  const coarse=typeof matchMedia==='function'&&matchMedia('(pointer: coarse)').matches;
+  const memory=globalThis.navigator?.deviceMemory;
+  const next=resolveGraphicsProfile(graphicsQuality,{width,height,dpr:globalThis.devicePixelRatio||1,maxSize:graphicsMaxSize,compact:coarse,lowMemory:Number.isFinite(memory)&&memory<=4});
+  if(!next)return false;
+  if(next.effectiveDPR!==graphicsResolution?.effectiveDPR)renderer.setPixelRatio?.(next.effectiveDPR);
+  graphicsResolution=next;return true;
+}
+function handleGraphicsCommand(detail){
+  if(!detail||typeof detail!=='object')return;
+  if(detail.action==='quality'&&graphicsAvailability().available){
+    const quality=normalizeGraphicsQuality(detail.value);
+    if(quality){
+      graphicsQuality=quality;try{localStorage.setItem('anatomia-graphics-v1',quality);graphicsPersistent=true;}catch{graphicsPersistent=false;}
+      applyGraphicsResolution();
+    }
+  }
+  publishGraphicsState();
+}
+document.addEventListener('anatomia:graphics-command',event=>handleGraphicsCommand(event.detail));
+
+function readCameraFrame(){
+  const viewport=$('#viewport'),realLayout=typeof getComputedStyle==='function',r=viewport.getBoundingClientRect();
+  const height=viewport.clientHeight||(realLayout?r.height:0)||600;
+  const width=viewport.clientWidth||(realLayout?r.width:0)||(camera?.aspect||1)*height;
+  const obstacles=[];
+  if(realLayout)for(const selector of ['.stage-caption','.system-dock','.atlas-shortcuts','#detail','#catalog','#scene-panel','.stage-tools','.viewer-controls','.viewer-angle-control']){
+    const el=$(selector);if(!el||el.hidden||el.getClientRects?.().length===0)continue;
+    const style=getComputedStyle(el);if(style.display==='none'||style.visibility==='hidden'||Number(style.opacity)===0)continue;
+    const box=el.getBoundingClientRect();if(!box.width||!box.height)continue;
+    const obstacle={left:box.left-r.left,top:box.top-r.top,right:box.left-r.left+box.width,bottom:box.top-r.top+box.height};
+    if(obstacle.right>0&&obstacle.left<width&&obstacle.bottom>0&&obstacle.top<height)obstacles.push(obstacle);
+  }
+  return safeSceneFrame(width,height,obstacles);
+}
+function refreshCameraFrame(){
+  if(!camera||xrActive)return cameraFrameState;
+  const frame=readCameraFrame(),w=frame.viewportWidth,h=frame.viewportHeight;
+  camera.aspect=w/h;camera.clearViewOffset();
+  const x=w/2-frame.centerX,y=h/2-frame.centerY;
+  if(Math.abs(x)>.01||Math.abs(y)>.01)camera.setViewOffset(w,h,x,y,w,h);
+  camera.updateProjectionMatrix();cameraFrameState=frame;return frame;
+}
+function radiusForSceneBox(box,theta=view.turn?.to??view.theta,phi=view.turn?.toPhi??view.phi){
+  return fittedSceneRadius(box.getSize(new THREE.Vector3()).toArray(),{theta,phi,fov:camera?.fov||35,frame:refreshCameraFrame()});
+}
+function frameAtlasHome(allowFind=false){
+  if(!loaded||fallbackMode||xrActive||(quiz&&!(allowFind&&quiz.type==='find'))||lesson||physio)return false;
+  const ids=visibleSceneIds(),box=new THREE.Box3();ids.flatMap(id=>organMeshes.get(id)||[]).forEach(mesh=>box.expandByObject(mesh));
+  if(box.isEmpty())return false;
+  const radius=radiusForSceneBox(box,.13,1.52);
+  view.toTarget.copy(box.getCenter(new THREE.Vector3()));view.toRadius=radius;
+  sceneZoomLimit=Math.max(3.7,radius);sceneFit={ids:[...ids],aspect:camera.aspect,radius,kind:'home',frame:{...cameraFrameState}};
+  initialPresentationFramed=true;syncZoomControls();scheduleSceneState();return true;
+}
 function focusOrgan(keepAngle=false){
   if(!loaded)return;if(xrActive){if(isolated)xrFocusOrgan();return}
   const c=centers.get(selected);if(!c)return;const box=new THREE.Box3();focusedIds().flatMap(id=>organMeshes.get(id)||[]).forEach(m=>box.expandByObject(m));
-  view.toTarget.copy(box.getCenter(new THREE.Vector3()));view.toRadius=THREE.MathUtils.clamp(box.getSize(new THREE.Vector3()).length()*2.1*Math.max(1,1/(camera?.aspect||1)),.28,25);
-  sceneFit=null;sceneZoomLimit=Math.max(3.7,view.toRadius);
-  if(comparison3D){comparison3D.fitRadius=view.toRadius;comparison3D.fitAspect=camera?.aspect||1;comparison3D.fitAutomatic=true;}
+  const targetTheta=(!lesson&&!keepAngle) ? .12 : (view.turn?.to??view.theta),targetPhi=(!lesson&&!keepAngle) ? 1.5 : (view.turn?.toPhi??view.phi);
+  view.toTarget.copy(box.getCenter(new THREE.Vector3()));view.toRadius=radiusForSceneBox(box,targetTheta,targetPhi);
+  sceneFit={ids:[...focusedIds()],aspect:camera.aspect,radius:view.toRadius,kind:'focus',frame:{...cameraFrameState}};sceneZoomLimit=Math.max(3.7,view.toRadius);
+  if(comparison3D){comparison3D.fitRadius=view.toRadius;comparison3D.fitAspect=camera?.aspect||1;comparison3D.fitAutomatic=true;comparison3D.frame={...cameraFrameState};}
+  initialPresentationFramed=true;
   scheduleSceneState();
   if(!lesson&&!keepAngle)turnTo(.12,1.5);syncZoomControls();
 }
@@ -92,7 +176,7 @@ function home(){
   if(comparison3D){isolated=true;contextMode=false;focusOrgan();applyAppearance();renderCard();syncStagePrompt();return;}
   if(xrActive){xrInspectCenter=null;modelRoot.rotation.set(0,0,0);modelRoot.scale.setScalar(1);modelRoot.position.set(0,0,-1.45)}
   sceneFit=null;sceneZoomLimit=3.7;view.toTarget.set(0,1.26,0);view.toRadius=1.88;turnTo(.13,1.52);isolated=false;contextMode=false;
-  applyAppearance();if(!quiz)renderCard();$('#view-name').textContent='ВИД СПЕРЕДИ';
+  applyAppearance();if(!quiz)renderCard();frameAtlasHome(quiz?.type==='find');$('#view-name').textContent='ВИД СПЕРЕДИ';
 }
 
 function applyAppearance(){
@@ -101,7 +185,10 @@ function applyAppearance(){
   for(const [id,list]of organMeshes){const o=byId(id),ghost=isolated&&contextMode&&!focus.includes(id);list.forEach(m=>{
     m.visible=!hiddenOrgans.has(id)&&(!isolated||focus.includes(id)||contextMode)&&(!!quiz||!!lesson||filter==='all'||o.system===filter);
     const highlight=revealed?revealed.includes(id):comparison3D?comparison3D.ids.includes(id):id===selected&&!quiz;
-    m.material.emissive.set(highlight?o.color:'#000000');m.material.emissiveIntensity=highlight?(revealed ? .3 : .13):0;
+    const atlas=!quiz&&!lesson&&!physio,profile=surfaceProfile(id);
+    m.material.color.set(o.color);if(atlas&&!highlight)m.material.color.multiplyScalar(selectionProfile.unselectedBrightness);
+    m.material.roughness=profile.roughness-(atlas&&highlight&&!ghost?selectionProfile.roughnessReduction:0);
+    m.material.emissive.set(highlight?o.color:'#000000');m.material.emissiveIntensity=highlight?(revealed?selectionProfile.answerEmissive:atlas?selectionProfile.emissive:.13):0;
     if(m.material.transparent!==ghost){m.material.transparent=ghost;m.material.needsUpdate=true}
     m.material.opacity=ghost ? contextOpacity : 1;m.material.depthWrite=!ghost;m.renderOrder=ghost?-1:0;
   })}
@@ -112,8 +199,8 @@ function applyAppearance(){
 function showModal(html){$('#modal-content').innerHTML=html;const title=$('#modal-content h2');if(title){title.id='modal-title';$('#modal').setAttribute('aria-labelledby','modal-title')}$('#modal').showModal()}
 function practice(){setNav('practice');openPracticeHub({fallbackMode:fallbackMode||!loaded,viewed:progress.viewed.length});}
 
-function about(){setNav('sources');showModal(`<div class="modal-eyebrow">ОБ АТЛАСЕ / ВЕРСИЯ 1.8</div><h2>Анатомия, которую<br>можно рассмотреть.</h2><p>Учебный 3D-атлас для медицинского колледжа. 16 органов и групп структур, пространственный практикум, задания на функции и WebXR. Отбор структур предназначен для вводного изучения макроанатомии.</p><p><b>Как работать:</b> выберите орган в каталоге или на модели; вращайте перетаскиванием, приближайте колесом или щипком. Shift + перетаскивание, правая кнопка мыши или движение двумя пальцами перемещают вид. Стрелки вращают вид, + / − меняют масштаб, H возвращает общий вид. После фокуса на сцене WASD перемещают прицел, Enter выбирает орган. Латеральность указана относительно тела. Скелет служит ориентиром; цвет органов условный.</p><p><b>VR:</b> откройте сайт по HTTPS в браузере совместимого шлема и нажмите «Войти в VR». Триггер выбирает орган или кнопку панели; стик вращает модель. Кнопки на панели: предыдущий / следующий орган, изоляция, поиск, выход. В шлеме доступен пространственный поиск; тесты с вариантами и расчётная модель доступны в обычном режиме. Доступность VR зависит от устройства и браузера.</p><p><b>Границы модели:</b> это образовательная визуализация, не диагностический инструмент и не тренажёр выполнения вмешательств. Не все отделы и микроструктуры представлены; размеры и расположение отражают исходную модель, а не варианты нормы у конкретного человека. Перед применением в оценивании содержание следует согласовать с преподавателем.</p><h3>Источники и лицензии</h3><ul class="source-list"><li>Геометрия: <a href="https://github.com/Z-Anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D, DBCLS; WebGL-экспорт: <a href="https://github.com/nqwrc/3d-anatomy" target="_blank" rel="noopener">nqwrc/3d-anatomy</a>. Компоненты имеют разные лицензии, в том числе модели почек — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a> с некоммерческими условиями. Модели отобраны, объединены и оптимизированы; лицензии и авторство сохранены в <a href="./models/License.txt" target="_blank">исходном уведомлении</a> и <a href="./ASSET_SOURCES.md" target="_blank">описании источников</a>.</li><li>Учебные факты сверены с OpenStax, <i>Anatomy and Physiology 2e</i>, Betts et al. Ссылки на разделы приведены в каждой карточке. Формулировки карточек и задания составлены для этого атласа; изображения и задания учебника не копировались.</li><li>Рендеринг: <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> (MIT). Ключи и аккаунты не требуются. Данные о пациентах не используются.</li></ul><button class="secondary" id="export">Скачать мой результат</button>`);$('#export').onclick=()=>{const b=new Blob([JSON.stringify({application:'ANATOMIA',version:'1.8.0',exported:new Date().toISOString(),...progress},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='anatomia-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}}
-function startQuiz(type,items,scope){if(type==='find'&&(!loaded||fallbackMode)){toast('Пространственный поиск доступен после загрузки 3D. В резервном режиме работают вопросы и ситуации.');return}clearStudyModes();toggleCatalog(false);setSceneOnly(false);$('#modal').close();reviewedQuiz=null;quiz={type,items:items||(type==='find'?shuffle(organs.map(o=>o.id)).slice(0,8):type==='case'?cases:shuffle(organs.map(o=>o.id)).slice(0,8)),index:0,score:0,answered:false,last:null,custom:!!items,scope:scope==='review'?'review':items?'custom':'standard',history:[],optionOrder:null};document.body.classList.add('in-practice');isolated=false;autoRotate=false;$('#system').value='all';$('#search').value='';setNav('practice');home();renderList();renderQuiz();updateXRPanel();if(type!=='find')focusQuestion();else focusScene()}
+function about(){setNav('sources');showModal(`<div class="modal-eyebrow">ОБ АТЛАСЕ / ВЕРСИЯ 1.9</div><h2>Анатомия, которую<br>можно рассмотреть.</h2><p>Учебный 3D-атлас для медицинского колледжа. 16 органов и групп структур, пространственный практикум, задания на функции и WebXR. Отбор структур предназначен для вводного изучения макроанатомии.</p><p><b>Как работать:</b> выберите орган в каталоге или на модели; вращайте перетаскиванием, приближайте колесом или щипком. Shift + перетаскивание, правая кнопка мыши или движение двумя пальцами перемещают вид. Стрелки вращают вид, + / − меняют масштаб, H возвращает общий вид. После фокуса на сцене WASD перемещают прицел, Enter выбирает орган. Латеральность указана относительно тела. Скелет служит ориентиром; цвет органов условный.</p><p><b>Качество 3D:</b> в настройках сцены доступны «Авто», «Высокое» и «Экономное». Они меняют разрешение изображения; выбор сохраняется на этом устройстве. Студийный свет и параметры поверхности помогают читать форму исходной модели. В показе стрелки ← / → переключают шаги, Home / End ведут к первому / последнему шагу, Esc завершает показ — когда фокус находится в его панели.</p><p><b>VR:</b> откройте сайт по HTTPS в браузере совместимого шлема и нажмите «Войти в VR». Триггер выбирает орган или кнопку панели; стик вращает модель. Кнопки на панели: предыдущий / следующий орган, изоляция, поиск, выход. В шлеме доступен пространственный поиск; тесты с вариантами и расчётная модель доступны в обычном режиме. Доступность VR зависит от устройства и браузера.</p><p><b>Границы модели:</b> это образовательная визуализация, не диагностический инструмент и не тренажёр выполнения вмешательств. Не все отделы и микроструктуры представлены; размеры и расположение отражают исходную модель, а не варианты нормы у конкретного человека. Перед применением в оценивании содержание следует согласовать с преподавателем.</p><h3>Источники и лицензии</h3><ul class="source-list"><li>Геометрия: <a href="https://github.com/Z-Anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D, DBCLS; WebGL-экспорт: <a href="https://github.com/nqwrc/3d-anatomy" target="_blank" rel="noopener">nqwrc/3d-anatomy</a>. Компоненты имеют разные лицензии, в том числе модели почек — <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a> с некоммерческими условиями. Модели отобраны, объединены и оптимизированы; лицензии и авторство сохранены в <a href="./models/License.txt" target="_blank">исходном уведомлении</a> и <a href="./ASSET_SOURCES.md" target="_blank">описании источников</a>.</li><li>Учебные факты сверены с OpenStax, <i>Anatomy and Physiology 2e</i>, Betts et al. Ссылки на разделы приведены в каждой карточке. Формулировки карточек и задания составлены для этого атласа; изображения и задания учебника не копировались.</li><li>Рендеринг: <a href="https://threejs.org" target="_blank" rel="noopener">Three.js</a> (MIT). Ключи и аккаунты не требуются. Данные о пациентах не используются.</li></ul><button class="secondary" id="export">Скачать мой результат</button>`);$('#export').onclick=()=>{const b=new Blob([JSON.stringify({application:'ANATOMIA',version:'1.9.0',exported:new Date().toISOString(),...progress},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='anatomia-progress.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}}
+function startQuiz(type,items,scope){if(type==='find'&&(!loaded||fallbackMode)){toast('Пространственный поиск доступен после загрузки 3D. В резервном режиме работают вопросы и ситуации.');return}clearStudyModes();toggleCatalog(false);setSceneOnly(false);$('#modal').close();reviewedQuiz=null;quiz={type,items:items||(type==='find'?shuffle(organs.map(o=>o.id)).slice(0,8):type==='case'?cases:shuffle(organs.map(o=>o.id)).slice(0,8)),index:0,score:0,answered:false,last:null,custom:!!items,scope:scope==='review'?'review':items?'custom':'standard',history:[],optionOrder:null};document.body.classList.add('in-practice');isolated=false;autoRotate=false;$('#system').value='all';$('#search').value='';setNav('practice');renderList();renderQuiz();if(type==='find')publishSceneState();home();updateXRPanel();if(type!=='find')focusQuestion();else focusScene()}
 function current(){if(!quiz)return null;return quiz.type==='case'?quiz.items[quiz.index]:byId(quiz.items[quiz.index])}
 function renderQuiz(){
   if(!quiz)return;updateFallback();document.body.classList.toggle('spatial-practice',quiz.type==='find');document.body.classList.toggle('quiz-finished',!!quiz.finished);syncStagePrompt();
@@ -146,18 +233,23 @@ function syncStagePrompt(){
 
 function answerFind(id){if(!quiz||quiz.answered||quiz.finished||quiz.type!=='find')return;quiz.answered=true;quiz.last=id;quiz.correct=id===current().id;if(quiz.correct)quiz.score++;selected=current().id;recordAnswer();applyAppearance();renderQuiz();updateXRPanel();toast(quiz.correct?'Верно ✓':'Нужный орган выделен. Нажмите «Показать».');}
 function answerChoice(index){if(!quiz||quiz.answered||quiz.finished)return;quiz.answered=true;quiz.last=index;quiz.correct=index===current().answer;if(quiz.correct)quiz.score++;selected=quiz.type==='case'?current().target:current().id;recordAnswer();applyAppearance();renderQuiz();$('.feedback')?.focus({preventScroll:true});updateXRPanel()}
-function nextQuestion(){if(!quiz?.answered||quiz.finished)return;quiz.index++;if(quiz.index>=quiz.items.length){quiz.finished=true;if(!quiz.custom)progress.best[quiz.type]=Math.max(Number(progress.best[quiz.type])||0,quiz.score);progress.lastAttempt={type:quiz.type,score:quiz.score,total:quiz.items.length,date:new Date().toISOString(),completedAt:new Date().toISOString(),scope:quiz.scope||'custom',answers:quiz.history};save();renderQuiz();focusQuestion();updateXRPanel();return}quiz.answered=false;quiz.last=null;quiz.optionOrder=null;home();renderQuiz();if(quiz.type!=='find')focusQuestion();else focusScene();updateXRPanel()}
+function nextQuestion(){if(!quiz?.answered||quiz.finished)return;quiz.index++;if(quiz.index>=quiz.items.length){quiz.finished=true;if(!quiz.custom)progress.best[quiz.type]=Math.max(Number(progress.best[quiz.type])||0,quiz.score);progress.lastAttempt={type:quiz.type,score:quiz.score,total:quiz.items.length,date:new Date().toISOString(),completedAt:new Date().toISOString(),scope:quiz.scope||'custom',answers:quiz.history};save();renderQuiz();focusQuestion();updateXRPanel();return}quiz.answered=false;quiz.last=null;quiz.optionOrder=null;renderQuiz();home();if(quiz.type!=='find')focusQuestion();else focusScene();updateXRPanel()}
 function exitQuiz(){quiz=null;document.body.classList.remove('in-practice','spatial-practice','quiz-finished');isolated=false;setNav('atlas');renderList();renderCard();home();syncStagePrompt();updateXRPanel();$(fallbackMode?'#detail':'#viewport').focus({preventScroll:true})}
 function createLabels(){for(const o of organs){const d=document.createElement('div');d.className='label';d.textContent=o.name;$('#labels').append(d);labelNodes.set(o.id,d)}}
 function updateLabels(){if(!camera)return;const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;let used=[];for(const o of organs){const d=labelNodes.get(o.id);const active=o.id===selected||comparison3D?.ids.includes(o.id);const allowed=!hiddenOrgans.has(o.id)&&showLabels&&!quiz&&!xrActive&&(active||(!isolated&&['brain','lungR','liver','bladder'].includes(o.id)));const m=organMeshes.get(o.id)?.[0];if(!allowed||!m?.visible){d.hidden=true;continue}const pos=centers.get(o.id).clone();modelRoot.localToWorld(pos);const p=pos.project(camera);let x=(p.x*.5+.5)*w,y=(-p.y*.5+.5)*h;const left=o.id.endsWith('R')||o.id==='liver'||o.id==='brain';x+=left?-74:74;const clash=used.some(v=>Math.abs(v[1]-y)<30&&Math.abs(v[0]-x)<135);if(clash&&!active){d.hidden=true;continue}d.hidden=p.z>1||p.z<0||x<45||x>w-45||y<145||y>h-140;if(!d.hidden){used.push([x,y]);d.style.left=x+'px';d.style.top=y+'px';d.classList.toggle('active',active)}}}
 function resize(){
   if(!renderer||!camera||xrActive||fallbackMode)return;
   const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;if(!w||!h)return;
-  const previousAspect=camera.aspect;camera.aspect=w/h;camera.clearViewOffset();if(w>700)camera.setViewOffset(w,h,w*.08,0,w,h);
-  camera.updateProjectionMatrix();renderer.setSize(w,h);
-  if(comparison3D&&comparison3D.fitAutomatic!==false&&previousAspect>0&&Math.abs(camera.aspect/(comparison3D.fitAspect||previousAspect)-1)>.08)focusOrgan(true);
-  else if(sceneFit&&previousAspect>0&&Math.abs(camera.aspect/sceneFit.aspect-1)>.08)fitSceneView();
-  scheduleSceneState();
+  const previousAspect=camera.aspect;refreshCameraFrame();applyGraphicsResolution(w,h);renderer.setSize(w,h);
+  const changed=old=>!old||Math.abs(cameraFrameState.width/old.width-1)>.08||Math.abs(cameraFrameState.height/old.height-1)>.08;
+  // A layout change may refit an explicitly automatic view, never an active exercise or a saved/manual camera.
+  if(!quiz&&!lesson&&!physio){
+    if(comparison3D&&comparison3D.fitAutomatic!==false&&previousAspect>0&&(Math.abs(camera.aspect/(comparison3D.fitAspect||previousAspect)-1)>.08||changed(comparison3D.frame)))focusOrgan(true);
+    else if(sceneFit&&previousAspect>0&&(Math.abs(camera.aspect/sceneFit.aspect-1)>.08||changed(sceneFit.frame))){
+      if(sceneFit.kind==='home')frameAtlasHome();else if(sceneFit.kind==='focus')focusOrgan(true);else fitSceneView();
+    }
+  }
+  scheduleSceneState();publishGraphicsState();
 }
 function cameraUpdate(dt){if(xrActive)return;if(view.turn){const t=view.turn;t.time=Math.min(1,t.time+dt/0.9);const u=reduced?1:t.time*t.time*(3-2*t.time);view.theta=THREE.MathUtils.lerp(t.from,t.to,u);view.phi=THREE.MathUtils.lerp(t.fromPhi,t.toPhi,u);if(t.time>=1||reduced)view.turn=null;}view.target.lerp(view.toTarget,reduced?1:Math.min(1,dt*9));view.radius=THREE.MathUtils.lerp(view.radius,view.toRadius,reduced?1:Math.min(1,dt*9));if(autoRotate)view.theta+=dt*.15;const s=Math.sin(view.phi);camera.position.set(view.target.x+view.radius*s*Math.sin(view.theta),view.target.y+view.radius*Math.cos(view.phi),view.target.z+view.radius*s*Math.cos(view.theta));camera.lookAt(view.target);const angle=currentAngle(),left=$('.left-marker'),right=$('.right-marker');
   if(left.dataset.angle!==angle){
@@ -204,7 +296,7 @@ function bindOrbit(){
       pinch=distance;dragged=true;
     }else if(points.size===1){
       if(panning){panScene(e.clientX-old.x,e.clientY-old.y,c);dragged=true;}
-      else{view.theta-=(e.clientX-old.x)*.006;view.phi=THREE.MathUtils.clamp(view.phi-(e.clientY-old.y)*.005,.1,Math.PI-.1);if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)dragged=true;}
+      else{manualCameraChange();view.theta-=(e.clientX-old.x)*.006;view.phi=THREE.MathUtils.clamp(view.phi-(e.clientY-old.y)*.005,.1,Math.PI-.1);if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)dragged=true;}
     }
     syncZoomControls();
   });
@@ -218,6 +310,7 @@ function bindOrbit(){
   on($('#viewport'),'keydown',e=>{
     if(!loaded||fallbackMode||xrActive)return;
     view.turn=null;autoRotate=false;
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))manualCameraChange();
     if(e.key==='ArrowLeft')view.theta+=.15;
     else if(e.key==='ArrowRight')view.theta-=.15;
     else if(e.key==='ArrowUp')view.phi=Math.max(.1,view.phi-.1);
@@ -257,6 +350,9 @@ function setViewerAngle(value){
   if(!loaded||fallbackMode||xrActive)return;
   const angles={front:[0,Math.PI/2],right:[-Math.PI/2,Math.PI/2],back:[Math.PI,Math.PI/2],left:[Math.PI/2,Math.PI/2],top:[0,.12],bottom:[0,Math.PI-.12]};
   autoRotate=false;applyAppearance();if(Object.hasOwn(angles,value))turnTo(...angles[value]);else view.turn=null;
+  if(Object.hasOwn(angles,value)&&!quiz&&!lesson&&!physio&&(sceneFit||comparison3D?.fitAutomatic)){
+    if(sceneFit?.kind==='focus'||comparison3D)focusOrgan(true);else fitSceneView();
+  }
   scheduleSceneState();
 }
 function currentAngle(){
@@ -280,7 +376,7 @@ function syncViewerControls(){
   const vr=$('#vr');if(vr)vr.hidden=fallbackMode||!loaded||vrSupported===false;
   const retry=$('#retry-3d');if(retry){retry.disabled=busy;retry.textContent=busy?'Загрузка…':loaded?'Вернуться в 3D':'Попробовать 3D';}
   document.body.classList.toggle('viewer-loading',busy);
-  syncZoomControls();syncFullscreenButton();scheduleSceneState();
+  syncZoomControls();syncFullscreenButton();scheduleSceneState();publishGraphicsState();
 }
 function syncFullscreenButton(){
   const b=$('#viewer-fullscreen');if(!b)return;const active=!!document.fullscreenElement||theatreMode;
@@ -303,6 +399,7 @@ function bindViewerControls(){
   $('#viewer-fullscreen')?.addEventListener('click',toggleFullscreen);
   document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('viewer-native-fullscreen',!!document.fullscreenElement);syncFullscreenButton();resize();if(fallbackMode)setImageTransform();});
   globalThis.addEventListener?.('resize',()=>{resize();if(fallbackMode)setImageTransform();});
+  document.addEventListener('anatomia:scene-layout',()=>resize());
   const image=$('#fallback-image');if(!image)return;image.setAttribute('tabindex','0');image.setAttribute('draggable','false');image.title='Клавиши + / − — масштаб, стрелки — перемещение увеличенного изображения, H — сброс';
   let drag=null;
   image.addEventListener('pointerdown',e=>{if(!fallbackMode||imageScale<=1||e.button>0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,offset:{...imageOffset}};image.setPointerCapture(e.pointerId);e.preventDefault();});
@@ -318,7 +415,7 @@ function makeXR(){xrCanvas=document.createElement('canvas');xrCanvas.width=xrCan
 function xrSelect(controller){const temp=new THREE.Matrix4().extractRotation(controller.matrixWorld);raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);raycaster.ray.direction.set(0,0,-1).applyMatrix4(temp);const panel=raycaster.intersectObject(xrPanel)[0];const hits=raycaster.intersectObjects(meshes,false).filter(h=>h.object.visible&&!hiddenOrgans.has(h.object.userData.organId)&&h.object.material.opacity>.3);if(panel&&(!hits[0]||panel.distance<hits[0].distance)){const x=panel.uv.x*1024,y=(1-panel.uv.y)*1024;if(y>=744&&y<958){const col=Math.floor((x-30)/330),row=y<836?0:y>=866?1:-1;if(col>=0&&col<3&&row>=0&&x>=30+col*330&&x<=334+col*330)xrAction(row,col)}return}if(hits[0]){const id=hits[0].object.userData.organId;if(comparison3D){if(comparison3D.ids.includes(id)){selected=id;renderCard();applyAppearance();}}else select(id)}}
 function xrAction(row,col){if(quiz){if(col===2){renderer.xr.getSession()?.end();return}if(col===0){if(row===0&&quiz.answered&&!quiz.finished)inspectAnswer();else{clearStudyModes();exitQuiz()};return}if(row===1||quiz.finished){startQuiz('find');return}if(quiz.answered)nextQuestion();else home();return}if(row===1){if(col===0)home();if(col===1)startQuiz('find');if(col===2)renderer.xr.getSession()?.end()}else if(col===1){isolated=!isolated;if(isolated)xrFocusOrgan();else home();applyAppearance();renderCard()}else{const index=organs.findIndex(o=>o.id===selected);select(organs[(index+(col===0?-1:1)+organs.length)%organs.length].id)}updateXRPanel()}
 async function enterVR(){let session;if(!loaded||fallbackMode){showModal('<div class="modal-eyebrow">РЕЖИМ VR</div><h2>Для VR нужна работающая 3D-сцена.</h2><p>В этом режиме доступны карточки, вопросы и расчёт МОК. Для пространственного просмотра откройте эту же ссылку в браузере с WebGL 2, а для VR — в совместимом шлеме с WebXR.</p>');return}try{if(!navigator.xr||!await navigator.xr.isSessionSupported('immersive-vr')){showModal('<div class="modal-eyebrow">РЕЖИМ VR</div><h2>Откройте атлас в шлеме.</h2><p>Этот браузер не сообщает о поддержке immersive WebXR. Откройте эту же HTTPS‑ссылку в совместимом браузере VR‑шлема, например Meta Quest Browser.</p><p>На компьютере и телефоне доступен весь 3D‑атлас и практикум. Поддержка VR зависит от устройства, браузера и разрешений.</p>');return}if(lesson||physio||comparison3D)exitStudy();hiddenOrgans.clear();applyAppearance();if(quiz&&quiz.type!=='find')exitQuiz();session=await navigator.xr.requestSession('immersive-vr',{requiredFeatures:['local-floor']});await renderer.xr.setSession(session)}catch(err){if(session)await session.end().catch(()=>{});toast('Не удалось войти в VR. Проверьте подключение шлема и разрешение браузера.');console.error('WebXR session:',err)}}
-async function loadGLB(url){const loader=new GLTFLoader();return loader.loadAsync(new URL(url,rootURL).href)}
+async function loadGLB(url,onProgress){const loader=new GLTFLoader();return loader.loadAsync(new URL(url,rootURL).href,onProgress)}
 function disposeObject(object){
   const geometries=new Set(),materials=new Set();
   object?.traverse?.(node=>{if(node.geometry)geometries.add(node.geometry);for(const material of Array.isArray(node.material)?node.material:node.material?[node.material]:[])materials.add(material);});
@@ -331,6 +428,7 @@ function disposeViewer(){
   meshes.length=0;organMeshes.clear();centers.clear();labelNodes.clear();controllers.length=0;xrButtons.length=0;
   $('#labels').innerHTML='';scene=renderer=camera=modelRoot=anatomy=skeleton=raycaster=null;
   xrPanel=xrCanvas=xrCtx=xrTexture=xrInspectCenter=null;xrHover=-1;xrActive=false;loaded=false;skeletonLoad='idle';
+  graphicsResolution=null;graphicsMaxSize=8192;cameraFrameState=null;publishGraphicsState();
 }
 function applyInitialScene(){
   if(initialSceneApplied)return;initialSceneApplied=true;
@@ -358,6 +456,8 @@ function resume3DView(){
   $('#viewport').hidden=false;renderer.domElement.hidden=false;$('#fallback-view').hidden=true;$('#fallback-status').hidden=true;$('#loading').hidden=true;$('#labels').hidden=false;
   $('#viewport').setAttribute('aria-label','3D модель. Перетаскивание — вращение. Shift или правая кнопка с перетаскиванием, два пальца — перемещение. Щипок и плюс или минус — масштаб. Стрелки — вращение, H — общий вид. WASD — прицел, Enter — выбор.');
   resize();applyAppearance();renderCard();syncStagePrompt();syncViewerControls();prevTime=0;
+  if(initialPresentationPending&&!initialPresentationFramed){if(isolated&&!quiz&&!physio)focusOrgan();else frameAtlasHome();}
+  if(initialPresentationFramed)initialPresentationPending=false;
   renderer.setAnimationLoop?.(renderFrame);return true;
 }
 async function setViewerMode(mode){
@@ -379,28 +479,33 @@ async function init({force3D=false}={}){
   loadingTimer=setTimeout(()=>{if(epoch===viewerEpoch&&viewerLoad==='loading')activateFallback('3D не успел загрузиться');},15000);
   try{
     renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;
+    renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=studioLightProfile.exposure;
+    try{const gl=renderer.getContext?.();graphicsMaxSize=Math.min(renderer.capabilities?.maxTextureSize||8192,gl?.getParameter(gl.MAX_RENDERBUFFER_SIZE)||8192);}catch{graphicsMaxSize=4096;}
     renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType('local-floor');$('#viewport').append(renderer.domElement);
     renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();if(epoch===viewerEpoch)activateFallback('Связь с графическим модулем прервалась');});
     scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(35,1,.01,30);raycaster=new THREE.Raycaster();modelRoot=new THREE.Group();scene.add(modelRoot);
-    scene.add(new THREE.HemisphereLight(0xd6ebef,0x304444,2));
-    const key=new THREE.DirectionalLight(0xffe2ca,3.2);key.position.set(-1,2,3);scene.add(key);
-    const rim=new THREE.DirectionalLight(0x92ccce,2.3);rim.position.set(2,1,-2);scene.add(rim);
-    const fill=new THREE.DirectionalLight(0xe4edea,.9);fill.position.set(0,-1,2);scene.add(fill);
+    createStudioLights();
     bindOrbit();createLabels();makeXR();viewerResizeObserver=new ResizeObserver(()=>{resize();if(fallbackMode)setImageTransform();});viewerResizeObserver.observe($('#viewport'));
     if(!fallbackMode){resize();cameraUpdate(1);}
-    const gltf=await loadGLB('./models/atlas.glb');
+    const gltf=await loadGLB('./models/atlas.glb',event=>{
+      if(epoch!==viewerEpoch||viewerLoad!=='loading')return;
+      const measured=event.lengthComputable&&event.total>0,percent=measured?Math.min(100,Math.round(event.loaded/event.total*100)):null;
+      $('#load-status').textContent=percent===100?'Подготавливаем 3D-модель…':percent!==null?`Загружаем 3D-модель · ${percent}%`:'Загружаем исходную 3D-модель…';
+    });
     if(epoch!==viewerEpoch){disposeObject(gltf.scene);return;}
     anatomy=gltf.scene;modelRoot.add(anatomy);anatomy.updateMatrixWorld(true);
-    anatomy.traverse(m=>{if(!m.isMesh)return;let node=m,id;while(node&&!id){id=node.userData?.organId;node=node.parent;}if(!id||!byId(id))return;m.userData.organId=id;m.material=new THREE.MeshStandardMaterial({color:byId(id).color,roughness:.48,metalness:.035,side:THREE.DoubleSide});meshes.push(m);if(!organMeshes.has(id))organMeshes.set(id,[]);organMeshes.get(id).push(m);});
+    const materials=new Map(),sourceMaterials=new Set();
+    anatomy.traverse(m=>{if(!m.isMesh)return;let node=m,id;while(node&&!id){id=node.userData?.organId;node=node.parent;}if(!id||!byId(id))return;m.userData.organId=id;for(const material of Array.isArray(m.material)?m.material:[m.material])if(material)sourceMaterials.add(material);if(!materials.has(id))materials.set(id,createOrganMaterial(id));m.material=materials.get(id);meshes.push(m);if(!organMeshes.has(id))organMeshes.set(id,[]);organMeshes.get(id).push(m);});
+    anatomy.traverse(m=>{for(const material of Array.isArray(m.material)?m.material:m.material?[m.material]:[])sourceMaterials.delete(material);});sourceMaterials.forEach(material=>material.dispose?.());
     for(const organ of organs){const list=organMeshes.get(organ.id);if(!list?.length)throw Error('В модели отсутствует '+organ.id);const box=new THREE.Box3();list.forEach(m=>box.expandByObject(m));centers.set(organ.id,box.getCenter(new THREE.Vector3()));}
-    loaded=true;viewerLoad='ready';skeletonLoad='loading';clearTimeout(loadingTimer);$('#loading').hidden=true;
+    loaded=true;viewerLoad='ready';skeletonLoad='loading';initialPresentationPending=!initialPresentationFramed;clearTimeout(loadingTimer);$('#loading').hidden=true;
     if(viewerImagePreference)showImageView('Статичный вид исходной модели',false);
-    else{resume3DView();if(isolated&&!quiz&&!physio)focusOrgan();}
+    else resume3DView();
     renderList();runInitialDemo();refreshVRAvailability(epoch);
     loadGLB('./models/skeleton-context.glb').then(g=>{
       if(epoch!==viewerEpoch){disposeObject(g.scene);return;}
-      skeleton=g.scene;skeleton.traverse(m=>{if(m.isMesh){m.material=new THREE.MeshStandardMaterial({color:0x9db8b8,roughness:.85,transparent:true,opacity:.13,depthWrite:false,side:THREE.DoubleSide});m.renderOrder=-1;}});
+      skeleton=g.scene;const boneMaterial=new THREE.MeshStandardMaterial({color:0xa9c1c7,roughness:.84,metalness:0,transparent:true,opacity:.12,depthWrite:false,side:THREE.DoubleSide,forceSinglePass:true});
+      const boneSources=new Set();skeleton.traverse(m=>{if(m.isMesh){for(const material of Array.isArray(m.material)?m.material:[m.material])if(material)boneSources.add(material);m.material=boneMaterial;m.renderOrder=-1;}});boneSources.forEach(material=>material.dispose?.());
       modelRoot.add(skeleton);skeletonLoad='ready';applyAppearance();syncViewerControls();
     }).catch(error=>{if(epoch!==viewerEpoch)return;skeletonLoad='unavailable';showSkeleton=false;syncViewerControls();console.warn('Skeleton unavailable:',error);});
   }catch(error){if(epoch!==viewerEpoch)return;console.warn('Atlas unavailable; educational fallback active:',error);activateFallback('Не удалось загрузить 3D-сцену');}
@@ -452,10 +557,10 @@ function fitSceneView(){
   const ids=visibleSceneIds(),box=new THREE.Box3();
   ids.flatMap(id=>organMeshes.get(id)||[]).forEach(mesh=>box.expandByObject(mesh));
   if(!ids.length||box.isEmpty())return false;
-  const aspect=camera?.aspect||1,radius=THREE.MathUtils.clamp(box.getSize(new THREE.Vector3()).length()*2.1*Math.max(1,1/aspect),.28,25);
+  const radius=radiusForSceneBox(box),aspect=camera?.aspect||1;
   view.toTarget.copy(box.getCenter(new THREE.Vector3()));view.toRadius=radius;autoRotate=false;
-  sceneFit={ids:[...ids],aspect,radius};sceneZoomLimit=Math.max(3.7,radius);
-  if(comparison3D){comparison3D.fitRadius=radius;comparison3D.fitAspect=aspect;comparison3D.fitAutomatic=true;}
+  sceneFit={ids:[...ids],aspect,radius,frame:{...cameraFrameState}};sceneZoomLimit=Math.max(3.7,radius);
+  if(comparison3D){comparison3D.fitRadius=radius;comparison3D.fitAspect=aspect;comparison3D.fitAutomatic=true;comparison3D.frame={...cameraFrameState};}
   syncZoomControls();scheduleSceneState();return true;
 }
 function setSceneComposition(ids){
@@ -586,14 +691,14 @@ function focusScene(){if(xrActive)return;$('#viewport').focus({preventScroll:tru
 function restoreResults(){if(!reviewedQuiz)return;quiz=reviewedQuiz;reviewedQuiz=null;document.body.classList.add('in-practice');setNav('practice');home();renderList();renderQuiz();focusQuestion();updateXRPanel()}
 
 function turnTo(theta,phi){let to=theta;while(to-view.theta>Math.PI)to-=Math.PI*2;while(to-view.theta< -Math.PI)to+=Math.PI*2;view.turn={from:view.theta,to,fromPhi:view.phi,toPhi:phi,time:0}}
-function toggleCatalog(open){if(quiz||lesson||physio||comparison3D)open=false;$('#catalog').hidden=!open;document.body.classList.toggle('catalog-open',open);$('#catalog-toggle').setAttribute('aria-expanded',String(open));if(open)$('#search').focus({preventScroll:true});else if(document.activeElement?.closest?.('#catalog'))$('#catalog-toggle').focus({preventScroll:true})}
-function setSceneOnly(on){document.body.classList.toggle('only-scene',on);$('#scene-only').setAttribute('aria-pressed',String(on));$('#scene-only').title=on?'Вернуть панели':'Скрыть панели';$('#scene-only').setAttribute('aria-label',$('#scene-only').title);if(on)toggleCatalog(false)}
+function toggleCatalog(open){if(quiz||lesson||physio||comparison3D)open=false;$('#catalog').hidden=!open;document.body.classList.toggle('catalog-open',open);$('#catalog-toggle').setAttribute('aria-expanded',String(open));if(open)$('#search').focus({preventScroll:true});else if(document.activeElement?.closest?.('#catalog'))$('#catalog-toggle').focus({preventScroll:true});resize()}
+function setSceneOnly(on){document.body.classList.toggle('only-scene',on);$('#scene-only').setAttribute('aria-pressed',String(on));$('#scene-only').title=on?'Вернуть панели':'Скрыть панели';$('#scene-only').setAttribute('aria-label',$('#scene-only').title);if(on)toggleCatalog(false);resize()}
 function cycleOrgan(direction){const filter=$('#system').value;const list=organs.filter(o=>filter==='all'||o.system===filter);const index=list.findIndex(o=>o.id===selected);select(list[(index+direction+list.length)%list.length].id,true)}
 function organInfo(id){const o=byId(id);showModal(`<div class="modal-eyebrow">${systemNames[o.system]}</div><h2>${o.name}</h2><div class="summary-latin">${o.latin}</div><div class="fact-block"><h3>Где находится</h3><p>${o.location}</p></div><div class="fact-block"><h3>Что делает</h3><p>${o.function}</p></div><div class="fact-block"><h3>Рассмотрите</h3><p>${o.landmark}</p></div><a class="source-link" href="${sources[o.source]}" target="_blank" rel="noopener">OpenStax · учебный источник ↗</a>`)}
 function clearStudyModes(){clearSceneEdits();lesson=null;lessonStep=0;physio=null;contextMode=false;document.body.classList.remove('in-lesson','in-physio');syncStagePrompt()}
 function exitStudy(){clearStudyModes();home();setNav('atlas');renderList();syncStagePrompt();updateXRPanel()}
 function startLesson(id){const next=lessons.find(l=>l.id===id);if(!next)return;if(!loaded||fallbackMode){toast('Этот маршрут требует 3D. Карточки и самопроверка доступны в разделе «Практика».');return}if(quiz)exitQuiz();clearStudyModes();lesson=next;lessonStep=0;autoRotate=false;$('#system').value='all';$('#search').value='';toggleCatalog(false);setSceneOnly(false);$('#modal').close();document.body.classList.add('in-lesson');setNav('practice');applyLessonStep()}
-function applyLessonStep(){if(!lesson)return;const step=lesson.steps[lessonStep];selected=step.selected;isolated=true;contextMode=false;for(const id of step.ids)if(!progress.viewed.includes(id))progress.viewed.push(id);save();applyAppearance();focusOrgan();turnTo(step.theta||0,step.phi||1.5);renderLesson();syncStagePrompt();if(xrActive)xrFocusOrgan();else $('#lesson-heading').focus({preventScroll:true})}
+function applyLessonStep(){if(!lesson)return;const step=lesson.steps[lessonStep];selected=step.selected;isolated=true;contextMode=false;for(const id of step.ids)if(!progress.viewed.includes(id))progress.viewed.push(id);save();applyAppearance();turnTo(step.theta||0,step.phi||1.5);focusOrgan();renderLesson();syncStagePrompt();if(xrActive)xrFocusOrgan();else $('#lesson-heading').focus({preventScroll:true})}
 function renderLesson(){if(!lesson)return;const step=lesson.steps[lessonStep],last=lessonStep===lesson.steps.length-1;
   $('#organ-card').innerHTML=`<div class="card-kicker"><span>СМОТРИТЕ И СРАВНИВАЙТЕ</span><span class="number">${lessonStep+1} / ${lesson.steps.length}</span></div><div class="lesson-count">${lesson.steps.map((_,i)=>`<i class="${i<=lessonStep?'active':''}"></i>`).join('')}</div><h2 id="lesson-heading" tabindex="-1">${step.title}</h2><p class="lesson-text">${step.text}</p><div class="lesson-actions"><button class="secondary" id="lesson-prev" aria-label="Предыдущий шаг" ${lessonStep===0?'disabled':''}>←</button><button class="primary" id="lesson-next">${last?'Проверить себя':'Далее'} ${icon(last?'check':'arrow')}</button></div><button class="context-button" id="lesson-context" aria-pressed="${contextMode}">${icon('layers')}Соседние органы</button><button class="text-button lesson-exit" id="lesson-exit">В атлас</button>`;
   $('#lesson-prev').onclick=()=>{if(lessonStep>0){lessonStep--;applyLessonStep()}};
@@ -647,11 +752,25 @@ function resetExperience(){
   $('#catalog-toggle').focus({preventScroll:true});toast('Начальный вид восстановлен. Сохранённый прогресс не удалён.');
 }
 function startDemo(){showDemoStep(0)}
+function handleDemoKey(event){
+  if(demoStep<0||event.altKey||event.ctrlKey||event.metaKey||event.target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
+  const key=event.key;
+  if(!['ArrowLeft','ArrowRight','Home','End','Escape'].includes(key))return;
+  event.preventDefault();event.stopPropagation?.();
+  if(key==='Escape'){stopDemo();return;}
+  if(key==='Home'){showDemoStep(0);return;}
+  if(key==='End'){showDemoStep(demoSteps.length-1);return;}
+  if(key==='ArrowLeft'){if(demoStep>0)showDemoStep(demoStep-1);return;}
+  if(demoStep===demoSteps.length-1)stopDemo();else showDemoStep(demoStep+1);
+}
+$('#demo-bar').addEventListener('keydown',handleDemoKey);
 function showDemoStep(index){
   if(index<0||index>=demoSteps.length)return;
   $('#modal').close();clearStudyModes();exitQuiz();reviewedQuiz=null;$('#search').value='';$('#system').value='all';toggleCatalog(false);setSceneOnly(false);autoRotate=false;
   demoStep=index;document.body.classList.add('demo-active');$('#demo-bar').hidden=false;
   $('#demo-count').textContent=`ПОКАЗ · ${index+1} / ${demoSteps.length}`;
+  const progress=$('#demo-progress');if(progress){progress.max=demoSteps.length;progress.value=index+1;progress.setAttribute('aria-label',`Шаг ${index+1} из ${demoSteps.length}: ${demoSteps[index].title}`);}
+  $('#demo-bar').setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight Home End Escape');
   $('#demo-title').textContent=demoSteps[index].title;$('#demo-hint').textContent=demoSteps[index].hint;
   $('#demo-prev').disabled=index===0;$('#demo-next').textContent=index===demoSteps.length-1?'Завершить':'Далее →';
   if(index===0){select('heart');home()}

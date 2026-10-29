@@ -6,6 +6,11 @@ const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({'&':'&am
 const byId = id => organs.find(organ => organ.id === id);
 const viewLabels = {front:'Спереди',back:'Сзади',right:'Справа',left:'Слева',top:'Сверху',bottom:'Снизу'};
 const presetLabels = {all:'Все структуры',cardiorespiratory:'Сердце и дыхание',digestive:'Пищеварение',urinary:'Почки и пузырь'};
+const qualityLabels = {auto:'Авто',high:'Высокое',eco:'Экономное'};
+const qualityHints = {auto:'Разрешение подбирается для этого экрана.',high:'Чётче изображение; выше нагрузка на устройство.',eco:'Меньше нагрузка на устройство при вращении модели.'};
+const viewStyleKey = 'anatomia-view-style-v1';
+const normalizeSearch = value => String(value).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/ё/g,'е').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+const searchNames = new Map(organs.map(organ=>[organ.id,normalizeSearch(`${organ.name} ${organ.latin}`)]));
 
 function initialiseScenePanel() {
   const stage = document.querySelector('.stage');
@@ -14,11 +19,17 @@ function initialiseScenePanel() {
   let storage;
   try { storage = localStorage; }
   catch { storage = {getItem(){throw new Error('Storage unavailable');},setItem(){throw new Error('Storage unavailable');}}; }
+  let viewStyle = 'light', viewStylePersistent = true;
+  try { if (storage.getItem(viewStyleKey) === 'studio') viewStyle = 'studio'; }
+  catch { viewStylePersistent = false; }
+  document.body.classList.toggle('studio-view',viewStyle === 'studio');
   const store = createSceneStore(storage);
   const sharedScene = sceneFromURL(location.href);
   let shared = sharedScene ? {scene:sharedScene,phase:'waiting',autoArmed:true,requestId:null} : null;
   let state = {available:false,reason:'Ожидаем состояние 3D-просмотра.',visible:[],hidden:[],selected:null,context:false,isolated:false,contextOpacity:.075,snapshot:null};
+  let graphicsState = {available:false,quality:'auto',effectiveDPR:null,reason:'Ожидаем готовность 3D-просмотра.'};
   let open = false, activeTab = 'organs', requestCounter = 0, deleteId = null, renameId = null, receivedState = false;
+  let receivedGraphicsState = false;
   let lastSavedSignature = '', lastApply = null, shareVersion = 0;
   const panel = document.createElement('aside');
   panel.id = 'scene-panel';
@@ -35,8 +46,9 @@ function initialiseScenePanel() {
         <div class="sp-section-label"><h3>Быстрый состав</h3><span id="scene-visible-count"></span></div>
         <div class="sp-presets" role="group" aria-label="Наборы структур">${scenePresets.map(preset=>`<button data-scene-preset="${preset.id}" data-scene-live aria-pressed="false" title="${escapeHTML(preset.name)}">${escapeHTML(presetLabels[preset.id] || preset.name)}</button>`).join('')}</div>
         <section class="sp-camera" aria-labelledby="scene-camera-title"><h3 id="scene-camera-title">Ракурс</h3><div class="sp-views" role="group" aria-label="Ракурс модели">${Object.entries(viewLabels).map(([value,label])=>`<button data-scene-view="${value}" data-scene-live>${label}</button>`).join('')}</div><button class="sp-fit" data-scene-ui="fit" data-scene-live>${icon('focus')}Всё видимое в кадре</button><p class="sp-help">Вращайте модель мышью или касанием. Настройки сцены остаются открытыми.</p></section>
-        <details class="sp-composition" open><summary>Состав сцены <span>Показывать / скрывать</span></summary><p class="sp-help">Снимите отметку, чтобы открыть обзор за органом. Последняя видимая структура останется в сцене.</p>${groups.map(group=>`<fieldset class="sp-organ-group"><legend>${escapeHTML(group.name)}</legend>${group.items.map(organ=>`<div class="sp-organ-row" data-scene-row="${organ.id}"><label class="sp-organ-label"><input type="checkbox" data-scene-visible="${organ.id}" data-scene-live aria-label="Показывать: ${escapeHTML(organ.name)}"><span><b>${escapeHTML(organ.name)}</b><small>${escapeHTML(organ.latin)}</small></span></label><button class="sp-select-organ" data-scene-organ="${organ.id}" data-scene-live title="Выбрать и рассмотреть: ${escapeHTML(organ.name)}" aria-label="Выбрать и рассмотреть: ${escapeHTML(organ.name)}">${icon('focus')}</button></div>`).join('')}</fieldset>`).join('')}</details>
+        <details class="sp-composition"><summary><span class="sp-composition-title">Состав сцены <small>Поиск и видимость</small></span><span id="scene-composition-count">${organs.length} структур</span></summary><div class="sp-search"><label for="scene-organ-search">Найти орган</label><div class="sp-search-field"><input id="scene-organ-search" type="search" placeholder="Название или латынь" maxlength="100" autocomplete="off" spellcheck="false" aria-describedby="scene-search-count" aria-controls="scene-organ-results"><button type="button" data-scene-ui="clear-search" class="sp-search-clear" aria-label="Очистить поиск органов" hidden>${icon('close')}</button></div><p id="scene-search-count" role="status" aria-live="polite" aria-atomic="true"></p></div><p class="sp-help">Снимите отметку, чтобы открыть обзор за органом. Последняя видимая структура останется в сцене.</p><div id="scene-organ-results">${groups.map(group=>`<fieldset class="sp-organ-group" data-scene-group="${group.key}"><legend>${escapeHTML(group.name)}</legend>${group.items.map(organ=>`<div class="sp-organ-row" data-scene-row="${organ.id}"><label class="sp-organ-label"><input type="checkbox" data-scene-visible="${organ.id}" data-scene-live aria-label="Показывать: ${escapeHTML(organ.name)}"><span><b>${escapeHTML(organ.name)}</b><small>${escapeHTML(organ.latin)}</small></span></label><button class="sp-select-organ" data-scene-organ="${organ.id}" data-scene-live title="Выбрать и рассмотреть: ${escapeHTML(organ.name)}" aria-label="Выбрать и рассмотреть: ${escapeHTML(organ.name)}">${icon('focus')}</button></div>`).join('')}</fieldset>`).join('')}</div><div class="sp-search-empty" id="scene-search-empty" hidden><b>Ничего не найдено</b><p>Попробуйте часть русского или латинского названия.</p><button type="button" data-scene-ui="clear-search">Показать все органы</button></div></details>
         <section class="sp-context" aria-labelledby="scene-context-title"><h3 id="scene-context-title">Прозрачные соседи</h3><label class="sp-context-switch"><input id="scene-context-toggle" type="checkbox"><span>Показать соседние органы</span></label><p class="sp-help" id="scene-context-help">Изолируйте орган или откройте пару, чтобы включить соседние структуры.</p><label class="sp-range-label" for="scene-context-opacity"><span>Видимость соседей</span><output id="scene-opacity-value" for="scene-context-opacity">7,5%</output></label><input id="scene-context-opacity" type="range" min="0.03" max="0.3" step="0.005" value="0.075" aria-describedby="scene-context-help"></section>
+        <section class="sp-graphics" aria-labelledby="scene-graphics-title"><h3 id="scene-graphics-title">Графика</h3><p class="sp-control-label" id="scene-quality-label">Качество 3D</p><div class="sp-choice-group sp-quality" role="group" aria-labelledby="scene-quality-label" aria-describedby="scene-quality-help">${Object.entries(qualityLabels).map(([value,label])=>`<button type="button" data-graphics-quality="${value}" aria-pressed="false" disabled>${label}</button>`).join('')}</div><p class="sp-help" id="scene-quality-help"></p><p class="sp-control-label" id="scene-style-label">Фон сцены</p><div class="sp-choice-group sp-styles" role="group" aria-labelledby="scene-style-label"><button type="button" data-scene-style="light" aria-pressed="false"><span class="sp-style-swatch sp-swatch-light" aria-hidden="true"></span>Светлый</button><button type="button" data-scene-style="studio" aria-pressed="false"><span class="sp-style-swatch sp-swatch-studio" aria-hidden="true"></span>Студия</button></div><p class="sp-help" id="scene-style-help" hidden></p></section>
       </section>
       <section id="scene-page-saved" role="tabpanel" aria-labelledby="scene-tab-saved" hidden>
         <p class="sp-help sp-saved-intro">Сохраните состав органов, положение камеры, масштаб и подписи. К этому виду можно вернуться или открыть его по ссылке.</p>
@@ -50,9 +62,60 @@ function initialiseScenePanel() {
   const $ = selector => panel.querySelector(selector);
   const command = detail => document.dispatchEvent(new CustomEvent('anatomia:scene-command',{detail}));
   const requestState = () => command({action:'request'});
+  const graphicsCommand = detail => document.dispatchEvent(new CustomEvent('anatomia:graphics-command',{detail}));
+  const requestGraphics = () => graphicsCommand({action:'request'});
   const nextRequestId = () => `scene-panel-${++requestCounter}`;
   const setMessage = text => { $('#scene-panel-message').textContent = text || ''; };
   const isVisible = element => element?.isConnected && !element.disabled && !element.closest('[hidden],dialog:not([open])') && element.getClientRects().length > 0;
+
+  function filterComposition() {
+    const input = $('#scene-organ-search');
+    const query = normalizeSearch(input.value);
+    const words = query ? query.split(' ') : [];
+    let count = 0;
+    panel.querySelectorAll('[data-scene-row]').forEach(row=>{
+      const match = words.every(word=>searchNames.get(row.dataset.sceneRow)?.includes(word));
+      row.hidden = !match;
+      if (match) count++;
+    });
+    panel.querySelectorAll('[data-scene-group]').forEach(group=>{ group.hidden = !group.querySelector('[data-scene-row]:not([hidden])'); });
+    const description = words.length ? `Найдено: ${count} из ${organs.length}` : `В списке: ${organs.length} структур`;
+    if ($('#scene-search-count').textContent !== description) $('#scene-search-count').textContent = description;
+    $('#scene-composition-count').textContent = words.length ? `${count} из ${organs.length}` : `${organs.length} структур`;
+    $('.sp-search-clear').hidden = !input.value;
+    $('#scene-search-empty').hidden = count !== 0;
+  }
+
+  function clearSearch() {
+    const input = $('#scene-organ-search');
+    input.value = '';
+    filterComposition();
+    input.focus({preventScroll:true});
+  }
+
+  function patchGraphics() {
+    panel.querySelectorAll('[data-graphics-quality]').forEach(button=>{
+      button.disabled = !graphicsState.available;
+      button.setAttribute('aria-pressed',String(button.dataset.graphicsQuality === graphicsState.quality));
+    });
+    const description = graphicsState.available ? qualityHints[graphicsState.quality] : graphicsState.reason || 'Качество можно изменить после загрузки 3D.';
+    if ($('#scene-quality-help').textContent !== description) $('#scene-quality-help').textContent = description;
+  }
+
+  function patchViewStyle() {
+    panel.querySelectorAll('[data-scene-style]').forEach(button=>{ button.setAttribute('aria-pressed',String(button.dataset.sceneStyle === viewStyle)); });
+    $('#scene-style-help').hidden = viewStylePersistent;
+    $('#scene-style-help').textContent = viewStylePersistent ? '' : 'Фон доступен для этой страницы. Браузер не сохранил выбор.';
+  }
+
+  function setViewStyle(value) {
+    if (!['light','studio'].includes(value)) return;
+    viewStyle = value;
+    document.body.classList.toggle('studio-view',value === 'studio');
+    try { storage.setItem(viewStyleKey,value);viewStylePersistent = true; }
+    catch { viewStylePersistent = false; }
+    patchViewStyle();
+  }
 
   function updateShared() {
     const section = $('#scene-shared');
@@ -170,7 +233,9 @@ function initialiseScenePanel() {
     panel.hidden = false;
     document.body.classList.add('scene-panel-open');
     trigger.setAttribute('aria-expanded','true');
+    document.dispatchEvent(new CustomEvent('anatomia:scene-layout'));
     requestState();
+    requestGraphics();
     patchState();
     if (focus && open) $('#scene-panel-title').focus({preventScroll:true});
   }
@@ -181,6 +246,7 @@ function initialiseScenePanel() {
     panel.hidden = true;
     document.body.classList.remove('scene-panel-open');
     trigger.setAttribute('aria-expanded','false');
+    document.dispatchEvent(new CustomEvent('anatomia:scene-layout'));
     if (restoreFocus) (isVisible(trigger) ? trigger : document.querySelector('#viewport'))?.focus({preventScroll:true});
   }
 
@@ -206,6 +272,8 @@ function initialiseScenePanel() {
     const button = event.target.closest('button');
     if (!button || button.disabled || !panel.contains(button)) return;
     if (button.dataset.sceneTab) { setTab(button.dataset.sceneTab); return; }
+    if (button.dataset.graphicsQuality) { stopAutomaticShared();graphicsCommand({action:'quality',value:button.dataset.graphicsQuality});return; }
+    if (button.dataset.sceneStyle) { stopAutomaticShared();setViewStyle(button.dataset.sceneStyle);return; }
     if (button.dataset.scenePreset) { stopAutomaticShared();setMessage('');command({action:'preset',id:button.dataset.scenePreset});return; }
     if (button.dataset.sceneView) { stopAutomaticShared();setMessage('');command({action:'view',value:button.dataset.sceneView});return; }
     if (button.dataset.sceneOrgan) {
@@ -231,11 +299,13 @@ function initialiseScenePanel() {
     }
     const action = button.dataset.sceneUi;
     if (action === 'close') { stopAutomaticShared();closePanel(); }
+    else if (action === 'clear-search') clearSearch();
     else if (action === 'fit') { stopAutomaticShared();setMessage('');command({action:'fit'}); }
     else if (action === 'apply-shared' && shared) applySnapshot(shared.scene,{sharedRequest:true});
     else if (action === 'cancel-shared') { shared = null;updateShared();setMessage('Открытие сцены из ссылки отменено.'); }
     else if (action === 'share-current') { requestState();if(state.available && state.snapshot)shareSnapshot(state.snapshot); }
   });
+  $('#scene-organ-search').addEventListener('input',()=>{stopAutomaticShared();filterComposition();});
   panel.addEventListener('change',event=>{
     if (event.target.matches('[data-scene-visible]')) {
       if (!state.available) return;
@@ -276,7 +346,8 @@ function initialiseScenePanel() {
   panel.addEventListener('keydown',event=>{
     if (event.key === 'Escape') {
       event.preventDefault();event.stopPropagation();stopAutomaticShared();
-      if (renameId && event.target.closest('[data-scene-rename]')) {
+      if (event.target.id === 'scene-organ-search' && event.target.value) clearSearch();
+      else if (renameId && event.target.closest('[data-scene-rename]')) {
         const id = renameId;renameId = null;renderSaved();
         [...panel.querySelectorAll('[data-saved-action="rename"]')].find(element=>element.dataset.savedId===id)?.focus({preventScroll:true});
       } else closePanel();
@@ -294,6 +365,13 @@ function initialiseScenePanel() {
   });
   document.addEventListener('pointerdown',()=>stopAutomaticShared(),{capture:true});
   document.addEventListener('keydown',event=>{if(event.key !== 'Tab' && !['Shift','Control','Alt','Meta'].includes(event.key))stopAutomaticShared();},{capture:true});
+  document.addEventListener('anatomia:graphics-state',event=>{
+    const next = event.detail;
+    if (!next || typeof next.available !== 'boolean' || !Object.hasOwn(qualityLabels,next.quality)) return;
+    receivedGraphicsState = true;
+    graphicsState = {...next,reason:typeof next.reason === 'string' ? next.reason : ''};
+    patchGraphics();
+  });
   document.addEventListener('anatomia:scene-state',event=>{
     const next = event.detail;
     if (!next || typeof next.available !== 'boolean') return;
@@ -317,13 +395,21 @@ function initialiseScenePanel() {
   trigger.setAttribute('aria-controls','scene-panel');
   trigger.setAttribute('aria-expanded','false');
   trigger.setAttribute('aria-label','Настроить 3D-сцену');
+  filterComposition();
+  patchGraphics();
+  patchViewStyle();
   patchState();
   if (shared) openPanel();
-  else requestState();
+  else { requestState();requestGraphics(); }
   setTimeout(()=>{
-    if (receivedState) return;
-    state.reason = '3D-просмотр пока не отвечает. Сохранённые ракурсы и ссылки остаются доступны.';
-    patchState();
+    if (!receivedState) {
+      state.reason = '3D-просмотр пока не отвечает. Сохранённые ракурсы и ссылки остаются доступны.';
+      patchState();
+    }
+    if (!receivedGraphicsState) {
+      graphicsState.reason = 'Настройки качества пока недоступны. Фон можно изменить ниже.';
+      patchGraphics();
+    }
   },4000);
 }
 

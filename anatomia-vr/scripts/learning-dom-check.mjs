@@ -5,6 +5,7 @@ import * as THREE from '../vendor/three.module.min.js';
 import * as data from '../data.js';import * as experience from '../experience.js';
 import * as learningState from '../learning-state.js';
 import * as sceneState from '../scene-state.js';
+import * as renderProfile from '../render-profile.js';
 import {normalizeTeachingAttempt} from '../teaching-state.js';
 import {teachingModules} from '../teaching-content.js';import {teachingActivities} from '../teaching-activities.js';
 const {Window}=await import(process.env.HAPPY_DOM_MODULE||'happy-dom');
@@ -16,7 +17,7 @@ async function harness({denied=false,raw=null}={}){
  if(raw)for(const [key,value]of Object.entries(raw))window.localStorage.setItem(key,value);
  const storage=denied?{getItem(){throw Error('denied')},setItem(){throw Error('denied')}}:window.localStorage;
  const common={document,window,location:window.location,localStorage:storage,navigator:{clipboard:{writeText:()=>Promise.reject(Error('denied'))}},CustomEvent:window.CustomEvent,URL,URLSearchParams,console,Blob,matchMedia:()=>({matches:false}),setTimeout:()=>1,clearTimeout(){}};
- const app=vm.createContext({...common,THREE,...data,...experience,...sceneState,openPracticeHub(){}});
+ const app=vm.createContext({...common,THREE,...data,...experience,...sceneState,...renderProfile,openPracticeHub(){}});
  vm.runInContext(read('app.js').replace(/^import .*$/gm,'').replaceAll('import.meta.url',JSON.stringify('https://example.org/anatomia-vr/app.js')).replace('renderList();renderCard();init();','renderList();renderCard();'),app);
  vm.runInContext("activateFallback('Test without WebGL')",app);
  const teaching=vm.createContext({...common,teachingModules,teachingActivities,normalizeTeachingAttempt});vm.runInContext(read('teaching.js').replace(/^import .*$/gm,'').replace('export function','function'),teaching);

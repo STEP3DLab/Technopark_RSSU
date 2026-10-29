@@ -1,0 +1,278 @@
+/* ANATOMIA 1.9 — presentation surfaces.
+   Last in the cascade. Anatomy, teaching diagrams and the MEDSI logo are untouched. */
+:root {
+  --rail-left: 28px;
+  --showcase-ink: #173c4b;
+  --showcase-muted: #4a6878;
+  --showcase-line: #d1e1e5;
+  --showcase-shadow: 0 12px 36px #173c4b0d, 0 2px 8px #173c4b04;
+}
+
+/* A quiet header gives the model the largest uninterrupted surface. */
+.topbar { height: 80px; padding: 0 28px; gap: 18px; border-color: #d9e8eb; }
+.topbar::after { height: 2px; }
+.brand-logo { width: 158px; }
+.brand-title { font-size: 14px; letter-spacing: 1.5px; }
+.brand small { font-size: 9px; letter-spacing: .1px; color: #55717c; }
+.topbar nav { padding: 4px; gap: 2px; border-color: transparent; background: #edf4f5; border-radius: 13px; }
+.topbar nav > button { font-size: 13px; font-weight: 500; border-radius: 9px; }
+.topbar nav > .active { background: #fff; color: #075b6e; box-shadow: 0 2px 7px #16324f0a; }
+.header-actions { gap: 7px; }
+.demo-start { background: #e5f3f1; color: #066f74; border-color: #bedddc; font-weight: 600; }
+.demo-start span { color: #466d76; font-weight: 400; }
+.header-actions > .icon-button { border-color: transparent; color: #426778; }
+.header-actions > .icon-button:hover:not(:disabled) { border-color: #c1d8df; background: #f2f8f9; }
+.workspace { height: calc(100dvh - 80px); }
+
+/* The atlas remains light by default. The stage grid is deliberately subtle. */
+.stage, .only-scene .stage {
+  background: radial-gradient(ellipse at 49% 43%, #fff 0, #f4faf9 33%, #e8f3f5 70%, #edf0f8 100%);
+}
+.stage-glow { top: 4%; height: 84%; left: 22%; width: 58%; background: radial-gradient(ellipse, #7cd8d80b, transparent 70%); }
+.stage-grid { opacity: .32; background-size: 64px 64px; mask-image: linear-gradient(transparent 52%, #0009 100%); }
+.stage-caption { top: 26px; max-width: 310px; }
+.stage-caption .eyebrow { color: #46717c; font-size: 10px; letter-spacing: 1.5px; font-weight: 600; }
+.stage-caption h1 { color: var(--showcase-ink); font-size: 32px; font-weight: 600; line-height: 1.16; letter-spacing: -1px; margin: 10px 0 7px; }
+.stage-caption p { color: var(--showcase-muted); font-size: 13px; line-height: 1.55; }
+.view-badge { color: #426b79; font-size: 9px; letter-spacing: 1px; }
+.side-marker { color: #547981; font-size: 18px; }
+.side-marker small { font-size: 8px; letter-spacing: 1.2px; }
+.stage-foot { color: #446b76; font-size: 11px; }
+.education-label, .fallback-mode .education-label { color: #496a78; }
+.label { font-size: 12px; font-weight: 500; color: #345969; padding: 7px 10px; border-color: #bfd6dc; background: #fffffff5; box-shadow: 0 3px 10px #173c4b0b; }
+.label.active { color: #066970; background: #fff; border-color: #3a979a; box-shadow: 0 3px 12px #087f8315; }
+
+/* One unmistakable entry into scene tools; systems remain quiet secondary choices. */
+.catalog-toggle, .fallback-mode .catalog-toggle { top: 140px; border-color: #bed4db; background: #ffffffed; box-shadow: none; border-radius: 11px; }
+.system-dock { width: 220px; gap: 7px; }
+.system-dock > :is(span, p, label) { font-size: 10px; letter-spacing: .8px; color: #476b78; margin-bottom: 5px; }
+.system-dock button { border-color: #d8e6e9; background: #ffffffc9; color: #345968; min-height: 37px; padding: 8px 10px; border-radius: 9px; backdrop-filter: none; }
+.system-dock button[aria-pressed="true"] { background: #0a797f; border-color: #0a797f; box-shadow: none; color: #fff; }
+.atlas-shortcuts { width: 220px; gap: 8px; }
+.atlas-shortcuts button { min-height: 54px; border-radius: 13px; padding: 12px; border-color: #cedfe4; box-shadow: none; }
+.atlas-shortcuts #scene-tools-toggle { background: #087f83; border-color: #087f83; color: #fff; box-shadow: 0 6px 16px #087f8319; }
+.atlas-shortcuts #scene-tools-toggle:hover:not(:disabled) { background: #066a70; border-color: #066a70; color: #fff; }
+.atlas-shortcuts #scene-tools-toggle svg { color: #fff; }
+.atlas-shortcuts #scene-tools-toggle small { color: #e0f3f1; }
+.atlas-shortcuts small { color: #4c6b7b; line-height: 1.45; }
+
+.viewer-controls { top: 25px; }
+.viewer-mode, .viewer-controls .icon-button, .viewer-angle-control select { border-color: #ccdee3; box-shadow: 0 3px 12px #173c4b05; background: #fffffff5; }
+.viewer-mode button[aria-pressed="true"] { background: #0a797f; }
+.stage-tools { border-color: #cadfe3; background: #fffffff2; border-radius: 15px; box-shadow: var(--showcase-shadow); padding: 6px; gap: 3px; }
+.stage-tools button { color: #365f70; border-radius: 10px; }
+.stage-tools button[aria-pressed="true"] { background: #e1f2ef; color: #08767d; }
+.stage-tools button:hover:not(:disabled) { background: #edf5f7; }
+.stage-tools button[aria-pressed="true"]:hover:not(:disabled) { background: #d5ebe7; }
+.stage-tools .tool-separator { background: #d6e3e7; }
+
+/* The organ card keeps its hierarchy at projector distance. */
+.detail { width: 304px; right: 28px; padding: 21px; border-radius: 19px; border: 1px solid var(--showcase-line); border-top: 3px solid #159a9c; box-shadow: var(--showcase-shadow); background: #fffffff7; backdrop-filter: blur(16px); }
+.detail h2 { color: var(--showcase-ink); font-size: 30px; line-height: 1.17; font-weight: 600; letter-spacing: -.8px; }
+.card-kicker { font-size: 10px; color: #3c6b77; letter-spacing: .9px; margin-bottom: 14px; }
+.card-pager button { background: #f5f9fa; border-color: #d6e4e8; border-radius: 9px; }
+.organ-system-tag { border-color: transparent; color: #0a7479; background: #e8f5f2; font-size: 10px; letter-spacing: .1px; padding: 5px 7px; }
+.latin { color: #6b5a91; font-size: 17px; }
+.detail .brief { color: #234d5b; font-size: 15px; line-height: 1.5; font-weight: 500; }
+.organ-location-preview { color: #486775; font-size: 13px; line-height: 1.6; margin-bottom: 17px; }
+.detail .primary { background: #087f83; border-color: #087f83; box-shadow: 0 3px 8px #087f8310; }
+.detail .primary:hover:not(:disabled) { background: #066a70; color: #fff; }
+.detail .card-actions .icon-button { background: #f0f7f8; border-color: #c8dde2; }
+.structure-tools button { border-color: #d5e4e7; background: #f6fafb; }
+.card-links .text-button { font-size: 12px; color: #375e6e; }
+.teach-card-launch { background: #eaf5f5; border-color: #c4dedf; font-weight: 500; }
+.card-study-tools { border-color: #deeaed; padding-top: 11px; }
+.card-study-tools button, .organ-share { color: #426879; }
+.library, .fallback-mode .library { border-color: #c5dade; box-shadow: var(--showcase-shadow); border-radius: 17px; }
+.organ-item.active { border-color: #9ac7ca; background: #eaf6f3; }
+.organ-thumb { background: #f2f8f8; border-color: #dfebed; }
+.fallback-view { left: 252px; right: 354px; }
+.fallback-view img { filter: drop-shadow(0 16px 22px #17414c1c); }
+.fallback-view p { color: #476a76; background: #f4faf9e8; border: 1px solid #dce8e9; border-radius: 8px; padding: 5px 9px; }
+.fallback-status { background: #f4f9faed; border-color: #bfd7dd; color: #34596b; border-radius: 12px; }
+.fallback-status button { border-color: #b5d1d8; color: #0c6e79; }
+.loading { background: radial-gradient(ellipse at center, #fff, #eef7f8); }
+.loading b { color: #174452; font-size: 25px; letter-spacing: 5px; }
+.loading span { color: #496e7b; font-size: 13px; }
+.toast { background: #183f4d; border-color: #446f7c; box-shadow: 0 8px 24px #173c4b22; }
+
+/* The presentation controls occupy their own row, never cover anatomy. */
+.demo-bar { min-height: 100px; padding: 14px 28px; gap: 26px; border-bottom: 1px solid #c9dfe3; background: #f3f9f8; box-shadow: inset 4px 0 0 #159a9c; }
+.demo-bar > div:first-child { min-width: 0; }
+.demo-bar .eyebrow { color: #0a7479; font-size: 10px; font-weight: 600; letter-spacing: 1.2px; }
+.demo-bar b { display: block; color: #1c4554; font-size: 21px; font-weight: 600; line-height: 1.2; letter-spacing: -.3px; }
+.demo-bar p { color: #476a76; font-size: 13px; line-height: 1.5; margin-top: 6px; max-width: 800px; }
+#demo-progress { display: block; appearance: none; width: min(260px,100%); height: 3px; margin-top: 10px; padding: 0; border: 0; border-radius: 3px; overflow: hidden; background: #dbe9e9; color: #138b90; accent-color: #138b90; }
+#demo-progress::-webkit-progress-bar { border-radius: 3px; background: #dbe9e9; }
+#demo-progress::-webkit-progress-value { border-radius: 3px; background: linear-gradient(90deg, #10978f, #258ac0); }
+#demo-progress::-moz-progress-bar { border-radius: 3px; background: linear-gradient(90deg, #10978f, #258ac0); }
+.demo-controls { gap: 8px; }
+.demo-controls button { border-color: #c7dce1; background: #fff; color: #315e6f; min-height: 44px; }
+.demo-controls #demo-next { min-width: 120px; color: #fff; background: #087f83; border-color: #087f83; font-weight: 600; }
+.demo-controls #demo-next:hover:not(:disabled) { color: #fff; background: #066a70; }
+.demo-controls #demo-exit { color: #476b77; border-color: transparent; background: transparent; }
+.demo-controls #demo-exit:hover { border-color: #c7dce1; background: #fff; }
+.demo-active .workspace { height: calc(100dvh - 180px); }
+
+/* Studio background is a display preference, not a change to anatomical data. */
+body.studio-view .stage, body.studio-view.only-scene .stage {
+  background: radial-gradient(ellipse at 48% 42%, #164d58 0, #103b48 31%, #092b39 62%, #071d2c 100%);
+}
+.studio-view .stage-glow { background: radial-gradient(ellipse, #47b6ab20, transparent 65%); }
+.studio-view .stage-grid { opacity: .24; background-image: linear-gradient(#a7e1dd20 1px, transparent 1px), linear-gradient(90deg, #a7e1dd20 1px, transparent 1px); }
+.studio-view .stage-caption h1 { color: #f0faf9; }
+.studio-view .stage-caption :is(.eyebrow, p) { color: #b9d5dc; }
+.studio-view :is(.view-badge, .stage-foot, .education-label, .side-marker) { color: #b5d1d9; }
+.studio-view .small-dot { background: #72d7cc; }
+.studio-view .system-dock > :is(span, p, label) { color: #b9d5dc; }
+.studio-view .system-dock button { border-color: #577a867d; color: #d6e9ec; background: #0f3542c9; }
+.studio-view .system-dock button[aria-pressed="true"] { background: #0b7d80; border-color: #59b8b2; color: #fff; }
+.studio-view .system-dock button:hover:not(:disabled):not([aria-pressed="true"]) { border-color: #8db9bf; background: #214f5c; color: #fff; }
+.studio-view .label { border-color: #729ba6; background: #123642ed; color: #dceff1; box-shadow: 0 4px 12px #0002; }
+.studio-view .label.active { border-color: #80d8cd; background: #16444f; color: #f1fffd; }
+.studio-view .fallback-view img { filter: drop-shadow(0 18px 24px #0004); }
+.studio-view .fallback-view p { color: #d3e8eb; border-color: #426b78; background: #113541eb; }
+.studio-view .fallback-status { background: #113541ed; color: #d3e8eb; border-color: #517d88; }
+.studio-view .fallback-status button { background: #fff; color: #0a6474; border-color: #b7d7dc; }
+.studio-view.spatial-practice .stage-caption { background: linear-gradient(90deg, #103743f2, #10374333); }
+.studio-view .stage-result { color: #9ee2ce; }
+.studio-view .loading { background: radial-gradient(ellipse at center, #174c58, #0a2635); }
+.studio-view .loading b { color: #e8f7f7; }
+.studio-view .loading span { color: #bed9df; }
+.studio-view .loading #continue-flat { color: #d4f4ee; border-color: #6fa7ad; }
+.studio-view .loader-ring { border-color: #386b77; border-top-color: #88dacc; }
+.studio-view #viewport:focus-visible { outline-color: #93e0df; }
+.studio-view :is(.catalog-toggle, .scene-only, .viewer-mode, .viewer-controls .icon-button, .viewer-angle-control select, .stage-tools) { box-shadow: 0 4px 14px #041d261c; }
+
+@media (min-width: 701px) {
+  body { display: flex; flex-direction: column; height: 100dvh; min-height: 100dvh; }
+  .topbar, .demo-bar { flex: 0 0 auto; }
+  .workspace, .demo-active .workspace { flex: 1 1 auto; height: auto; min-height: 500px; }
+  :is(.viewer-theatre,.viewer-native-fullscreen) .workspace { height: 100dvh; min-height: 0; }
+}
+@media (min-width: 1550px) {
+  :root { --rail-left: 36px; }
+  .topbar { padding-left: 36px; padding-right: 36px; }
+  .detail { right: 36px; width: 332px; padding: 25px; }
+  .detail h2 { font-size: 33px; }
+  .stage-caption h1 { font-size: 36px; }
+  .system-dock, .atlas-shortcuts { width: 236px; }
+  .fallback-view { left: 252px; right: 388px; }
+}
+@media (min-width: 701px) and (max-width: 1100px) {
+  :root { --rail-left: 20px; }
+  .topbar { padding: 0 20px; gap: 10px; }
+  .brand-logo { width: 145px; }
+  .topbar nav > button { padding-left: 11px; padding-right: 11px; font-size: 12px; }
+  .header-actions { gap: 5px; }
+  .detail { right: 20px; width: 274px; padding: 18px; max-height: calc(100% - 242px); }
+  .in-comparison3d .detail { max-height: calc(100% - 242px); }
+  .fallback-mode .detail { max-height: calc(100% - 224px); }
+  .image-choice .detail { max-height: calc(100% - 186px); }
+  body:not(.fallback-mode):is(.in-practice,.in-physio) .detail { max-height: calc(100% - 168px); }
+  .fallback-mode:is(.in-practice,.in-physio) .detail { max-height: calc(100% - 211px); }
+  .detail h2 { font-size: 27px; }
+  .detail .brief { font-size: 14px; }
+  .stage-caption { max-width: 255px; }
+  .stage-caption h1, .fallback-mode .stage-caption h1 { font-size: 28px; }
+  .system-dock, .atlas-shortcuts { width: 190px; }
+  .atlas-shortcuts button { font-size: 12px; }
+  .fallback-view { left: 208px; right: 310px; }
+  .demo-bar { padding-left: 20px; padding-right: 20px; gap: 18px; }
+  .demo-bar b { font-size: 19px; }
+  .demo-bar p { font-size: 12px; }
+}
+@media (min-width: 701px) and (max-width: 1000px) {
+  .system-dock { top: 192px; width: calc(100% - 332px); max-width: none; flex-wrap: nowrap; overflow-x: auto; max-height: none; margin: 0; padding: 3px 3px 9px; scrollbar-width: thin; scrollbar-color: #8db7c2 transparent; }
+  .system-dock > :is(span, p, label) { display: none; }
+  .system-dock button { flex: 0 0 auto; font-size: 12px; min-height: 40px; white-space: nowrap; }
+  .atlas-shortcuts { width: 172px; }
+  .atlas-shortcuts small { display: none; }
+  .atlas-shortcuts button { min-height: 48px; font-size: 12px; line-height: 1.4; }
+  .fallback-view { left: 130px; right: 306px; top: 245px; }
+  .demo-active .fallback-view { top: 160px; left: 35px; }
+  .vr-btn { width: 42px; padding: 9px; justify-content: center; }
+  .vr-btn > span:last-child { display: none; }
+}
+@media (min-width: 701px) and (max-height: 720px) {
+  .workspace { min-height: 500px; }
+  .demo-active .workspace { min-height: 480px; }
+  .system-dock { top: 192px; max-height: 108px; overflow-y: auto; }
+  .atlas-shortcuts { grid-template-columns: minmax(0,1fr); width: 196px; bottom: 78px; gap: 6px; }
+  .atlas-shortcuts button { min-height: 42px; padding: 9px 11px; }
+  .atlas-shortcuts small { display: none; }
+  .fallback-mode .atlas-shortcuts { bottom: 140px; }
+  .detail { padding: 17px; max-height: calc(100% - 242px); }
+  .in-comparison3d .detail { max-height: calc(100% - 242px); }
+  .fallback-mode .detail { padding: 17px; max-height: calc(100% - 224px); }
+  .image-choice .detail { max-height: calc(100% - 186px); }
+  body:not(.fallback-mode):is(.in-practice,.in-physio) .detail { max-height: calc(100% - 168px); }
+  .fallback-mode:is(.in-practice,.in-physio) .detail { max-height: calc(100% - 211px); }
+  .detail h2 { font-size: 27px; }
+  .detail .brief { font-size: 14px; margin-bottom: 12px; }
+  .organ-location-preview { font-size: 12px; margin-bottom: 13px; }
+}
+@media (max-width: 700px) {
+  :root { --rail-left: 16px; }
+  .topbar { height: auto; min-height: 112px; padding: 12px 16px 10px; gap: 9px; }
+  .brand-logo { width: 150px; }
+  .topbar nav { width: 100%; }
+  .topbar nav > button { font-size: 12px; min-height: 42px; padding: 9px 8px; }
+  .header-actions { gap: 6px; }
+  .workspace, .demo-active .workspace { height: auto; min-height: 0; }
+  .stage-caption { top: 19px; max-width: calc(100% - 76px); }
+  .stage-caption h1, .fallback-mode .stage-caption h1 { font-size: 27px; }
+  .stage-caption .eyebrow { font-size: 9px; letter-spacing: 1px; }
+  .stage-caption p { font-size: 12px; }
+  .catalog-toggle { top: 110px; border-radius: 10px; }
+  .fallback-mode .catalog-toggle { top: auto; }
+  .system-dock { width: auto; gap: 7px; }
+  .system-dock button { min-height: 40px; }
+  .atlas-shortcuts { width: auto; }
+  .atlas-shortcuts button { min-height: 46px; padding: 10px; font-size: 12px; border-radius: 11px; }
+  .viewer-controls { top: 110px; }
+  :is(.only-scene,.in-practice,.in-lesson,.in-physio,.in-comparison3d) .viewer-controls { top: 17px; }
+  .fallback-mode .viewer-controls { top: auto; }
+  .stage-tools { padding: 5px; gap: 2px; border-radius: 13px; }
+  .stage-tools button { width: 38px; height: 42px; }
+  .stage-tools .tool-separator { margin-left: 2px; margin-right: 2px; }
+  .detail, .fallback-mode .detail { width: auto; right: auto; padding: 21px; margin: 5px 12px 18px; border-radius: 18px; }
+  .detail h2 { font-size: 30px; }
+  .detail .brief { font-size: 15px; }
+  .organ-location-preview { font-size: 13px; }
+  .card-links .text-button { font-size: 13px; }
+  .fallback-view { inset: auto; }
+  .fallback-view p { font-size: 11px; }
+  .fallback-status { font-size: 12px; line-height: 1.55; }
+  .fallback-status button { min-height: 42px; }
+  .demo-bar { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; min-height: 0; padding: 14px 16px; }
+  .demo-bar b { font-size: 20px; line-height: 1.25; }
+  .demo-bar p { font-size: 12px; line-height: 1.5; }
+  #demo-progress { width: 100%; margin-top: 10px; }
+  .demo-controls { display: grid; width: 100%; grid-template-columns: 44px minmax(0,1fr) 44px; gap: 8px; }
+  .demo-controls button { height: 44px; min-height: 44px; padding: 8px 12px; }
+  .demo-controls #demo-next { order: initial; min-width: 0; font-size: 13px; }
+  .demo-controls #demo-exit { width: 44px; height: 44px; min-height: 44px; }
+  .studio-view .detail { background: #fff; }
+}
+@media (max-width: 360px) {
+  .topbar { padding-left: 12px; padding-right: 12px; }
+  .brand-logo { width: 132px; }
+  .topbar nav > button { font-size: 11px; }
+  .detail, .fallback-mode .detail { padding: 18px; }
+  .stage-tools button { width: 35px; }
+  .atlas-shortcuts button { font-size: 11px; }
+  .demo-bar { padding-left: 12px; padding-right: 12px; }
+  .demo-bar b { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage, .stage-glow, .detail, .demo-bar, .atlas-shortcuts button { animation: none; transition: none; }
+}
+@media (forced-colors: active) {
+  .studio-view .stage, .studio-view.only-scene .stage { background: Canvas; }
+  .studio-view .stage-glow, .studio-view .stage-grid { display: none; }
+  .studio-view :is(.stage-caption h1,.stage-caption p,.stage-caption .eyebrow,.view-badge,.stage-foot,.side-marker,.education-label,.system-dock>span) { color: CanvasText; }
+  .studio-view .label, .studio-view .fallback-status, .studio-view .fallback-view p { color: CanvasText; background: Canvas; border-color: CanvasText; }
+  .studio-view .system-dock button, .atlas-shortcuts #scene-tools-toggle { color: ButtonText; background: ButtonFace; border-color: ButtonText; }
+  .studio-view .system-dock button[aria-pressed="true"], .atlas-shortcuts #scene-tools-toggle:focus-visible { outline: 2px solid Highlight; }
+}

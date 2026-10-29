@@ -5,6 +5,7 @@ import * as THREE from '../vendor/three.module.min.js';
 import * as data from '../data.js';
 import * as experience from '../experience.js';
 import * as sceneState from '../scene-state.js';
+import * as renderProfile from '../render-profile.js';
 
 // Execute the production state/event functions with small DOM stand-ins.
 // These tests do not render WebGL or claim to verify a physical VR headset.
@@ -54,7 +55,7 @@ function harness() {
   });
   const storage = new Map();
   const context = vm.createContext({
-    THREE, ...data, ...experience, ...sceneState, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
+    THREE, ...data, ...experience, ...sceneState, ...renderProfile, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
     CustomEvent: class {constructor(type,options={}) {this.type=type;this.detail=options.detail;}},
     location: {search: ''},
     localStorage: {getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v)},
@@ -760,6 +761,171 @@ test('Scene selection focuses an organ without revealing unrelated hidden struct
     assert.equal(visibleSceneIds().sort().join(','),'airway,lungL,lungR');assert.ok(normalizeScene(sceneSnapshot()));
     startQuiz('function',['heart']);const before=JSON.stringify(quiz);handleSceneCommand({action:'select',id:'brain'});assert.equal(JSON.stringify(quiz),before);
   `);
+});
+
+test('Studio materials keep source geometry and clear selection without an overbright atlas emissive',({run})=>{
+  run(`
+    const matrices=meshes.map(m=>m.matrixWorld.toArray().join(','));
+    for(const [id,list] of organMeshes)for(const mesh of list)mesh.material=createOrganMaterial(id);
+    selected='heart';applyAppearance();
+    assert.ok(organMeshes.get('heart')[0].material.emissiveIntensity>0&&organMeshes.get('heart')[0].material.emissiveIntensity<.1);
+    assert.equal(organMeshes.get('lungR')[0].material.emissiveIntensity,0);
+    assert.ok(organMeshes.get('lungR')[0].material.roughness>organMeshes.get('kidneyR')[0].material.roughness);
+    for(const mesh of meshes)assert.equal(mesh.material.metalness,0);
+    assert.equal(meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|'),matrices.join('|'));
+    const before=meshes.map(m=>m.material.color.getHex());
+    handleGraphicsCommand({action:'quality',value:'eco'});
+    assert.equal(meshes.map(m=>m.material.color.getHex()).join(','),before.join(','));
+    scene=new THREE.Scene();createStudioLights();
+    assert.equal(scene.children.filter(node=>node.isLight).length,4);
+    assert.ok(scene.children.filter(node=>node.isLight).every(light=>!light.castShadow));
+  `);
+});
+
+test('Graphics quality commands synchronously report real buffer limits and preserve an answered quiz and camera',({run})=>{
+  run(`
+    startQuiz('function',['heart']);answerChoice(current().answer);
+    const stateBefore=JSON.stringify(quiz),cameraBefore=JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray(),projection:camera.projectionMatrix.toArray()});
+    $('#viewport').clientWidth=1400;$('#viewport').clientHeight=900;globalThis.devicePixelRatio=3;
+    let appliedDPR=null;renderer.setPixelRatio=value=>{appliedDPR=value;};renderer.setSize=()=>{};
+    handleGraphicsCommand({action:'quality',value:'high'});
+    let result=document.events.filter(e=>e.type==='anatomia:graphics-state').at(-1).detail;
+    assert.equal(result.available,true);assert.equal(result.quality,'high');assert.equal(result.effectiveDPR,appliedDPR);
+    assert.ok(result.resolution.width*result.resolution.height<=4000000);
+    assert.equal(localStorage.getItem('anatomia-graphics-v1'),'high');
+    const high=appliedDPR;handleGraphicsCommand({action:'quality',value:'eco'});assert.ok(appliedDPR<high);
+    assert.equal(JSON.stringify(quiz),stateBefore);
+    assert.equal(JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray(),projection:camera.projectionMatrix.toArray()}),cameraBefore);
+    const events=document.events.length;handleGraphicsCommand({action:'request'});assert.equal(document.events.length,events+1);
+  `);
+});
+
+test('Graphics readiness is honest for loading, image, XR and failed contexts, and invalid preferences cannot apply',({run})=>{
+  run(`
+    graphicsQuality='auto';let changes=0;renderer.setPixelRatio=()=>{changes++};
+    for(const blocked of ['loading','image','vr','unavailable']){
+      viewerLoad=blocked==='loading'?'loading':blocked==='unavailable'?'unavailable':'ready';
+      fallbackMode=blocked==='image';xrActive=blocked==='vr';loaded=blocked!=='unavailable';
+      handleGraphicsCommand({action:'quality',value:'high'});
+      const state=document.events.filter(e=>e.type==='anatomia:graphics-state').at(-1).detail;
+      assert.equal(state.available,false);assert.equal(state.effectiveDPR,null);assert.equal(state.resolution,null);assert.ok(state.reason.length>10);
+      assert.equal(graphicsQuality,'auto');
+    }
+    loaded=true;fallbackMode=false;xrActive=false;viewerLoad='ready';
+    for(const value of [null,{},'ultra','__proto__'])handleGraphicsCommand({action:'quality',value});
+    assert.equal(graphicsQuality,'auto');assert.equal(changes,0);
+  `);
+});
+
+test('Failed preference storage still applies quality, and disposal clears hardware state without losing the chosen profile',({run})=>{
+  run(`
+    $('#viewport').clientWidth=1200;$('#viewport').clientHeight=800;renderer.setPixelRatio=()=>{};
+    localStorage.setItem=()=>{throw Error('Storage blocked');};handleGraphicsCommand({action:'quality',value:'eco'});
+    let state=document.events.filter(e=>e.type==='anatomia:graphics-state').at(-1).detail;
+    assert.equal(state.quality,'eco');assert.equal(state.persistent,false);assert.equal(state.available,true);
+    const material=createOrganMaterial('heart');let disposed=0;material.addEventListener('dispose',()=>{disposed++;});
+    organMeshes.get('heart')[0].material=material;organMeshes.get('lungR')[0].material=material;
+    scene=new THREE.Scene();scene.add(modelRoot);disposeViewer();
+    state=document.events.filter(e=>e.type==='anatomia:graphics-state').at(-1).detail;
+    assert.equal(disposed,1);assert.equal(graphicsQuality,'eco');assert.equal(state.available,false);assert.equal(graphicsResolution,null);
+  `);
+});
+
+test('Measured tablet panels frame the actual scene and off-axis pointer picking stays aligned',({run})=>{
+  run(`
+    $('#viewport').clientWidth=768;$('#viewport').clientHeight=770;
+    $('#viewport').getBoundingClientRect=()=>({left:0,top:80,width:768,height:770});renderer.domElement.getBoundingClientRect=$('#viewport').getBoundingClientRect;
+    renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};
+    globalThis.getComputedStyle=el=>({display:el.layoutVisible?'block':'none',visibility:'visible',opacity:'1'});
+    const rectangles={'#detail':[474,108,274,642],'.system-dock':[20,272,436,62],'.atlas-shortcuts':[20,654,172,116],'.stage-tools':[205.5,771,357,56]};
+    for(const [selector,[left,top,width,height]] of Object.entries(rectangles)){const el=$(selector);el.layoutVisible=true;el.getBoundingClientRect=()=>({left,top,width,height});}
+    const matrices=meshes.map(m=>m.matrixWorld.toArray().join(','));home();cameraUpdate(2);camera.updateMatrixWorld(true);
+    assert.ok(cameraFrameState.width>250&&cameraFrameState.height>400);assert.ok(camera.view?.enabled);
+    const box=new THREE.Box3().setFromObject(modelRoot);
+    for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
+      const p=new THREE.Vector3(x,y,z).project(camera),px=(p.x+1)*768/2,py=(1-p.y)*770/2;
+      assert.ok(px>=cameraFrameState.left-1e-6&&px<=cameraFrameState.right+1e-6&&py>=cameraFrameState.top-1e-6&&py<=cameraFrameState.bottom+1e-6);
+    }
+    const point=centers.get('brain').clone().project(camera);pick({clientX:(point.x+1)*768/2,clientY:80+(1-point.y)*770/2});assert.equal(selected,'brain');
+    assert.equal(meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|'),matrices.join('|'));
+  `);
+});
+
+test('Opening a scene panel respects manual and saved camera poses while explicit fit uses the free region',({run})=>{
+  run(`
+    $('#viewport').clientWidth=390;$('#viewport').clientHeight=600;$('#viewport').getBoundingClientRect=()=>({left:0,top:0,width:390,height:600});
+    renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};
+    globalThis.getComputedStyle=el=>({display:el.layoutVisible?'block':'none',visibility:'visible',opacity:'1'});
+    home();manualCameraChange();view.theta=.4;view.phi=1.3;view.toRadius=4;view.toTarget.set(.1,1.2,-.1);view.turn=null;
+    const saved=sceneSnapshot();assert.ok(saved);assert.equal(restoreSceneSnapshot(saved),true);
+    $('#scene-panel').layoutVisible=true;$('#scene-panel').getBoundingClientRect=()=>({left:10,top:350,width:370,height:250});
+    document.dispatchEvent(new CustomEvent('anatomia:scene-layout'));
+    assert.equal(JSON.stringify(sceneSnapshot().camera),JSON.stringify(saved.camera));assert.ok(cameraFrameState.bottom<350);
+    handleSceneCommand({action:'preset',id:'cardiorespiratory'});assert.ok(sceneFit);assert.ok(sceneFit.frame.bottom<350);
+    startQuiz('function',['heart']);const before=JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray()});
+    $('#viewport').clientWidth=370;resize();
+    assert.equal(JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray()}),before);
+  `);
+});
+
+test('Spatial practice starts with every source structure in view without revealing its target or overriding manual navigation',({run})=>{
+  run(`
+    $('#viewport').clientWidth=390;$('#viewport').clientHeight=600;renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};
+    startQuiz('find',['heart','bladder']);
+    const first=JSON.stringify({target:view.toTarget.toArray(),radius:view.toRadius});assert.equal(sceneFit.ids.length,16);
+    for(const mesh of meshes)assert.equal(mesh.material.emissiveIntensity,0);
+    const whole=new THREE.Box3().setFromObject(modelRoot);assert.ok(view.toTarget.distanceTo(whole.getCenter(new THREE.Vector3()))<1e-8);
+    answerFind('heart');nextQuestion();assert.equal(JSON.stringify({target:view.toTarget.toArray(),radius:view.toRadius}),first);
+    manualCameraChange();view.toRadius=2;view.toTarget.set(.2,.8,-.1);
+    const manual=JSON.stringify({target:view.toTarget.toArray(),radius:view.toRadius});$('#viewport').clientWidth=370;resize();handleGraphicsCommand({action:'quality',value:'eco'});
+    assert.equal(JSON.stringify({target:view.toTarget.toArray(),radius:view.toRadius}),manual);assert.equal(quiz.answered,false);assert.equal(quiz.index,1);
+    home();assert.equal(sceneFit.ids.length,16);assert.ok(view.toTarget.distanceTo(whole.getCenter(new THREE.Vector3()))<1e-8);
+  `);
+});
+
+test('Starting spatial practice closes the settings panel before fitting, even with deferred scene-state microtasks',({run})=>{
+  run(`
+    const pending=[];globalThis.queueMicrotask=callback=>pending.push(callback);let panelOpen=true;
+    $('#viewport').clientWidth=768;$('#viewport').clientHeight=770;
+    $('#viewport').getBoundingClientRect=()=>({left:0,top:80,width:768,height:770});renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};
+    const rectangles={'#scene-panel':[20,110,300,642,'panel'],'#detail':[474,108,274,642,'atlas'],'.system-dock':[20,272,436,62,'atlas'],'.atlas-shortcuts':[20,654,172,116,'atlas'],'.stage-tools':[205.5,771,357,56,'always']};
+    for(const [selector,[left,top,width,height,group]] of Object.entries(rectangles)){const el=$(selector);el.layoutGroup=group;el.getBoundingClientRect=()=>({left,top,width,height});}
+    globalThis.getComputedStyle=el=>({display:(el.layoutGroup==='panel'?panelOpen:el.layoutGroup==='atlas'?!panelOpen:el.layoutGroup==='always')?'block':'none',visibility:'visible',opacity:'1'});
+    document.addEventListener('anatomia:scene-state',event=>{
+      if(event.detail.activity&&panelOpen){panelOpen=false;document.dispatchEvent(new CustomEvent('anatomia:scene-layout'));}
+    });
+    startQuiz('find',['heart']);
+    assert.equal(panelOpen,false,'Activity panel must close synchronously before home measures the scene');
+    assert.equal(sceneFit.ids.length,16);assert.ok(sceneFit.frame.width>250&&sceneFit.frame.width<300);
+    assert.equal(sceneFit.frame.width,cameraFrameState.width);assert.equal(sceneFit.frame.height,cameraFrameState.height);
+    const fitted=view.toRadius;while(pending.length)pending.shift()();
+    assert.equal(view.toRadius,fitted);assert.equal(sceneFit.frame.width,cameraFrameState.width);assert.equal(quiz.answered,false);
+  `);
+});
+
+test('The first prepared scene frames after an image-first load but later mode toggles preserve the camera',({run})=>{
+  run(`
+    $('#viewport').clientWidth=768;$('#viewport').clientHeight=770;
+    renderer.setSize=()=>{};renderer.setPixelRatio=()=>{};renderer.setAnimationLoop=()=>{};
+    initialPresentationFramed=false;initialPresentationPending=true;fallbackMode=true;viewerImagePreference=true;viewerLoad='ready';
+    resume3DView();assert.equal(initialPresentationFramed,true);assert.equal(initialPresentationPending,false);
+    const box=new THREE.Box3().setFromObject(modelRoot);assert.ok(view.toTarget.distanceTo(box.getCenter(new THREE.Vector3()))<1e-8);
+    manualCameraChange();view.toRadius=2.4;view.toTarget.set(.2,1.1,0);view.turn=null;view.theta=.6;view.phi=1.3;
+    const before=JSON.stringify(sceneSnapshot().camera);showImageView('Image',false);resume3DView();
+    assert.equal(JSON.stringify(sceneSnapshot().camera),before);
+  `);
+});
+
+test('Demo keyboard navigation is bounded and reports its five steps without intercepting editable controls',({run,node})=>{
+  run("activateFallback('Test');startDemo();assert.equal($('#demo-progress').value,1);");
+  const press=key=>node('#demo-bar').dispatch('keydown',{key,preventDefault(){},stopPropagation(){}});
+  press('ArrowLeft');run('assert.equal(demoStep,0);');
+  press('ArrowRight');run("assert.equal(demoStep,1);assert.equal($('#demo-progress').value,2);");
+  press('End');run("assert.equal(demoStep,4);assert.equal($('#demo-progress').value,5);assert.ok(quiz);");
+  node('#demo-bar').dispatch('keydown',{key:'Home',target:{closest(){return true;}},preventDefault(){throw Error('Should not intercept input')}});
+  run('assert.equal(demoStep,4);');
+  press('Home');run("assert.equal(demoStep,0);assert.equal($('#demo-progress').value,1);");
+  press('Escape');run("assert.equal(demoStep,-1);assert.equal($('#demo-bar').hidden,true);");
 });
 
 console.log(JSON.stringify({
