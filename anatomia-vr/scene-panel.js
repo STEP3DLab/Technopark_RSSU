@@ -1,6 +1,6 @@
-import {organs, systemNames} from './data.js?v=1.10.0';
+import {organs, systemNames} from './data.js?v=1.10.1';
 import {icon} from './experience.js';
-import {createSceneStore, sceneFromURL, sceneURL, scenePresets, sceneLimit} from './scene-state.js?v=1.10.0';
+import {createSceneStore, sceneFromURL, sceneURL, scenePresets, sceneLimit} from './scene-state.js?v=1.10.1';
 
 const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const byId = id => organs.find(organ => organ.id === id);
