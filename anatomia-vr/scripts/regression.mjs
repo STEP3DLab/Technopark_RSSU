@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import * as THREE from '../vendor/three.module.min.js';
 import * as data from '../data.js';
 import * as experience from '../experience.js';
+import * as sceneState from '../scene-state.js';
 
 // Execute the production state/event functions with small DOM stand-ins.
 // These tests do not render WebGL or claim to verify a physical VR headset.
@@ -53,7 +54,7 @@ function harness() {
   });
   const storage = new Map();
   const context = vm.createContext({
-    THREE, ...data, ...experience, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
+    THREE, ...data, ...experience, ...sceneState, assert, console, URL, URLSearchParams, document, openPracticeHub(options) {document.lastPracticeOptions=options;},
     CustomEvent: class {constructor(type,options={}) {this.type=type;this.detail=options.detail;}},
     location: {search: ''},
     localStorage: {getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v)},
@@ -592,6 +593,172 @@ test('Portrait resize refits a pair without changing its angle or causing a zoom
     assert.ok(maxViewRadius()>=view.toRadius);const fitted=view.toRadius;zoomViewer(1);
     assert.ok(Math.abs(view.toRadius-fitted*.8)<1e-8);
     for(let i=0;i<100;i++)zoomViewer(-1);assert.equal(view.toRadius,maxViewRadius());
+  `);
+});
+
+
+test('Scene state requests return validated visual state without learner data',({run})=>{
+  run(`
+    handleSceneCommand({action:'request'});
+    const state=document.events.filter(e=>e.type==='anatomia:scene-state').at(-1).detail;
+    assert.equal(state.available,true);assert.equal(state.blocked,null);assert.equal(state.visible.length,16);
+    assert.ok(normalizeScene(state.snapshot));assert.equal('progress' in state.snapshot,false);assert.equal('best' in state.snapshot,false);
+    state.snapshot.hidden.push('heart');state.visible.length=0;
+    assert.equal(hiddenOrgans.size,0);assert.equal(visibleSceneIds().length,16);
+    setViewerMode('image');handleSceneCommand({action:'request'});
+    const imageState=document.events.filter(e=>e.type==='anatomia:scene-state').at(-1).detail;
+    assert.equal(imageState.available,false);assert.equal(imageState.blocked,'image');assert.equal(imageState.snapshot,null);
+  `);
+});
+
+test('All scene presets show their exact source structures without moving geometry',({run})=>{
+  run(`
+    const transforms=meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|');
+    for(const preset of scenePresets){
+      handleSceneCommand({action:'preset',id:preset.id});
+      assert.equal(visibleSceneIds().sort().join(','),[...preset.ids].sort().join(','));
+      assert.equal(meshes.filter(m=>m.visible&&m.material.opacity===1).length,preset.ids.length);
+      assert.equal($('#system').value,'all');assert.equal(isolated,false);assert.ok(normalizeScene(sceneSnapshot()));
+      assert.equal(meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|'),transforms);
+      assert.ok(view.toRadius<=maxViewRadius());
+    }
+  `);
+});
+
+test('Visibility edits preserve the displayed set when leaving isolation, a filter or a pair',({run})=>{
+  run(`
+    select('heart');isolated=true;contextMode=true;applyAppearance();
+    handleSceneCommand({action:'visibility',id:'lungL',visible:true});
+    assert.equal(visibleSceneIds().sort().join(','),'heart,lungL');assert.equal(isolated,false);assert.equal(contextMode,false);assert.equal($('#system').value,'all');
+    applySystem('resp');handleSceneCommand({action:'visibility',id:'heart',visible:true});
+    assert.equal(visibleSceneIds().sort().join(','),'heart,lungL,lungR');
+    startComparison3D(['kidneyR','kidneyL']);handleSceneCommand({action:'visibility',id:'bladder',visible:true});
+    assert.equal(comparison3D,null);assert.equal(visibleSceneIds().sort().join(','),'bladder,kidneyL,kidneyR');
+  `);
+});
+
+test('Removing the selected or final visible structure keeps a valid nonempty scene',({run})=>{
+  run(`
+    handleSceneCommand({action:'preset',id:'urinary'});
+    selected='kidneyR';handleSceneCommand({action:'visibility',id:'kidneyR',visible:false});
+    assert.equal(selected,'kidneyL');assert.ok(normalizeScene(sceneSnapshot()));
+    handleSceneCommand({action:'visibility',id:'kidneyL',visible:false});assert.equal(selected,'bladder');
+    const before=JSON.stringify(sceneSnapshot());
+    handleSceneCommand({action:'visibility',id:'bladder',visible:false,requestId:'last'});
+    const result=document.events.filter(e=>e.type==='anatomia:scene-result').at(-1).detail;
+    assert.equal(result.ok,false);assert.equal(result.requestId,'last');assert.equal(JSON.stringify(sceneSnapshot()),before);
+    assert.equal(visibleSceneIds().join(','),'bladder');
+  `);
+});
+
+test('Applying a saved pair restores camera, layer settings and original model transforms',({run})=>{
+  run(`
+    startComparison3D(['lungR','lungL']);contextMode=true;contextOpacity=.24;showSkeleton=false;showLabels=true;
+    view.turn=null;view.theta=.6;view.phi=1.2;view.toRadius=1.3;view.toTarget.set(.2,1.1,-.3);
+    applyAppearance();const saved=sceneSnapshot();assert.ok(saved);
+    const transforms=meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|');
+    resetExperience();handleSceneCommand({action:'apply',snapshot:saved,requestId:'restore'});
+    const result=document.events.filter(e=>e.type==='anatomia:scene-result').at(-1).detail;
+    assert.equal(result.ok,true);assert.equal(result.requestId,'restore');assert.equal(JSON.stringify(sceneSnapshot()),JSON.stringify(saved));
+    assert.equal(view.radius,1.3);assert.equal(view.target.toArray().join(','),'0.2,1.1,-0.3');
+    assert.equal(showLabels,true);assert.equal(showSkeleton,false);assert.equal(contextOpacity,.24);
+    assert.equal(meshes.filter(m=>m.visible&&m.material.opacity===1).length,2);
+    assert.equal(meshes.map(m=>m.matrixWorld.toArray().join(',')).join('|'),transforms);
+  `);
+});
+
+test('Invalid or unavailable scene commands preserve active learning and camera state',({run})=>{
+  run(`
+    const saved=sceneSnapshot();const before=JSON.stringify(saved);
+    handleSceneCommand({action:'apply',snapshot:{...saved,camera:{...saved.camera,radius:Infinity}}});
+    assert.equal(JSON.stringify(sceneSnapshot()),before);
+    handleSceneCommand({action:'preset',id:'unknown'});assert.equal(JSON.stringify(sceneSnapshot()),before);
+    startQuiz('function',['heart']);answerChoice(0);const quizBefore=JSON.stringify(quiz),viewBefore=JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray()});
+    for(const request of [{action:'apply',snapshot:saved},{action:'preset',id:'urinary'},{action:'visibility',id:'heart',visible:false},{action:'view',value:'top'}])handleSceneCommand(request);
+    assert.equal(JSON.stringify(quiz),quizBefore);assert.equal(JSON.stringify({theta:view.theta,phi:view.phi,radius:view.toRadius,target:view.toTarget.toArray()}),viewBefore);
+    assert.equal(document.events.filter(e=>e.type==='anatomia:scene-state').at(-1).detail.blocked,'practice');
+    exitQuiz();xrActive=true;handleSceneCommand({action:'apply',snapshot:saved});assert.equal(document.events.filter(e=>e.type==='anatomia:scene-state').at(-1).detail.blocked,'vr');
+    xrActive=false;setViewerMode('image');handleSceneCommand({action:'apply',snapshot:saved});assert.equal(fallbackMode,true);
+  `);
+});
+
+test('Neighbour opacity stays within safe picking limits and resets before practice',({run})=>{
+  run(`
+    startComparison3D(['lungR','lungL']);handleSceneCommand({action:'context',value:true});
+    handleSceneCommand({action:'context-opacity',value:.3});assert.equal(contextOpacity,.3);
+    assert.equal(organMeshes.get('brain')[0].material.opacity,.3);
+    const ghost=organMeshes.get('brain')[0],target=organMeshes.get('lungL')[0];
+    raycaster.intersectObjects=()=>[{object:ghost,distance:1},{object:target,distance:2}];pick({clientX:400,clientY:300});assert.equal(selected,'lungL');
+    handleSceneCommand({action:'context-opacity',value:.31});assert.equal(contextOpacity,.3);
+    handleSceneCommand({action:'context-opacity',value:'0.1'});assert.equal(contextOpacity,.3);
+    startQuiz('find',['heart']);assert.equal(contextOpacity,.075);assert.equal(contextMode,false);assert.equal(hiddenOrgans.size,0);
+  `);
+});
+
+test('Six camera views report the right orientation and swap lateral markers behind the body',({run,node})=>{
+  for(const angle of ['front','right','back','left','top','bottom']){
+    run(`handleSceneCommand({action:'view',value:'${angle}'});for(let i=0;i<60;i++)cameraUpdate(1/60);assert.equal(currentAngle(),'${angle}');assert.ok(normalizeScene(sceneSnapshot()));`);
+    if(angle==='front'){assert.ok(node('.left-marker').innerHTML.startsWith('П'));assert.equal(node('.left-marker').style.opacity,'.8');}
+    else if(angle==='back'){assert.ok(node('.left-marker').innerHTML.startsWith('Л'));assert.ok(node('.right-marker').innerHTML.startsWith('П'));assert.equal(node('.left-marker').style.opacity,'.8');}
+    else assert.equal(node('.left-marker').style.opacity,'0');
+  }
+});
+
+test('A fitted custom scene survives portrait resize and visibility edits without a zoom jump',({run})=>{
+  run(`
+    handleSceneCommand({action:'preset',id:'all'});const initial=view.toRadius;
+    view.theta=1.1;view.phi=1.3;view.turn=null;renderer.setSize=()=>{};$('#viewport').clientHeight=800;
+    for(let width=780;width>=360;width-=20){$('#viewport').clientWidth=width;resize();}
+    assert.ok(Math.abs(camera.aspect/sceneFit.aspect-1)<=.08);assert.ok(view.toRadius>initial);assert.equal(view.theta,1.1);assert.equal(view.phi,1.3);
+    const cameraBefore=view.toRadius;handleSceneCommand({action:'visibility',id:'heart',visible:false});
+    assert.equal(view.toRadius,cameraBefore);assert.ok(maxViewRadius()>=cameraBefore);zoomViewer(1);assert.ok(Math.abs(view.toRadius-cameraBefore*.8)<1e-8);
+  `);
+});
+
+test('Shift and right-button panning move the target without rotating or selecting an organ',({run,node})=>{
+  run('let pickCount=0;pick=()=>{pickCount++};bindOrbit();');
+  const canvas=node('#test-canvas');
+  for(const mode of [{button:0,shiftKey:true},{button:2,shiftKey:false}]){
+    run('view.theta=.4;view.phi=1.2;view.toTarget.set(0,1.26,0);view.target.copy(view.toTarget);');
+    const event=(x,y)=>({pointerId:1,clientX:x,clientY:y,preventDefault(){},...mode});
+    canvas.dispatch('pointerdown',event(100,100));canvas.dispatch('pointermove',event(160,140));canvas.dispatch('pointerup',event(160,140));
+    run('assert.equal(pickCount,0);assert.equal(view.theta,.4);assert.equal(view.phi,1.2);assert.ok(view.toTarget.distanceTo(new THREE.Vector3(0,1.26,0))>.01);assert.ok(normalizeScene(sceneSnapshot()));');
+  }
+  run('panScene(1000000,-1000000);assert.ok(view.toTarget.x>=-5&&view.toTarget.x<=5);assert.ok(view.toTarget.y>=-2&&view.toTarget.y<=5);assert.ok(view.toTarget.z>=-5&&view.toTarget.z<=5);assert.ok(normalizeScene(sceneSnapshot()));');
+});
+
+
+test('Panning during a camera transition keeps both current and destination targets bounded',({run})=>{
+  run(`
+    view.target.set(0,1.2,0);view.toTarget.set(5,5,5);view.toRadius=3.7;
+    panScene(1000000,-1000000);
+    for(const target of [view.target,view.toTarget]){assert.ok(target.x>=-5&&target.x<=5);assert.ok(target.y>=-2&&target.y<=5);assert.ok(target.z>=-5&&target.z<=5);}
+    assert.equal(view.target.toArray().join(','),view.toTarget.toArray().join(','));
+    assert.ok(normalizeScene(sceneSnapshot()));
+  `);
+});
+
+test('Extreme narrow viewports keep focused views inside the shareable camera range',({run})=>{
+  run(`
+    camera.aspect=.01;startComparison3D(['brain','bladder']);
+    assert.equal(view.toRadius,25);assert.equal(maxViewRadius(),25);assert.ok(normalizeScene(sceneSnapshot()));
+    handleSceneCommand({action:'visibility',id:'heart',visible:true});assert.equal(view.toRadius,25);assert.equal(maxViewRadius(),25);
+    zoomViewer(1);assert.equal(view.toRadius,20);
+  `);
+});
+
+
+test('Scene selection focuses an organ without revealing unrelated hidden structures',({run})=>{
+  run(`
+    handleSceneCommand({action:'preset',id:'urinary'});handleSceneCommand({action:'select',id:'kidneyL'});
+    assert.equal(selected,'kidneyL');assert.equal(visibleSceneIds().sort().join(','),'bladder,kidneyL,kidneyR');
+    handleSceneCommand({action:'select',id:'heart'});assert.equal(selected,'heart');
+    assert.equal(visibleSceneIds().sort().join(','),'bladder,heart,kidneyL,kidneyR');
+    startComparison3D(['lungR','lungL']);handleSceneCommand({action:'select',id:'lungL'});
+    assert.equal(selected,'lungL');assert.equal(comparison3D.ids.join(','),'lungR,lungL');assert.equal(visibleSceneIds().length,2);
+    handleSceneCommand({action:'select',id:'airway'});assert.equal(comparison3D,null);assert.equal(selected,'airway');
+    assert.equal(visibleSceneIds().sort().join(','),'airway,lungL,lungR');assert.ok(normalizeScene(sceneSnapshot()));
+    startQuiz('function',['heart']);const before=JSON.stringify(quiz);handleSceneCommand({action:'select',id:'brain'});assert.equal(JSON.stringify(quiz),before);
   `);
 });
 

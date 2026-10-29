@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA · Колледж МЕДСИ</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.7.0"><link rel="stylesheet" href="./teaching.css?v=1.7.0"><link rel="stylesheet" href="./medsi.css?v=1.7.0"><link rel="stylesheet" href="./learning.css?v=1.7.0"><link rel="stylesheet" href="./workbench.css?v=1.7.0"><link rel="stylesheet" href="./practice-hub.css?v=1.7.0"><link rel="stylesheet" href="./recognition.css?v=1.7.0"><link rel="stylesheet" href="./progress-report.css?v=1.7.0"><link rel="stylesheet" href="./polish.css?v=1.7.0"></head>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="ANATOMIA: изучайте органы в 3D и VR. Визуальные маршруты, короткие задания и интерактивная физиология для медицинского колледжа."><title>ANATOMIA · Колледж МЕДСИ</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css?v=1.8.0"><link rel="stylesheet" href="./teaching.css?v=1.8.0"><link rel="stylesheet" href="./medsi.css?v=1.8.0"><link rel="stylesheet" href="./learning.css?v=1.8.0"><link rel="stylesheet" href="./workbench.css?v=1.8.0"><link rel="stylesheet" href="./practice-hub.css?v=1.8.0"><link rel="stylesheet" href="./recognition.css?v=1.8.0"><link rel="stylesheet" href="./progress-report.css?v=1.8.0"><link rel="stylesheet" href="./polish.css?v=1.8.0"><link rel="stylesheet" href="./scene-panel.css?v=1.8.0"></head>
 <body>
 <a class="skip-link" href="#detail">К карточке и заданию</a>
 <header class="topbar">
@@ -11,10 +11,10 @@
 <main class="workspace">
 <section class="stage" aria-label="Интерактивная анатомическая модель">
   <div class="stage-glow" aria-hidden="true"></div><div class="stage-grid" aria-hidden="true"></div>
-  <div id="viewport" tabindex="0" aria-label="3D модель. Стрелки — вращение, плюс и минус — масштаб, H — общий вид. WASD — прицел, Enter — выбор."></div>
+  <div id="viewport" tabindex="0" aria-label="3D модель. Перетаскивание — вращение; Shift или правая кнопка — перемещение. Стрелки — вращение, плюс и минус — масштаб, H — общий вид. WASD — прицел, Enter — выбор."></div>
   <div class="stage-caption"><span class="eyebrow" id="scene-mode">ИНТЕРАКТИВНЫЙ 3D-АТЛАС</span><h1 id="scene-heading">Исследуйте тело.</h1><p id="scene-subtitle">Коснитесь органа</p><div id="stage-quiz"></div></div>
   <div class="viewer-controls" role="group" aria-label="Режим просмотра"><div class="viewer-mode"><button id="view-3d" aria-pressed="true">3D</button><button id="view-image" aria-pressed="false">Изображение</button></div><button id="viewer-fullscreen" class="icon-button" aria-label="На весь экран" title="На весь экран" data-icon="focus"></button></div>
-  <label class="viewer-angle-control"><span class="sr-only">Ракурс</span><select id="viewer-angle" aria-label="Ракурс"><option value="free">Свободный</option><option value="front">Спереди</option><option value="right">Справа</option><option value="back">Сзади</option><option value="left">Слева</option></select></label>
+  <label class="viewer-angle-control"><span class="sr-only">Ракурс</span><select id="viewer-angle" aria-label="Ракурс"><option value="free">Свободный</option><option value="front">Спереди</option><option value="right">Справа</option><option value="back">Сзади</option><option value="left">Слева</option><option value="top">Сверху</option><option value="bottom">Снизу</option></select></label>
   <div class="view-badge"><span class="small-dot"></span><span id="view-name">ВИД СПЕРЕДИ</span></div>
   <button id="catalog-toggle" class="catalog-toggle" aria-expanded="false" aria-controls="catalog"><span data-icon="grid"></span><span>Органы</span><small>16</small></button>
   <div class="system-dock" role="group" aria-label="Быстрый выбор системы органов"><span>Системы организма</span>
@@ -27,7 +27,7 @@
     <button data-system="immune" aria-pressed="false" aria-label="Лимфатическая система">Лимфатическая</button>
     <button data-system="endocrine" aria-pressed="false" aria-label="Эндокринная система">Эндокринная</button>
   </div>
-  <div class="atlas-shortcuts" role="group" aria-label="Учебные инструменты"><button data-workbench="compare"><span data-icon="layers"></span><span>Сравнить органы<small>Вместе в 3D</small></span></button><button data-recognition="visual"><span data-icon="check"></span><span>Узнать по изображению<small>Проверить себя</small></span></button></div>
+  <div class="atlas-shortcuts" role="group" aria-label="Учебные инструменты"><button data-workbench="compare"><span data-icon="layers"></span><span>Сравнить органы<small>Вместе в 3D</small></span></button><button id="scene-tools-toggle" aria-expanded="false" aria-controls="scene-panel"><span data-icon="layers"></span><span>Настроить 3D-сцену<small>Органы · ракурсы · ссылка</small></span></button></div>
   <button id="scene-only" class="scene-only icon-button" title="Скрыть панели" aria-label="Скрыть панели" aria-pressed="false" data-icon="focus"></button>
   <div id="fallback-view" class="fallback-view" hidden><img id="fallback-image" decoding="async" alt="Статичный обзор исходной анатомической модели" width="720" height="900"><p id="fallback-caption"></p></div><div id="fallback-status" class="fallback-status" role="status" hidden><span>Резервный режим: карточки, тесты и расчёт доступны.</span><button id="retry-3d">Повторить 3D</button></div>
   <div id="labels" aria-hidden="true"></div><div id="keyboard-cursor" aria-hidden="true">+</div>
@@ -41,7 +41,7 @@
     <button id="labels-toggle" aria-pressed="false" title="Подписи" data-icon="labels" aria-label="Показать подписи"></button>
     <button id="rotate" aria-pressed="false" title="Автовращение" data-icon="play" aria-label="Автовращение"></button>
   </div>
-  <div class="stage-foot"><span>Потяните, чтобы повернуть</span><span class="model-tag">Z-ANATOMY / 3D</span></div>
+  <div class="stage-foot"><span>Потяните — вращение · Shift — перемещение</span><span class="model-tag">Z-ANATOMY / 3D</span></div>
   <div id="loading" class="loading"><div class="loader-ring"></div><b>ANATOMIA</b><span id="load-status">Загружаем анатомию…</span><button id="continue-flat">Продолжить без 3D</button><button id="retry" hidden>Повторить</button></div>
   <p class="education-label">Совместный проект с колледжем МЕДСИ · Учебная модель · не для диагностики</p>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -56,6 +56,6 @@
 <aside class="detail" id="detail" tabindex="-1" aria-label="Орган или учебное задание"><div id="organ-card"></div></aside>
 </main>
 <dialog id="modal" aria-label="Информация и учебные режимы"><button id="close-modal" class="close icon-button" aria-label="Закрыть" data-icon="close"></button><div id="modal-content"></div></dialog>
-<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.7.0"></script>
-<script type="module" src="./teaching.js?v=1.7.0"></script><script type="module" src="./learning.js?v=1.7.0"></script><script type="module" src="./workbench.js?v=1.7.0"></script><script type="module" src="./recognition.js?v=1.7.0"></script><script type="module" src="./progress-report.js?v=1.7.0"></script><script type="module" src="./entry.js?v=1.7.0"></script></body></html>
+<noscript>Для интерактивного атласа включите JavaScript.</noscript><script type="module" src="./app.js?v=1.8.0"></script>
+<script type="module" src="./teaching.js?v=1.8.0"></script><script type="module" src="./learning.js?v=1.8.0"></script><script type="module" src="./workbench.js?v=1.8.0"></script><script type="module" src="./recognition.js?v=1.8.0"></script><script type="module" src="./progress-report.js?v=1.8.0"></script><script type="module" src="./entry.js?v=1.8.0"></script><script type="module" src="./scene-panel.js?v=1.8.0"></script></body></html>
 

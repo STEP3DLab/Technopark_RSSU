@@ -1,12 +1,12 @@
 {
   "name": "anatomia-med-vr",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "type": "module",
   "private": true,
   "scripts": {
     "check": "node scripts/check.mjs && npm run check:study",
     "start": "python3 -m http.server 8080 --directory .",
-    "check:study": "node scripts/regression.mjs && node scripts/teaching-check.mjs && node scripts/brand-check.mjs && node scripts/learning-check.mjs && node scripts/workbench-check.mjs && node scripts/teaching-state-check.mjs && node scripts/recognition-check.mjs && node scripts/progress-report-check.mjs",
+    "check:study": "node scripts/regression.mjs && node scripts/teaching-check.mjs && node scripts/brand-check.mjs && node scripts/learning-check.mjs && node scripts/workbench-check.mjs && node scripts/teaching-state-check.mjs && node scripts/recognition-check.mjs && node scripts/progress-report-check.mjs && node scripts/scene-state-check.mjs",
     "build:offline": "node scripts/build-teaching-offline.mjs"
   }
 }

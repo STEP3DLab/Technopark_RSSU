@@ -1,0 +1,114 @@
+/* Non-modal 3D scene tools. The viewer stays available beside this panel. */
+#scene-panel{position:absolute;left:var(--rail-left,30px);top:139px;z-index:13;display:flex;flex-direction:column;width:318px;max-width:calc(100% - 32px);max-height:calc(100% - 215px);min-height:0;background:#fffffff8;color:#17384b;border:1px solid #b9d3dc;border-radius:20px;box-shadow:0 16px 48px #173c5324;backdrop-filter:blur(18px);overflow:hidden;font-family:var(--sans)}
+#scene-panel[hidden],#scene-panel [hidden]{display:none!important}
+#scene-panel *{box-sizing:border-box}
+#scene-panel :is(h2,h3,h4,p){margin:0}
+#scene-panel :is(button,input){font:inherit}
+#scene-panel button{min-height:42px;border:1px solid #bed4dc;border-radius:10px;color:#255365;background:#fff;line-height:1.45;cursor:pointer}
+#scene-panel button:hover:not(:disabled){background:#ecf7f5;border-color:#75b2b2}
+#scene-panel button:disabled{cursor:default;opacity:.46}
+#scene-panel :is(button,input,summary):focus-visible{outline:3px solid #04558a;outline-offset:3px}
+#scene-panel svg{width:18px;height:18px;flex-shrink:0}
+.sp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 17px 13px;background:linear-gradient(120deg,#edf8f5,#f4f6fb);flex:none}
+.sp-eyebrow{display:block;font-size:9px;font-weight:700;letter-spacing:1.3px;line-height:1.5;color:#087b7c}
+#scene-panel h2{font-size:20px;font-weight:600;letter-spacing:-.5px;line-height:1.25;margin-top:7px}
+#scene-panel .sp-close{width:44px;height:44px;flex-shrink:0;display:grid;place-items:center;padding:0;background:#fff}
+.sp-availability{padding:10px 17px;font-size:11px;line-height:1.5;color:#4c6976;border-top:1px solid #d7e7e9;border-bottom:1px solid #d7e7e9;background:#f6fafb;flex:none}
+.sp-availability.is-unavailable{background:#f7f5fb;color:#655878}
+.sp-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px 13px;border-bottom:1px solid #dae7ea;flex:none}
+#scene-panel .sp-tabs button{min-width:0;min-height:42px;padding:8px 6px;font-size:12px;text-align:center;border-color:transparent;background:#f3f7f8}
+#scene-panel .sp-tabs [aria-selected=true]{border-color:#3a9497;color:#066b71;background:#e6f4f2;font-weight:600}
+.sp-tabs span{display:inline-grid;place-items:center;font-size:9px;background:#fff;border-radius:6px;min-width:19px;height:19px;margin-left:3px}
+.sp-scroll{overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#a9c8d1 transparent;padding:15px 16px;min-height:70px;flex:1 1 auto}
+#scene-panel h3{font-size:12px;font-weight:700;letter-spacing:.1px;line-height:1.45;color:#244b5d}
+.sp-section-label,.sp-saved-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.sp-section-label>span,.sp-saved-heading>span{font-size:10px;color:#6a7e8b;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sp-presets{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:17px}
+#scene-panel .sp-presets button{min-width:0;padding:10px 9px;font-size:11px;text-align:left}
+#scene-panel .sp-presets [aria-pressed=true]{background:#e2f2ef;border-color:#399494;color:#066d72;font-weight:600}
+.sp-composition{border-top:1px solid #d7e7eb;border-bottom:1px solid #d7e7eb;padding:13px 0 6px}
+.sp-composition>summary{cursor:pointer;font-size:12px;font-weight:650;color:#244b5d;line-height:1.5;padding:0 0 6px}
+.sp-composition>summary>span{font-size:9px;font-weight:400;color:#71828b;margin-left:7px;white-space:nowrap}
+#scene-panel .sp-help{font-size:11px;color:#607a86;line-height:1.6;margin:5px 0 12px}
+.sp-organ-group{border:0;padding:0;margin:12px 0 8px;min-width:0}
+.sp-organ-group legend{font-size:9px;font-weight:600;line-height:1.5;letter-spacing:.2px;color:#6f7e89;padding:0 0 5px;max-width:100%}
+.sp-organ-row{display:grid;grid-template-columns:minmax(0,1fr) 39px;align-items:center;gap:3px;padding:1px 2px 1px 6px;margin:2px 0;border:1px solid transparent;border-radius:9px;background:#f7fafb}
+.sp-organ-row.is-selected{border-color:#9bc7cc;background:#ebf6f4;box-shadow:inset 3px 0 0 #087f83}
+.sp-organ-label{display:flex;align-items:center;gap:9px;min-height:51px;cursor:pointer;min-width:0;padding:6px 0}
+#scene-panel input[type=checkbox]{appearance:auto;width:17px;height:17px;min-width:17px;accent-color:#087f83;padding:0;margin:0;flex-shrink:0;cursor:pointer}
+#scene-panel input:disabled{cursor:default;opacity:.5}
+.sp-organ-label>span{min-width:0}
+.sp-organ-label b{display:block;font-size:11px;font-weight:500;line-height:1.45;overflow-wrap:anywhere}
+.sp-organ-label small{display:block;font:italic 10px/1.4 Georgia,serif;color:#7b7091;margin-top:2px;overflow-wrap:anywhere}
+#scene-panel .sp-select-organ{display:grid;place-items:center;min-height:39px;width:39px;border-color:transparent;background:transparent;padding:0}
+.sp-select-organ svg{width:16px!important;height:16px!important;opacity:.8}
+.sp-camera{padding:0 0 4px;margin-bottom:14px}
+.sp-views{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:10px 0}
+#scene-panel .sp-views button{font-size:10px;padding:7px 3px;min-height:39px}
+#scene-panel .sp-fit{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;font-size:11px;padding:9px}
+.sp-context{border-top:1px solid #d7e7eb;margin-top:17px;padding:15px 0 3px}
+.sp-context-switch{display:flex;align-items:center;gap:9px;font-size:11px;line-height:1.5;margin-top:9px;min-height:39px;cursor:pointer}
+.sp-range-label{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:#55717e;margin-top:12px;line-height:1.5}
+.sp-range-label output{font-variant-numeric:tabular-nums;color:#087f83;font-weight:600}
+#scene-panel input[type=range]{width:100%;height:32px;padding:0;margin:3px 0 0;accent-color:#087f83;background:transparent;border:0;cursor:pointer}
+#scene-panel input[type=range]:disabled{cursor:default}
+.sp-shared{padding:13px;border:1px solid #b6d2d6;background:#eff8f6;border-radius:12px;margin-bottom:17px}
+#scene-panel .sp-shared p{font-size:11px;line-height:1.6;color:#476672;margin:7px 0 11px}
+.sp-shared>div{display:flex;gap:6px;flex-wrap:wrap}
+#scene-panel .sp-shared button{font-size:10px;padding:8px 10px;min-height:38px}
+#scene-panel .sp-primary{display:flex;align-items:center;justify-content:center;gap:8px;background:#087f83;border-color:#087f83;color:#fff;font-weight:600}
+#scene-panel .sp-primary:hover:not(:disabled){background:#066d72;color:#fff}
+#scene-panel .sp-saved-intro{margin:0 0 13px}
+#scene-save-form{padding:13px;background:#f1f8f8;border:1px solid #d1e4e6;border-radius:12px;margin-bottom:19px}
+#scene-save-form label{font-size:11px;font-weight:600;display:block;margin-bottom:7px}
+#scene-panel input[type=text],#scene-panel input:not([type]){width:100%;min-width:0;min-height:43px;padding:9px 10px;font-size:12px;border:1px solid #b7d0d8;border-radius:8px;color:#244b5d;background:#fff}
+#scene-save-form button{width:100%;min-height:44px;padding:9px;font-size:11px;margin-top:9px}
+.sp-empty{text-align:center;padding:19px 13px;border:1px dashed #bed5dd;border-radius:12px;background:#fbfdfd}
+.sp-empty>span{display:block;color:#4a9b9c;margin-bottom:8px}
+.sp-empty b{font-size:12px;color:#325c69}
+#scene-panel .sp-empty p{font-size:11px;line-height:1.6;color:#6e838c;margin-top:7px}
+.sp-saved-item{border:1px solid #ccdfe4;border-radius:12px;padding:13px;margin:9px 0;background:#fff}
+#scene-panel .sp-saved-item h4{font-size:13px;line-height:1.5;font-weight:600;color:#234d5c;overflow-wrap:anywhere}
+.sp-saved-meta{display:flex;justify-content:space-between;align-items:center;gap:7px;margin:3px 0 8px}
+#scene-panel .sp-saved-meta>p{font-size:10px;color:#7a8890;line-height:1.5}
+#scene-panel .sp-rename{font-size:10px;min-height:34px;padding:4px 2px;flex-shrink:0;border-color:transparent;background:transparent;color:#387983}
+.sp-rename-form{padding:10px;border:1px solid #bad5db;border-radius:9px;background:#f4faf9;margin-top:9px}
+.sp-rename-form label{display:block;font-size:10px;font-weight:600;margin-bottom:7px}
+.sp-rename-form>div{display:flex;gap:7px;margin-top:8px}
+#scene-panel .sp-rename-form button{font-size:10px;padding:6px 11px;min-height:38px}
+.sp-saved-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;gap:6px}
+#scene-panel .sp-saved-actions button{display:flex;align-items:center;justify-content:center;gap:4px;font-size:10px;min-width:0;padding:6px;min-height:38px}
+#scene-panel .sp-saved-actions [data-saved-action=apply]{background:#edf6f4;border-color:#b7d7d6;color:#08757a;font-weight:600}
+.sp-saved-actions svg{width:14px!important;height:14px!important}
+#scene-panel .sp-saved-actions .sp-delete{border-color:transparent;color:#8c7474;background:transparent}
+.sp-delete-confirm{padding:9px;border:1px solid #e1c6bd;background:#fff9f6;border-radius:9px;margin-top:9px}
+#scene-panel .sp-delete-confirm p{font-size:11px;line-height:1.5;color:#805c50;margin-bottom:8px}
+.sp-delete-confirm>div{display:flex;gap:7px}
+#scene-panel .sp-delete-confirm button{font-size:10px;padding:6px 12px;min-height:38px}
+#scene-panel .sp-storage-note{font-size:10px;line-height:1.6;color:#768893;margin:14px 0 2px}
+.sp-share-result{padding:13px;background:#f3f7fb;border:1px solid #cbdce6;border-radius:11px;margin-top:16px}
+.sp-share-result label{display:block;font-size:10px;font-weight:600;line-height:1.5;margin-bottom:7px}
+#scene-panel .sp-share-result input{font-size:10px!important}
+#scene-panel .sp-share-result p{font-size:10px;line-height:1.6;color:#657b8c;margin-top:8px}
+.sp-foot{flex:none;padding:10px 13px 11px;border-top:1px solid #d5e4e8;background:#f5fafb}
+#scene-panel .sp-foot>button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:43px;font-size:11px;padding:7px;color:#066d76;background:#fff}
+#scene-panel-message{font-size:11px;line-height:1.5;color:#476878;margin:8px 2px 0!important;overflow-wrap:anywhere;max-height:90px;overflow:auto}
+#scene-panel-message:empty{display:none}
+.scene-panel-open .stage :is(.system-dock,.catalog-toggle,.atlas-shortcuts){visibility:hidden}
+.in-comparison3d:not(.only-scene) .atlas-shortcuts{display:grid}
+.in-comparison3d .atlas-shortcuts>button:not(#scene-tools-toggle){display:none}
+.only-scene #scene-panel{display:none}
+@media(max-width:1100px) and (min-width:701px){.scene-panel-open .detail{visibility:hidden}#scene-panel{width:300px}}
+@media(max-height:720px) and (min-width:701px){#scene-panel{top:105px;max-height:calc(100% - 162px)}.sp-head{padding:13px 15px 10px}.sp-availability{padding:8px 15px}.sp-tabs{padding:8px 11px}.sp-scroll{padding:12px 15px}}
+@media(max-width:700px){#scene-panel{position:fixed;top:auto;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));width:auto;max-width:none;max-height:53dvh;z-index:20;border-radius:20px}.sp-head{padding:14px 15px 11px}.sp-head h2{font-size:19px!important}.sp-availability{font-size:11px;padding:8px 15px}.sp-tabs{padding:8px 11px}.sp-scroll{padding:13px 15px}.sp-organ-label b{font-size:12px}.sp-organ-label small{font-size:11px}.sp-organ-label{min-height:52px}.sp-organ-row{grid-template-columns:minmax(0,1fr) 42px}#scene-panel .sp-select-organ{min-height:44px;width:42px}.sp-presets{gap:7px}#scene-panel .sp-presets button{font-size:12px;min-height:44px}#scene-panel .sp-views button{font-size:11px;min-height:42px}#scene-panel input:not([type]),#scene-panel input[type=text]{font-size:16px}.sp-foot{padding:9px 12px}.sp-foot>button{min-height:42px!important}.sp-tabs button{min-height:40px!important}.scene-panel-open .stage-caption{max-width:calc(100% - 72px)}}
+@media(prefers-reduced-motion:reduce){#scene-panel *,#scene-panel *::before,#scene-panel *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Keep one compact scene action beside the centred mobile angle selector. */
+@media(max-width:700px){
+  body:not(.fallback-mode):not(.only-scene):not(.in-practice):not(.in-lesson):not(.in-physio) .atlas-shortcuts{display:block;position:absolute;inset:auto auto 83px 12px;width:64px;max-width:none;margin:0}
+  body:not(.fallback-mode) .atlas-shortcuts>button:not(#scene-tools-toggle){display:none}
+  body:not(.fallback-mode) .atlas-shortcuts #scene-tools-toggle{display:flex;align-items:center;justify-content:center;gap:0;width:64px;min-height:44px;padding:8px 4px;font-size:12px;line-height:1.35}
+  body:not(.fallback-mode) .atlas-shortcuts #scene-tools-toggle>span{display:none}
+  body:not(.fallback-mode) .atlas-shortcuts #scene-tools-toggle::after{content:'Сцена'}
+  body:not(.fallback-mode):is(.only-scene,.in-practice,.in-lesson,.in-physio) .atlas-shortcuts{display:none}
+}
+@media(forced-colors:active){#scene-panel{background:Canvas;color:CanvasText;border:1px solid CanvasText}.sp-head,.sp-availability,.sp-foot,.sp-shared{background:Canvas;color:CanvasText}#scene-panel button,.sp-organ-row,.sp-saved-item{border:1px solid ButtonText}#scene-panel .sp-primary{background:Highlight;color:HighlightText}.sp-organ-row.is-selected{outline:1px solid Highlight}.sp-tabs [aria-selected=true]{outline:2px solid Highlight}}
